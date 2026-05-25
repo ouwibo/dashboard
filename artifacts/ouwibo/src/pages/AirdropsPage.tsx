@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import {
   useListAirdrops, getListAirdropsQueryKey,
   useCreateAirdrop, useUpdateAirdrop, useDeleteAirdrop,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Plus, Zap, CheckCircle, Trash2, Pencil, Search, Globe, Twitter, Send, Star, ExternalLink, Users, ListChecks, TrendingUp, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Zap, CheckCircle, Trash2, Pencil, Search, Globe, Twitter, Send, Star, ExternalLink, Users, ListChecks, TrendingUp, ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { mockApi, isDemoMode } from "@/lib/demoMode";
 
 const MONO    = "'Space Mono', monospace";
 const DISPLAY = "'Unbounded', sans-serif";
@@ -34,6 +35,32 @@ const CATEGORIES = ["defi","nft","layer1","layer2","gaming","dao","infrastructur
 const CHAINS = ["ETH","SOL","BNB","ARB","OP","BASE","APT","SUI","AVAX","MATIC","HYP","MON","BERA","HYP"];
 const STATUSES = ["active","upcoming","ended","potential"];
 const DIFFICULTIES = ["easy","medium","hard"];
+
+interface Airdrop {
+  id: number;
+  name: string;
+  slug: string;
+  description: string | null;
+  logoColor: string;
+  logoInitial: string;
+  websiteUrl: string | null;
+  twitterUrl: string | null;
+  telegramUrl: string | null;
+  discordUrl: string | null;
+  category: string;
+  chain: string;
+  status: string;
+  rewardEstimate: string | null;
+  totalValue: string | null;
+  difficulty: string;
+  isFeatured: boolean;
+  isVerified: boolean;
+  participantsCount: number;
+  taskCount: number;
+  startDate: string | null;
+  endDate: string | null;
+  createdAt: string;
+}
 
 interface AirdropForm {
   name: string; slug: string; description: string; logoColor: string; logoInitial: string;
@@ -166,6 +193,7 @@ function AirdropFormDialog({ open, onClose, form, setForm, onSubmit, isPending, 
 }
 
 export default function AirdropsPage() {
+  const [demoMode, setDemoMode] = useState(false);
   const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");
   const [search, setSearch] = useState("");
   const [showCreate, setShowCreate] = useState(false);
@@ -174,10 +202,38 @@ export default function AirdropsPage() {
   const [editForm, setEditForm] = useState<AirdropForm>(DEFAULT);
   const [sortField, setSortField] = useState<SortField>("rank");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
+  
+  // Local state for demo mode
+  const [localAirdrops, setLocalAirdrops] = useState<Airdrop[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
+  // Check demo mode on mount
+  useEffect(() => {
+    isDemoMode().then(setDemoMode);
+  }, []);
+
+  // Load data on mount and when filters change
+  useEffect(() => {
+    async function loadData() {
+      setIsLoading(true);
+      try {
+        if (demoMode) {
+          const params = filterStatus === "all" ? (search ? { search } : undefined) : (search ? { status: filterStatus, search } : { status: filterStatus });
+          const data = await mockApi.listAirdrops(params as Record<string, string>);
+          setLocalAirdrops(data as Airdrop[]);
+        }
+      } catch (error) {
+        console.error("Failed to load airdrops:", error);
+      }
+      setIsLoading(false);
+    }
+    loadData();
+  }, [demoMode, filterStatus, search]);
+
+  // React-query hooks for production mode
   const params = filterStatus === "all" ? (search ? { search } : undefined) : (search ? { status: filterStatus, search } : { status: filterStatus });
-  const { data: airdrops, isLoading } = useListAirdrops(params, {
-    query: { queryKey: getListAirdropsQueryKey(params) }
+  const { data: queryAirdrops } = useListAirdrops(demoMode ? false : params, {
+    query: { queryKey: getListAirdropsQueryKey(params), enabled: !demoMode }
   });
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -186,37 +242,85 @@ export default function AirdropsPage() {
   const updateAirdrop = useUpdateAirdrop();
   const deleteAirdrop = useDeleteAirdrop();
 
+  const airdrops = demoMode ? localAirdrops : queryAirdrops;
+
   function invalidate() {
-    queryClient.invalidateQueries({ queryKey: ["listAirdrops"] });
-    queryClient.invalidateQueries({ queryKey: getListAirdropsQueryKey() });
+    if (demoMode) {
+      // Reload local data
+      mockApi.listAirdrops(filterStatus === "all" ? undefined : { status: filterStatus }).then(data => {
+        setLocalAirdrops(data as Airdrop[]);
+      });
+    } else {
+      queryClient.invalidateQueries({ queryKey: ["listAirdrops"] });
+      queryClient.invalidateQueries({ queryKey: getListAirdropsQueryKey() });
+    }
   }
 
-  function handleCreate() {
-    createAirdrop.mutate(
-      { data: { ...createForm, isFeatured: createForm.isFeatured, isVerified: createForm.isVerified, category: createForm.category as "defi", chain: createForm.chain, status: createForm.status as "active", difficulty: createForm.difficulty as "easy" } as Parameters<typeof createAirdrop.mutate>[0]["data"] },
-      {
-        onSuccess: () => { invalidate(); setShowCreate(false); setCreateForm(DEFAULT); toast({ title: "Airdrop added!" }); },
-        onError: () => toast({ title: "Failed to add", variant: "destructive" }),
+  async function handleCreate() {
+    if (demoMode) {
+      try {
+        await mockApi.createAirdrop({
+          ...createForm,
+          category: createForm.category,
+          chain: createForm.chain,
+          status: createForm.status,
+          difficulty: createForm.difficulty,
+        });
+        setShowCreate(false);
+        setCreateForm(DEFAULT);
+        invalidate();
+        toast({ title: "Airdrop added!" });
+      } catch {
+        toast({ title: "Failed to add", variant: "destructive" });
       }
-    );
+    } else {
+      createAirdrop.mutate(
+        { data: { ...createForm, isFeatured: createForm.isFeatured, isVerified: createForm.isVerified, category: createForm.category as "defi", chain: createForm.chain, status: createForm.status as "active", difficulty: createForm.difficulty as "easy" } as Parameters<typeof createAirdrop.mutate>[0]["data"] },
+        {
+          onSuccess: () => { invalidate(); setShowCreate(false); setCreateForm(DEFAULT); toast({ title: "Airdrop added!" }); },
+          onError: () => toast({ title: "Failed to add", variant: "destructive" }),
+        }
+      );
+    }
   }
 
-  function handleEdit() {
+  async function handleEdit() {
     if (!editingId) return;
-    updateAirdrop.mutate(
-      { id: editingId, data: { ...editForm } as Parameters<typeof updateAirdrop.mutate>[0]["data"] },
-      {
-        onSuccess: () => { invalidate(); setEditingId(null); toast({ title: "Updated!" }); },
-        onError: () => toast({ title: "Failed to update", variant: "destructive" }),
+    if (demoMode) {
+      try {
+        await mockApi.updateAirdrop(editingId, editForm);
+        setEditingId(null);
+        invalidate();
+        toast({ title: "Updated!" });
+      } catch {
+        toast({ title: "Failed to update", variant: "destructive" });
       }
-    );
+    } else {
+      updateAirdrop.mutate(
+        { id: editingId, data: { ...editForm } as Parameters<typeof updateAirdrop.mutate>[0]["data"] },
+        {
+          onSuccess: () => { invalidate(); setEditingId(null); toast({ title: "Updated!" }); },
+          onError: () => toast({ title: "Failed to update", variant: "destructive" }),
+        }
+      );
+    }
   }
 
-  function handleDelete(id: number, name: string) {
-    deleteAirdrop.mutate({ id }, {
-      onSuccess: () => { invalidate(); toast({ title: `"${name}" removed` }); },
-      onError: () => toast({ title: "Failed to delete", variant: "destructive" }),
-    });
+  async function handleDelete(id: number, name: string) {
+    if (demoMode) {
+      try {
+        await mockApi.deleteAirdrop(id);
+        invalidate();
+        toast({ title: `"${name}" removed` });
+      } catch {
+        toast({ title: "Failed to delete", variant: "destructive" });
+      }
+    } else {
+      deleteAirdrop.mutate({ id }, {
+        onSuccess: () => { invalidate(); toast({ title: `"${name}" removed` }); },
+        onError: () => toast({ title: "Failed to delete", variant: "destructive" }),
+      });
+    }
   }
 
   function handleSort(field: SortField) {
@@ -261,6 +365,15 @@ export default function AirdropsPage() {
 
   return (
     <div>
+      {/* Demo Mode Banner */}
+      {demoMode && (
+        <div className="mb-4 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-100 text-amber-800 border-2 border-amber-300"
+          style={{ fontFamily: MONO, fontSize: "0.72rem" }}>
+          <AlertCircle size={14} className="shrink-0" />
+          <span><strong>Demo Mode</strong> — Showing sample data. Connect a backend API for live data.</span>
+        </div>
+      )}
+      
       {/* Header */}
       <div className="flex items-end justify-between mb-6">
         <div>
@@ -431,6 +544,12 @@ export default function AirdropsPage() {
 
       <AirdropFormDialog open={showCreate} onClose={() => setShowCreate(false)} form={createForm} setForm={setCreateForm} onSubmit={handleCreate} isPending={createAirdrop.isPending} mode="create" />
       {editingId !== null && <AirdropFormDialog open={true} onClose={() => setEditingId(null)} form={editForm} setForm={setEditForm} onSubmit={handleEdit} isPending={updateAirdrop.isPending} mode="edit" />}
+      {demoMode && (
+        <div className="flex items-center gap-2 bg-amber-500 text-white px-3 py-1.5 rounded-full border-2 border-amber-600 mt-4">
+          <AlertCircle size={12} className="flex-shrink-0" />
+          <span className="text-sm">Demo Mode — Showing sample data. Connect a backend API for live data.</span>
+        </div>
+      )}
     </div>
   );
 }
