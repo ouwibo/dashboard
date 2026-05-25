@@ -1,4 +1,3 @@
-import { Zap, TrendingUp, Clock, CheckCircle, Star, Globe, Twitter, Send, ExternalLink } from "lucide-react";
 import { Link } from "wouter";
 import { cn } from "@/lib/utils";
 import { mockAirdrops, mockActivity } from "@/lib/mockData";
@@ -6,192 +5,379 @@ import { mockAirdrops, mockActivity } from "@/lib/mockData";
 const MONO    = "'Space Mono', monospace";
 const DISPLAY = "'Unbounded', sans-serif";
 
-const PASTEL = { sky: "#b8d8f0", mint: "#b8e8c8", peach: "#f0c4a8", lavender: "#d4c0f0", yellow: "#f0e0a0", sage: "#c8dcc0" };
-const STATUS_STYLE: Record<string, { bg: string; label: string }> = {
-  active:    { bg: PASTEL.mint,     label: "Active"    },
-  upcoming:  { bg: PASTEL.yellow,   label: "Upcoming"  },
-  ended:     { bg: PASTEL.sage,     label: "Ended"     },
-  potential: { bg: PASTEL.lavender, label: "Potential" },
+const STATUS_COLOR: Record<string, { bg: string; text: string; label: string }> = {
+  active:    { bg: "#b8e8c8", text: "#0a5c2e", label: "Active"    },
+  upcoming:  { bg: "#f0e0a0", text: "#5c3d0a", label: "Upcoming"  },
+  ended:     { bg: "#c8dcc0", text: "#2d3d2a", label: "Ended"     },
+  potential: { bg: "#d4c0f0", text: "#3c1a7a", label: "Potential" },
 };
-const DIFF_STYLE: Record<string, string> = { easy: PASTEL.mint, medium: PASTEL.yellow, hard: PASTEL.peach };
-const ACT_STYLE: Record<string, string> = { airdrop_added: PASTEL.sky, airdrop_updated: PASTEL.yellow };
+
+const DIFF_BG: Record<string, string> = {
+  easy:   "#b8e8c8",
+  medium: "#f0e0a0",
+  hard:   "#f0c4a8",
+};
+
+/* Wave SVG decoration for cards/sections */
+const WaveSection = ({ color = "hsl(var(--primary)/0.12)" }: { color?: string }) => (
+  <div style={{ position: "relative", height: 60, overflow: "hidden", marginTop: -2 }}>
+    <svg preserveAspectRatio="none" viewBox="0 24 150 28"
+      style={{ position: "absolute", bottom: 0, width: "100%", height: "100%" }}>
+      <defs>
+        <path id="wv" d="M-160 44c30 0 58-18 88-18s58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"/>
+      </defs>
+      <g>
+        <use xlinkHref="#wv" x="48" y="0" fill={color}/>
+        <use xlinkHref="#wv" x="48" y="3" fill={color} style={{ opacity: 0.7 }}/>
+        <use xlinkHref="#wv" x="48" y="5" fill={color} style={{ opacity: 0.5 }}/>
+      </g>
+    </svg>
+  </div>
+);
+
+/* Inline SVG icons */
+const IconZap = ({ size = 16 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+  </svg>
+);
+
+const IconActivity = ({ size = 16 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+  </svg>
+);
+
+const IconStar = ({ size = 14 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+  </svg>
+);
+
+const IconCheck = ({ size = 14 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 6L9 17l-5-5"/>
+  </svg>
+);
+
+const IconClock = ({ size = 14 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"/>
+    <polyline points="12 6 12 12 16 14"/>
+  </svg>
+);
+
+const IconTrend = ({ size = 14 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+    <polyline points="17 6 23 6 23 12"/>
+  </svg>
+);
+
+const IconLink = ({ size = 14 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+  </svg>
+);
+
+/* Greeting based on time */
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 4)  return "🌙 Sweet Dreams!";
+  if (h < 12) return "☀️ Good Morning!";
+  if (h < 17) return "🌤 Good Afternoon!";
+  if (h < 22) return "🌆 Good Evening!";
+  return "🌃 Good Night!";
+}
 
 export default function DashboardPage() {
-  // Calculate stats from mock data
-  const stats = {
-    totalAirdrops: mockAirdrops.length,
-    activeAirdrops: mockAirdrops.filter(a => a.status === "active").length,
-    upcomingAirdrops: mockAirdrops.filter(a => a.status === "upcoming").length,
-    totalTasks: mockAirdrops.reduce((sum, a) => sum + a.taskCount, 0),
-  };
+  const active    = mockAirdrops.filter(a => a.status === "active");
+  const upcoming  = mockAirdrops.filter(a => a.status === "upcoming");
+  const featured  = mockAirdrops.filter(a => a.isFeatured);
+  const totalTasks = mockAirdrops.reduce((s, a) => s + (a.taskCount ?? 0), 0);
 
-  const featured = mockAirdrops.filter(a => a.isFeatured);
-  const active = mockAirdrops.filter(a => a.status === "active");
-  const activity = mockActivity;
-
-  const STAT_CARDS = [
-    { label: "Total Airdrops", value: stats.totalAirdrops, icon: Zap, bg: PASTEL.sky },
-    { label: "Active Now", value: stats.activeAirdrops, icon: TrendingUp, bg: PASTEL.mint },
-    { label: "Upcoming", value: stats.upcomingAirdrops, icon: Clock, bg: PASTEL.yellow },
-    { label: "Tasks Tracked", value: stats.totalTasks, icon: CheckCircle, bg: PASTEL.lavender },
+  const STATS = [
+    { label: "Total Airdrops", value: mockAirdrops.length, icon: <IconZap />,      bg: "#b8d8f0", },
+    { label: "Active",         value: active.length,       icon: <IconTrend />,    bg: "#b8e8c8", },
+    { label: "Upcoming",       value: upcoming.length,     icon: <IconClock />,    bg: "#f0e0a0", },
+    { label: "Tasks Tracked",  value: totalTasks,          icon: <IconActivity />, bg: "#d4c0f0", },
   ];
 
   return (
     <div>
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="w-8 h-8 rounded-xl bg-primary border-2 border-foreground flex items-center justify-center"
-            style={{ boxShadow: "2px 2px 0 hsl(var(--foreground))" }}>
-            <Zap size={14} fill="white" color="white" />
+      {/* ── Hero header with wave ── */}
+      <div className="relative overflow-hidden rounded-3xl mb-8"
+        style={{ border: "2px solid hsl(var(--border))", boxShadow: "4px 4px 0 hsl(var(--border))" }}>
+        <div style={{
+          background: "linear-gradient(135deg, hsl(var(--primary)/0.15) 0%, hsl(var(--primary)/0.05) 100%)",
+          padding: "32px 28px 0",
+        }}>
+          <div style={{ fontFamily: MONO, fontSize: "0.7rem", opacity: 0.6, marginBottom: 6 }}>
+            {getGreeting()} · {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
           </div>
-          <span className="px-2.5 py-0.5 rounded-full border-2 border-foreground/25 bg-primary text-white"
-            style={{ fontFamily: MONO, fontSize: "0.6rem", fontWeight: 700 }}>
-            LIVE TRACKER
-          </span>
+          <h1 style={{ fontFamily: DISPLAY, fontSize: "1.6rem", fontWeight: 700, lineHeight: 1.2, marginBottom: 8 }}>
+            Ouwibo Dashboard
+          </h1>
+          <p style={{ fontFamily: MONO, fontSize: "0.68rem", opacity: 0.6, marginBottom: 4 }}>
+            Track airdrops · Complete tasks · Earn rewards
+          </p>
         </div>
-        <h1 style={{ fontFamily: DISPLAY, fontSize: "1.6rem", fontWeight: 700, lineHeight: 1.1 }}>
-          Airdrop Dashboard
-        </h1>
-        <p className="text-muted-foreground mt-1" style={{ fontFamily: MONO, fontSize: "0.7rem" }}>
-          Track, complete tasks, and earn from the best crypto airdrops
-        </p>
+        <WaveSection />
       </div>
 
-      {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {STAT_CARDS.map(card => (
-          <div key={card.label} className="neo-card p-5" style={{ backgroundColor: card.bg }}>
-            <div className="flex items-start justify-between mb-3">
-              <p style={{ fontFamily: MONO, fontSize: "0.58rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.07em" }} className="text-foreground/60">{card.label}</p>
-              <div className="w-7 h-7 rounded-xl border-2 border-foreground/20 flex items-center justify-center bg-white/40">
-                <card.icon size={13} className="text-foreground/70" />
-              </div>
+      {/* ── Stat cards ── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {STATS.map((s, i) => (
+          <div key={i} className="neo-card p-5 relative overflow-hidden"
+            style={{ backgroundColor: s.bg }}>
+            {/* Dot decoration (from Blogger template) */}
+            <div style={{
+              position: "absolute", bottom: -12, left: -12,
+              width: 60, height: 60, borderRadius: "50%",
+              background: "rgba(0,0,0,0.06)",
+            }}/>
+            <div style={{ color: "#08102b", opacity: 0.55, marginBottom: 8 }}>{s.icon}</div>
+            <div style={{ fontFamily: DISPLAY, fontSize: "1.6rem", fontWeight: 700, color: "#08102b", lineHeight: 1 }}>
+              {s.value}
             </div>
-            <p style={{ fontFamily: DISPLAY, fontSize: "2rem", fontWeight: 700, lineHeight: 1 }}>{card.value}</p>
+            <div style={{ fontFamily: MONO, fontSize: "0.58rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "#08102b", opacity: 0.65, marginTop: 4 }}>
+              {s.label}
+            </div>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Featured airdrops */}
-        <div className="lg:col-span-2 neo-card p-5">
-          <div className="flex items-center justify-between mb-4">
-            <p style={{ fontFamily: DISPLAY, fontSize: "0.85rem", fontWeight: 700 }}>
-              ⭐ Featured Airdrops
-            </p>
-            <Link href="/airdrops"
-              className="flex items-center gap-1 text-primary hover:underline"
-              style={{ fontFamily: MONO, fontSize: "0.62rem", fontWeight: 700 }}>
-              View All <ExternalLink size={11} />
-            </Link>
-          </div>
-          {featured.length > 0 ? (
-            <div className="space-y-2">
-              {featured.slice(0, 5).map((airdrop, idx) => {
-                const st = STATUS_STYLE[airdrop.status] ?? { bg: PASTEL.sage, label: airdrop.status };
-                return (
-                  <Link href={`/airdrops/${airdrop.id}`} key={airdrop.id}>
-                    <div className="flex items-center gap-3 p-3 rounded-2xl border-2 border-foreground/10 hover:border-foreground/30 transition-all cursor-pointer"
-                      style={{ backgroundColor: idx % 2 === 0 ? "rgba(255,255,255,0.03)" : "transparent" }}>
-                      <div className="w-9 h-9 rounded-xl border-2 border-foreground/20 flex items-center justify-center text-white font-bold shrink-0"
-                        style={{ backgroundColor: airdrop.logoColor, fontFamily: DISPLAY, fontSize: "0.8rem", boxShadow: "2px 2px 0 rgba(0,0,0,0.15)" }}>
-                        {airdrop.logoInitial}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <p className="font-bold text-sm truncate" style={{ fontFamily: DISPLAY, fontSize: "0.78rem" }}>{airdrop.name}</p>
-                          {airdrop.isVerified && <CheckCircle size={11} className="text-primary shrink-0" />}
-                        </div>
-                        <p className="text-muted-foreground" style={{ fontFamily: MONO, fontSize: "0.6rem" }}>{airdrop.chain} · {airdrop.category}</p>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <p className="font-bold text-sm text-primary" style={{ fontFamily: MONO, fontSize: "0.7rem" }}>{airdrop.rewardEstimate ?? "TBD"}</p>
-                        <span className="px-2 py-0.5 rounded-full border-2 border-foreground/20 text-foreground/70"
-                          style={{ backgroundColor: st.bg, fontFamily: MONO, fontSize: "0.58rem", fontWeight: 700 }}>
-                          {st.label}
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        {/* ── Featured Airdrops ── */}
+        <div className="xl:col-span-2">
+          <div className="neo-card overflow-hidden">
+            {/* Card header */}
+            <div className="flex items-center justify-between px-6 py-4"
+              style={{ borderBottom: "2px solid hsl(var(--border))" }}>
+              <div className="flex items-center gap-2">
+                <IconStar size={16} />
+                <span style={{ fontFamily: DISPLAY, fontSize: "0.85rem", fontWeight: 700 }}>
+                  Featured Airdrops
+                </span>
+              </div>
+              <Link href="/airdrops"
+                style={{ fontFamily: MONO, fontSize: "0.62rem", fontWeight: 700, color: "hsl(var(--primary))" }}>
+                View all →
+              </Link>
             </div>
-          ) : (
-            <p className="text-muted-foreground text-center py-8" style={{ fontFamily: MONO, fontSize: "0.7rem" }}>No featured airdrops</p>
+
+            {featured.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16" style={{ opacity: 0.4 }}>
+                <IconZap size={32} />
+                <div style={{ fontFamily: MONO, fontSize: "0.7rem", marginTop: 12 }}>No featured airdrops yet</div>
+              </div>
+            ) : (
+              <div>
+                {featured.slice(0, 5).map((a, idx) => {
+                  const st = STATUS_COLOR[a.status] ?? STATUS_COLOR.ended;
+                  const diff = DIFF_BG[a.difficulty] ?? "#e6e6e6";
+                  return (
+                    <Link href={`/airdrops/${a.id}`} key={a.id}>
+                      <div
+                        className="flex items-center gap-4 px-6 py-3.5 hover:bg-muted/60 transition-colors cursor-pointer"
+                        style={{ borderBottom: idx < featured.length - 1 ? "1px solid hsl(var(--border)/0.4)" : undefined }}>
+                        {/* Logo */}
+                        <div style={{
+                          width: 38, height: 38, borderRadius: 12, flexShrink: 0,
+                          backgroundColor: a.logoColor ?? "#ddd",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontFamily: DISPLAY, fontSize: "0.8rem", fontWeight: 700, color: "#fff",
+                          border: "2px solid hsl(var(--border))", boxShadow: "2px 2px 0 hsl(var(--border))",
+                        }}>
+                          {a.logoInitial}
+                        </div>
+
+                        {/* Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span style={{ fontFamily: DISPLAY, fontSize: "0.82rem", fontWeight: 700 }}>{a.name}</span>
+                            {a.isVerified && <IconCheck size={12} />}
+                            {a.isFeatured && <IconStar size={11} />}
+                          </div>
+                          <div style={{ fontFamily: MONO, fontSize: "0.58rem", opacity: 0.6 }}>
+                            {a.chain} · {a.taskCount} tasks
+                          </div>
+                        </div>
+
+                        {/* Badges */}
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <span style={{
+                            fontFamily: MONO, fontSize: "0.55rem", fontWeight: 700,
+                            background: diff, borderRadius: 6, padding: "2px 8px",
+                            border: "1px solid rgba(0,0,0,0.12)",
+                          }}>{a.difficulty}</span>
+                          <span style={{
+                            fontFamily: MONO, fontSize: "0.55rem", fontWeight: 700,
+                            background: st.bg, color: st.text, borderRadius: 6, padding: "2px 8px",
+                            border: "1px solid rgba(0,0,0,0.12)",
+                          }}>{st.label}</span>
+                        </div>
+
+                        {/* Reward */}
+                        <div style={{
+                          fontFamily: MONO, fontSize: "0.65rem", fontWeight: 700,
+                          color: "hsl(var(--primary))", flexShrink: 0, minWidth: 60, textAlign: "right",
+                        }}>
+                          {a.rewardEstimate ?? "TBD"}
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* ── Active Grid ── */}
+          {active.length > 0 && (
+            <div className="neo-card overflow-hidden mt-6">
+              <div className="flex items-center justify-between px-6 py-4"
+                style={{ borderBottom: "2px solid hsl(var(--border))" }}>
+                <div className="flex items-center gap-2">
+                  <IconTrend size={16} />
+                  <span style={{ fontFamily: DISPLAY, fontSize: "0.85rem", fontWeight: 700 }}>
+                    🔥 Active Right Now
+                  </span>
+                </div>
+                <Link href="/airdrops?status=active"
+                  style={{ fontFamily: MONO, fontSize: "0.62rem", fontWeight: 700, color: "hsl(var(--primary))" }}>
+                  See all →
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 p-4">
+                {active.slice(0, 6).map(a => {
+                  const diff = DIFF_BG[a.difficulty] ?? "#e6e6e6";
+                  return (
+                    <Link href={`/airdrops/${a.id}`} key={a.id}>
+                      <div style={{
+                        borderRadius: 16, border: "2px solid hsl(var(--border))",
+                        padding: "14px", cursor: "pointer",
+                        boxShadow: "2px 2px 0 hsl(var(--border))",
+                        background: "hsl(var(--card))",
+                        transition: "transform 0.15s, box-shadow 0.15s",
+                      }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = "translate(-2px,-2px)"; (e.currentTarget as HTMLElement).style.boxShadow = "4px 4px 0 hsl(var(--border))"; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ""; (e.currentTarget as HTMLElement).style.boxShadow = "2px 2px 0 hsl(var(--border))"; }}>
+                        <div className="flex items-center gap-2 mb-3">
+                          <div style={{
+                            width: 30, height: 30, borderRadius: 8, flexShrink: 0,
+                            backgroundColor: a.logoColor ?? "#ddd",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            fontFamily: DISPLAY, fontSize: "0.7rem", fontWeight: 700, color: "#fff",
+                            border: "1.5px solid hsl(var(--border))",
+                          }}>{a.logoInitial}</div>
+                          <span style={{ fontFamily: DISPLAY, fontSize: "0.75rem", fontWeight: 700 }}>{a.name}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span style={{
+                            fontFamily: MONO, fontSize: "0.55rem", fontWeight: 700,
+                            background: diff, borderRadius: 6, padding: "2px 6px",
+                            border: "1px solid rgba(0,0,0,0.1)",
+                          }}>{a.difficulty}</span>
+                          <span style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 700, color: "hsl(var(--primary))" }}>
+                            {a.rewardEstimate ?? "TBD"}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1 mt-2" style={{ fontFamily: MONO, fontSize: "0.55rem", opacity: 0.55 }}>
+                          <IconCheck size={10} />
+                          {a.taskCount} tasks · {a.chain}
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
           )}
         </div>
 
-        {/* Activity feed */}
-        <div className="neo-card p-5">
-          <p className="mb-4" style={{ fontFamily: DISPLAY, fontSize: "0.85rem", fontWeight: 700 }}>Recent Activity</p>
-          <div className="space-y-0">
-            {activity.slice(0, 8).map((item, idx) => {
-              const bg = ACT_STYLE[item.type] ?? PASTEL.sage;
-              return (
-                <div key={item.id} className={cn("flex items-start gap-2 py-2.5", idx < 7 && "border-b border-border/40")}>
-                  <div className="w-5 h-5 rounded-full border-2 border-foreground/15 flex items-center justify-center shrink-0 mt-0.5"
-                    style={{ backgroundColor: bg }}>
-                    <Zap size={9} />
+        {/* ── Right column: Activity ── */}
+        <div>
+          <div className="neo-card overflow-hidden">
+            <div className="flex items-center gap-2 px-5 py-4"
+              style={{ borderBottom: "2px solid hsl(var(--border))" }}>
+              <IconActivity size={16} />
+              <span style={{ fontFamily: DISPLAY, fontSize: "0.85rem", fontWeight: 700 }}>
+                Recent Activity
+              </span>
+            </div>
+
+            {mockActivity.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12" style={{ opacity: 0.4 }}>
+                <IconActivity size={28} />
+                <div style={{ fontFamily: MONO, fontSize: "0.65rem", marginTop: 10 }}>No activity yet</div>
+              </div>
+            ) : (
+              <div className="px-5 py-3">
+                {mockActivity.map((act, i) => {
+                  const bg = ["#b8d8f0","#b8e8c8","#f0e0a0","#d4c0f0","#f0c4a8"][i % 5];
+                  return (
+                    <div key={act.id}
+                      className={cn("flex items-start gap-3 py-3", i < mockActivity.length - 1 ? "border-b border-border/30" : "")}>
+                      {/* Dot timeline */}
+                      <div style={{
+                        width: 28, height: 28, borderRadius: 8, flexShrink: 0,
+                        background: bg, border: "1.5px solid rgba(0,0,0,0.12)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        marginTop: 2,
+                      }}>
+                        <IconLink size={12} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 700, lineHeight: 1.4 }}>
+                          {act.message}
+                        </div>
+                        <div style={{ fontFamily: MONO, fontSize: "0.55rem", opacity: 0.5, marginTop: 2 }}>
+                          {new Date(act.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* ── Quick links ── */}
+          <div className="neo-card overflow-hidden mt-4">
+            <div className="px-5 py-4" style={{ borderBottom: "2px solid hsl(var(--border))" }}>
+              <span style={{ fontFamily: DISPLAY, fontSize: "0.85rem", fontWeight: 700 }}>Quick Access</span>
+            </div>
+            <div className="p-3 space-y-2">
+              {[
+                { label: "View All Airdrops", href: "/airdrops", icon: <IconZap size={13}/>, bg: "#b8e8c8" },
+                { label: "AI Chat Assistant", href: "/chat",     icon: <IconActivity size={13}/>, bg: "#b8d8f0" },
+                { label: "Settings",          href: "/settings", icon: <IconLink size={13}/>, bg: "#d4c0f0" },
+              ].map(item => (
+                <Link key={item.href} href={item.href}>
+                  <div className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-muted/60 cursor-pointer"
+                    style={{ border: "1.5px solid hsl(var(--border)/0.5)" }}>
+                    <div style={{
+                      width: 26, height: 26, borderRadius: 7, background: item.bg,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      border: "1px solid rgba(0,0,0,0.1)", flexShrink: 0,
+                    }}>{item.icon}</div>
+                    <span style={{ fontFamily: MONO, fontSize: "0.68rem", fontWeight: 700 }}>{item.label}</span>
+                    <span style={{ marginLeft: "auto", opacity: 0.4, fontFamily: MONO, fontSize: "0.8rem" }}>→</span>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs leading-tight text-foreground/80">{item.message}</p>
-                    <p className="text-muted-foreground mt-0.5" style={{ fontFamily: MONO, fontSize: "0.55rem" }}>
-                      {new Date(item.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Active airdrop list */}
-      {active.length > 0 && (
-        <div className="neo-card p-5 mt-4">
-          <div className="flex items-center justify-between mb-4">
-            <p style={{ fontFamily: DISPLAY, fontSize: "0.85rem", fontWeight: 700 }}>🔥 Active Right Now</p>
-            <Link href="/airdrops?status=active"
-              className="text-primary hover:underline"
-              style={{ fontFamily: MONO, fontSize: "0.62rem", fontWeight: 700 }}>
-              See all →
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {active.slice(0, 6).map(airdrop => {
-              const diff = DIFF_STYLE[airdrop.difficulty] ?? PASTEL.sage;
-              return (
-                <Link href={`/airdrops/${airdrop.id}`} key={airdrop.id}>
-                  <div className="p-3.5 rounded-2xl border-2 border-foreground/15 hover:border-foreground/40 transition-all cursor-pointer hover:-translate-y-0.5"
-                    style={{ boxShadow: "2px 2px 0 hsl(var(--border))" }}>
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-7 h-7 rounded-lg border-2 border-foreground/20 flex items-center justify-center text-white text-xs font-bold"
-                        style={{ backgroundColor: airdrop.logoColor, fontFamily: DISPLAY }}>
-                        {airdrop.logoInitial}
-                      </div>
-                      <p className="font-bold truncate flex-1" style={{ fontFamily: DISPLAY, fontSize: "0.75rem" }}>{airdrop.name}</p>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="px-2 py-0.5 rounded-full border-2 border-foreground/20"
-                        style={{ backgroundColor: diff, fontFamily: MONO, fontSize: "0.55rem", fontWeight: 700 }}>
-                        {airdrop.difficulty}
-                      </span>
-                      <span className="text-primary font-bold" style={{ fontFamily: MONO, fontSize: "0.65rem" }}>
-                        {airdrop.rewardEstimate ?? "TBD"}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1 mt-2 text-muted-foreground" style={{ fontFamily: MONO, fontSize: "0.58rem" }}>
-                      <CheckCircle size={10} />
-                      {airdrop.taskCount} tasks · {airdrop.chain}
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
