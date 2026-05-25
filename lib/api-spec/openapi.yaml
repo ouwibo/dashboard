@@ -2,24 +2,24 @@ openapi: 3.1.0
 info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
-  version: 0.1.0
-  description: Ouwibo Dashboard API
+  version: 0.2.0
+  description: Airdrop Tracker API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
-  - name: projects
-    description: Project operations
-  - name: tasks
-    description: Task operations
-  - name: members
-    description: Team member operations
-  - name: analytics
-    description: Analytics and stats
+  - name: airdrops
+    description: Airdrop operations
+  - name: airdrop-tasks
+    description: Airdrop task operations
+  - name: stats
+    description: Dashboard stats
   - name: activity
     description: Activity feed
+  - name: chat
+    description: AI chat
 
 paths:
   /healthz:
@@ -35,43 +35,70 @@ paths:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
 
-  /projects:
+  /airdrops:
     get:
-      operationId: listProjects
-      tags: [projects]
-      summary: List all projects
+      operationId: listAirdrops
+      tags: [airdrops]
+      summary: List all airdrops
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [active, upcoming, ended, potential]
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: chain
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: featured
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
       responses:
         "200":
-          description: List of projects
+          description: List of airdrops
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Project"
+                  $ref: "#/components/schemas/Airdrop"
     post:
-      operationId: createProject
-      tags: [projects]
-      summary: Create a project
+      operationId: createAirdrop
+      tags: [airdrops]
+      summary: Create an airdrop
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ProjectInput"
+              $ref: "#/components/schemas/AirdropInput"
       responses:
         "201":
           description: Created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Project"
+                $ref: "#/components/schemas/Airdrop"
 
-  /projects/{id}:
+  /airdrops/{id}:
     get:
-      operationId: getProject
-      tags: [projects]
-      summary: Get a project
+      operationId: getAirdrop
+      tags: [airdrops]
+      summary: Get an airdrop
       parameters:
         - name: id
           in: path
@@ -80,17 +107,17 @@ paths:
             type: integer
       responses:
         "200":
-          description: Project
+          description: Airdrop
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Project"
+                $ref: "#/components/schemas/Airdrop"
         "404":
           description: Not found
     patch:
-      operationId: updateProject
-      tags: [projects]
-      summary: Update a project
+      operationId: updateAirdrop
+      tags: [airdrops]
+      summary: Update an airdrop
       parameters:
         - name: id
           in: path
@@ -102,18 +129,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ProjectUpdate"
+              $ref: "#/components/schemas/AirdropUpdate"
       responses:
         "200":
           description: Updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Project"
+                $ref: "#/components/schemas/Airdrop"
     delete:
-      operationId: deleteProject
-      tags: [projects]
-      summary: Delete a project
+      operationId: deleteAirdrop
+      tags: [airdrops]
+      summary: Delete an airdrop
       parameters:
         - name: id
           in: path
@@ -124,23 +151,17 @@ paths:
         "204":
           description: Deleted
 
-  /tasks:
+  /airdrops/{id}/tasks:
     get:
-      operationId: listTasks
-      tags: [tasks]
-      summary: List tasks
+      operationId: listAirdropTasks
+      tags: [airdrop-tasks]
+      summary: List tasks for an airdrop
       parameters:
-        - name: projectId
-          in: query
-          required: false
+        - name: id
+          in: path
+          required: true
           schema:
             type: integer
-        - name: status
-          in: query
-          required: false
-          schema:
-            type: string
-            enum: [todo, in_progress, done]
       responses:
         "200":
           description: List of tasks
@@ -149,30 +170,11 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Task"
+                  $ref: "#/components/schemas/AirdropTask"
     post:
-      operationId: createTask
-      tags: [tasks]
-      summary: Create a task
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/TaskInput"
-      responses:
-        "201":
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Task"
-
-  /tasks/{id}:
-    patch:
-      operationId: updateTask
-      tags: [tasks]
-      summary: Update a task
+      operationId: createAirdropTask
+      tags: [airdrop-tasks]
+      summary: Create a task for an airdrop
       parameters:
         - name: id
           in: path
@@ -184,18 +186,43 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TaskUpdate"
+              $ref: "#/components/schemas/AirdropTaskInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AirdropTask"
+
+  /airdrop-tasks/{id}:
+    patch:
+      operationId: updateAirdropTask
+      tags: [airdrop-tasks]
+      summary: Update an airdrop task
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AirdropTaskUpdate"
       responses:
         "200":
           description: Updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Task"
+                $ref: "#/components/schemas/AirdropTask"
     delete:
-      operationId: deleteTask
-      tags: [tasks]
-      summary: Delete a task
+      operationId: deleteAirdropTask
+      tags: [airdrop-tasks]
+      summary: Delete an airdrop task
       parameters:
         - name: id
           in: path
@@ -206,116 +233,18 @@ paths:
         "204":
           description: Deleted
 
-  /members:
+  /stats:
     get:
-      operationId: listMembers
-      tags: [members]
-      summary: List team members
+      operationId: getStats
+      tags: [stats]
+      summary: Get dashboard stats
       responses:
         "200":
-          description: List of members
+          description: Stats
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Member"
-    post:
-      operationId: createMember
-      tags: [members]
-      summary: Add a team member
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/MemberInput"
-      responses:
-        "201":
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Member"
-
-  /members/{id}:
-    patch:
-      operationId: updateMember
-      tags: [members]
-      summary: Update a team member
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/MemberUpdate"
-      responses:
-        "200":
-          description: Updated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Member"
-    delete:
-      operationId: deleteMember
-      tags: [members]
-      summary: Remove a team member
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        "204":
-          description: Deleted
-
-  /analytics/summary:
-    get:
-      operationId: getAnalyticsSummary
-      tags: [analytics]
-      summary: Get dashboard summary stats
-      responses:
-        "200":
-          description: Summary stats
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AnalyticsSummary"
-
-  /analytics/progress:
-    get:
-      operationId: getProgressData
-      tags: [analytics]
-      summary: Get weekly progress data for chart
-      responses:
-        "200":
-          description: Weekly progress
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/ProgressPoint"
-
-  /analytics/task-breakdown:
-    get:
-      operationId: getTaskBreakdown
-      tags: [analytics]
-      summary: Get task status breakdown
-      responses:
-        "200":
-          description: Task breakdown
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/TaskBreakdown"
+                $ref: "#/components/schemas/DashboardStats"
 
   /activity:
     get:
@@ -332,6 +261,25 @@ paths:
                 items:
                   $ref: "#/components/schemas/ActivityItem"
 
+  /chat:
+    post:
+      operationId: sendChat
+      tags: [chat]
+      summary: Send a message to AI chat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatRequest"
+      responses:
+        "200":
+          description: AI response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -341,119 +289,206 @@ components:
         status:
           type: string
 
-    Project:
+    Airdrop:
       type: object
-      required: [id, name, status, progress, color, createdAt]
+      required: [id, name, slug, category, chain, status, difficulty, isFeatured, isVerified, participantsCount, taskCount, createdAt]
       properties:
         id:
           type: integer
         name:
           type: string
+        slug:
+          type: string
         description:
           type: ["string", "null"]
+        logoColor:
+          type: string
+        logoInitial:
+          type: string
+        websiteUrl:
+          type: ["string", "null"]
+        twitterUrl:
+          type: ["string", "null"]
+        telegramUrl:
+          type: ["string", "null"]
+        discordUrl:
+          type: ["string", "null"]
+        category:
+          type: string
+          enum: [defi, nft, layer1, layer2, gaming, dao, infrastructure, wallet, exchange]
+        chain:
+          type: string
         status:
           type: string
-          enum: [active, completed, on_hold, archived]
-        progress:
-          type: integer
-          minimum: 0
-          maximum: 100
-        color:
+          enum: [active, upcoming, ended, potential]
+        rewardEstimate:
+          type: ["string", "null"]
+        totalValue:
+          type: ["string", "null"]
+        difficulty:
           type: string
-        dueDate:
+          enum: [easy, medium, hard]
+        isFeatured:
+          type: boolean
+        isVerified:
+          type: boolean
+        participantsCount:
+          type: integer
+        taskCount:
+          type: integer
+        startDate:
+          type: ["string", "null"]
+        endDate:
           type: ["string", "null"]
         createdAt:
           type: string
 
-    ProjectInput:
+    AirdropInput:
       type: object
-      required: [name, status, color]
+      required: [name, slug, category, chain, status, difficulty]
       properties:
         name:
           type: string
           minLength: 1
+        slug:
+          type: string
+          minLength: 1
         description:
+          type: string
+        logoColor:
+          type: string
+        logoInitial:
+          type: string
+        websiteUrl:
+          type: string
+        twitterUrl:
+          type: string
+        telegramUrl:
+          type: string
+        discordUrl:
+          type: string
+        category:
+          type: string
+          enum: [defi, nft, layer1, layer2, gaming, dao, infrastructure, wallet, exchange]
+        chain:
           type: string
         status:
           type: string
-          enum: [active, completed, on_hold, archived]
-        progress:
-          type: integer
-          minimum: 0
-          maximum: 100
-        color:
+          enum: [active, upcoming, ended, potential]
+        rewardEstimate:
           type: string
-        dueDate:
+        totalValue:
+          type: string
+        difficulty:
+          type: string
+          enum: [easy, medium, hard]
+        isFeatured:
+          type: boolean
+        isVerified:
+          type: boolean
+        participantsCount:
+          type: integer
+        taskCount:
+          type: integer
+        startDate:
+          type: string
+        endDate:
           type: string
 
-    ProjectUpdate:
+    AirdropUpdate:
       type: object
       properties:
         name:
           type: string
           minLength: 1
+        slug:
+          type: string
         description:
+          type: string
+        logoColor:
+          type: string
+        logoInitial:
+          type: string
+        websiteUrl:
+          type: string
+        twitterUrl:
+          type: string
+        telegramUrl:
+          type: string
+        discordUrl:
+          type: string
+        category:
+          type: string
+          enum: [defi, nft, layer1, layer2, gaming, dao, infrastructure, wallet, exchange]
+        chain:
           type: string
         status:
           type: string
-          enum: [active, completed, on_hold, archived]
-        progress:
-          type: integer
-          minimum: 0
-          maximum: 100
-        color:
+          enum: [active, upcoming, ended, potential]
+        rewardEstimate:
           type: string
-        dueDate:
+        totalValue:
+          type: string
+        difficulty:
+          type: string
+          enum: [easy, medium, hard]
+        isFeatured:
+          type: boolean
+        isVerified:
+          type: boolean
+        participantsCount:
+          type: integer
+        taskCount:
+          type: integer
+        startDate:
+          type: string
+        endDate:
           type: string
 
-    Task:
+    AirdropTask:
       type: object
-      required: [id, title, status, priority, createdAt]
+      required: [id, airdropId, title, taskType, isRequired, sortOrder, createdAt]
       properties:
         id:
           type: integer
+        airdropId:
+          type: integer
         title:
           type: string
         description:
           type: ["string", "null"]
-        status:
-          type: string
-          enum: [todo, in_progress, done]
-        priority:
-          type: string
-          enum: [low, medium, high]
-        projectId:
-          type: ["integer", "null"]
-        assigneeId:
-          type: ["integer", "null"]
-        dueDate:
+        link:
           type: ["string", "null"]
+        taskType:
+          type: string
+          enum: [follow_twitter, join_telegram, join_discord, complete_quiz, stake, bridge, swap, provide_liquidity, register, other]
+        isRequired:
+          type: boolean
+        sortOrder:
+          type: integer
         createdAt:
           type: string
 
-    TaskInput:
+    AirdropTaskInput:
       type: object
-      required: [title, status, priority]
+      required: [title, taskType]
       properties:
         title:
           type: string
           minLength: 1
         description:
           type: string
-        status:
+        link:
           type: string
-          enum: [todo, in_progress, done]
-        priority:
+        taskType:
           type: string
-          enum: [low, medium, high]
-        projectId:
+          enum: [follow_twitter, join_telegram, join_discord, complete_quiz, stake, bridge, swap, provide_liquidity, register, other]
+        isRequired:
+          type: boolean
+        sortOrder:
           type: integer
-        assigneeId:
-          type: integer
-        dueDate:
-          type: string
 
-    TaskUpdate:
+    AirdropTaskUpdate:
       type: object
       properties:
         title:
@@ -461,100 +496,31 @@ components:
           minLength: 1
         description:
           type: string
-        status:
+        link:
           type: string
-          enum: [todo, in_progress, done]
-        priority:
+        taskType:
           type: string
-          enum: [low, medium, high]
-        projectId:
+          enum: [follow_twitter, join_telegram, join_discord, complete_quiz, stake, bridge, swap, provide_liquidity, register, other]
+        isRequired:
+          type: boolean
+        sortOrder:
           type: integer
-        assigneeId:
-          type: integer
-        dueDate:
-          type: string
 
-    Member:
+    DashboardStats:
       type: object
-      required: [id, name, role, email, createdAt]
+      required: [totalAirdrops, activeAirdrops, upcomingAirdrops, endedAirdrops, totalTasks, featuredCount]
       properties:
-        id:
+        totalAirdrops:
           type: integer
-        name:
-          type: string
-        role:
-          type: string
-        email:
-          type: string
-        avatarColor:
-          type: string
-        createdAt:
-          type: string
-
-    MemberInput:
-      type: object
-      required: [name, role, email]
-      properties:
-        name:
-          type: string
-          minLength: 1
-        role:
-          type: string
-        email:
-          type: string
-        avatarColor:
-          type: string
-
-    MemberUpdate:
-      type: object
-      properties:
-        name:
-          type: string
-          minLength: 1
-        role:
-          type: string
-        email:
-          type: string
-        avatarColor:
-          type: string
-
-    AnalyticsSummary:
-      type: object
-      required: [totalProjects, activeProjects, completedTasks, totalTasks, teamSize, completionRate]
-      properties:
-        totalProjects:
+        activeAirdrops:
           type: integer
-        activeProjects:
+        upcomingAirdrops:
           type: integer
-        completedTasks:
+        endedAirdrops:
           type: integer
         totalTasks:
           type: integer
-        teamSize:
-          type: integer
-        completionRate:
-          type: number
-
-    ProgressPoint:
-      type: object
-      required: [week, completed, created]
-      properties:
-        week:
-          type: string
-        completed:
-          type: integer
-        created:
-          type: integer
-
-    TaskBreakdown:
-      type: object
-      required: [todo, inProgress, done]
-      properties:
-        todo:
-          type: integer
-        inProgress:
-          type: integer
-        done:
+        featuredCount:
           type: integer
 
     ActivityItem:
@@ -565,10 +531,35 @@ components:
           type: integer
         type:
           type: string
-          enum: [task_created, task_completed, project_created, project_updated, member_joined]
         message:
           type: string
         actorName:
           type: ["string", "null"]
         createdAt:
+          type: string
+
+    ChatMessage:
+      type: object
+      required: [role, content]
+      properties:
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+
+    ChatRequest:
+      type: object
+      required: [messages]
+      properties:
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatMessage"
+
+    ChatResponse:
+      type: object
+      required: [message]
+      properties:
+        message:
           type: string

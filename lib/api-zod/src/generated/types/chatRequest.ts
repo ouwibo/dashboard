@@ -5,7 +5,8 @@
  * Airdrop Tracker API
  * OpenAPI spec version: 0.2.0
  */
+import type { ChatMessage } from './chatMessage';
 
-export interface HealthStatus {
-  status: string;
+export interface ChatRequest {
+  messages: ChatMessage[];
 }

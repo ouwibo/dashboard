@@ -5,10 +5,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import Layout from "@/components/Layout";
 import DashboardPage from "@/pages/DashboardPage";
-import ProjectsPage from "@/pages/ProjectsPage";
-import ProjectDetailPage from "@/pages/ProjectDetailPage";
-import TasksPage from "@/pages/TasksPage";
-import MembersPage from "@/pages/MembersPage";
+import AirdropsPage from "@/pages/AirdropsPage";
+import AirdropDetailPage from "@/pages/AirdropDetailPage";
+import ChatPage from "@/pages/ChatPage";
 import SettingsPage from "@/pages/SettingsPage";
 import NotFound from "@/pages/not-found";
 
@@ -26,10 +25,9 @@ function Router() {
     <Layout>
       <Switch>
         <Route path="/" component={DashboardPage} />
-        <Route path="/projects" component={ProjectsPage} />
-        <Route path="/projects/:id" component={ProjectDetailPage} />
-        <Route path="/tasks" component={TasksPage} />
-        <Route path="/members" component={MembersPage} />
+        <Route path="/airdrops" component={AirdropsPage} />
+        <Route path="/airdrops/:id" component={AirdropDetailPage} />
+        <Route path="/chat" component={ChatPage} />
         <Route path="/settings" component={SettingsPage} />
         <Route component={NotFound} />
       </Switch>

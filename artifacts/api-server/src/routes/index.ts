@@ -1,16 +1,16 @@
 import { Router, type IRouter } from "express";
 import healthRouter from "./health";
-import projectsRouter from "./projects";
-import tasksRouter from "./tasks";
-import membersRouter from "./members";
-import analyticsRouter from "./analytics";
+import airdropsRouter from "./airdrops";
+import airdropTasksRouter from "./airdrop-tasks";
+import statsRouter from "./stats";
+import chatRouter from "./chat";
 
 const router: IRouter = Router();
 
 router.use(healthRouter);
-router.use(projectsRouter);
-router.use(tasksRouter);
-router.use(membersRouter);
-router.use(analyticsRouter);
+router.use(airdropsRouter);
+router.use(airdropTasksRouter);
+router.use(statsRouter);
+router.use(chatRouter);
 
 export default router;

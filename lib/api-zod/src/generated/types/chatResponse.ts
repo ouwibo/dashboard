@@ -6,11 +6,6 @@
  * OpenAPI spec version: 0.2.0
  */
 
-export interface ActivityItem {
-  id: number;
-  type: string;
+export interface ChatResponse {
   message: string;
-  /** @nullable */
-  actorName?: string | null;
-  createdAt: string;
 }
