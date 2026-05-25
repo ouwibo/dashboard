@@ -184,126 +184,173 @@ function NavItem({ href, label, color, colorMuted, icon }: typeof navItems[0]) {
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { theme, setTheme } = useTheme();
-  const isDark = theme === "dark";
-  const [loc] = useLocation();
+  const { theme, toggleTheme } = useTheme();
+  const [location] = useLocation();
 
   return (
-    <div className="flex min-h-screen bg-background">
-
-      {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex flex-col fixed left-0 top-0 h-screen w-56 border-r-2 border-border bg-background z-40">
+    <div className="flex min-h-screen bg-background text-foreground">
+      {/* ── Desktop Sidebar ──────────────────── */}
+      <aside className="hidden lg:flex flex-col fixed left-0 top-0 h-full w-52 bg-card border-r-2 border-border z-30">
         {/* Logo */}
-        <div className="p-5 pb-4">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0"
-              style={{ background: "linear-gradient(135deg, #f97316 0%, #8b5cf6 50%, #06b6d4 100%)", boxShadow: "3px 3px 0 hsl(var(--border))" }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-              </svg>
-            </div>
-            <div>
-              <div style={{ fontFamily: DISPLAY, fontSize: "0.85rem", fontWeight: 800 }}>Ouwibo</div>
-              <div style={{ fontFamily: MONO, fontSize: "0.55rem", fontWeight: 700 }} className="text-muted-foreground">Airdrop Tracker</div>
-            </div>
+        <div className="px-5 pt-6 pb-4 flex items-center gap-3 border-b-2 border-border">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+            style={{ background: "linear-gradient(135deg,#f97316,#8b5cf6)", boxShadow: "3px 3px 0 rgba(0,0,0,0.2)" }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </svg>
           </div>
-
-          {/* Nav items */}
-          <nav className="flex flex-col gap-1">
-            {navItems.map(item => <NavItem key={item.href} {...item} />)}
-          </nav>
+          <div>
+            <p style={{ fontFamily: DISPLAY, fontSize: "0.85rem", fontWeight: 800 }}>Ouwibo</p>
+            <p className="text-muted-foreground" style={{ fontFamily: MONO, fontSize: "0.55rem" }}>Airdrop Tracker</p>
+          </div>
         </div>
 
-        {/* Spacer */}
-        <div className="flex-1" />
+        {/* Nav */}
+        <nav className="flex-1 px-3 py-4 space-y-1">
+          {navItems.map(item => {
+            const active = location === item.href;
+            return (
+              <Link key={item.href} href={item.href}>
+                <div className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all",
+                  active ? "border-2" : "hover:bg-muted border-2 border-transparent"
+                )}
+                  style={active ? {
+                    background: item.colorMuted,
+                    borderColor: item.color,
+                    boxShadow: `2px 2px 0 ${item.color}40`,
+                  } : {}}>
+                  <span style={{ color: active ? item.color : undefined }} className={cn(!active && "text-muted-foreground")}>
+                    {item.icon(active)}
+                  </span>
+                  <span style={{
+                    fontFamily: MONO, fontSize: "0.68rem", fontWeight: 700,
+                    color: active ? item.color : undefined,
+                  }} className={cn(!active && "text-foreground")}>
+                    {item.label}
+                  </span>
+                  {active && <div className="ml-auto w-1.5 h-1.5 rounded-full" style={{ backgroundColor: item.color }} />}
+                </div>
+              </Link>
+            );
+          })}
+        </nav>
 
-        {/* Wave decoration */}
-        <div className="overflow-hidden opacity-30 mb-0 -mb-1">
-          <svg viewBox="0 0 220 60" className="w-full">
-            <path d="M0,30 C40,50 80,10 120,30 C160,50 200,10 220,30 L220,60 L0,60 Z" fill="#f97316" opacity="0.3"/>
-            <path d="M0,40 C40,20 80,55 120,40 C160,20 200,55 220,40 L220,60 L0,60 Z" fill="#8b5cf6" opacity="0.3"/>
-            <path d="M0,50 C50,30 100,60 150,45 C180,36 210,50 220,55 L220,60 L0,60 Z" fill="#06b6d4" opacity="0.4"/>
+        {/* Wave + Theme Toggle */}
+        <div className="mt-auto">
+          <svg viewBox="0 0 200 40" preserveAspectRatio="none" className="w-full h-8 opacity-30">
+            <path d="M0,20 C40,5 80,35 120,20 C160,5 180,25 200,20 L200,40 L0,40 Z" fill="#f97316" />
+            <path d="M0,25 C50,10 100,35 150,22 C175,15 190,28 200,25 L200,40 L0,40 Z" fill="#8b5cf6" />
+            <path d="M0,30 C60,20 120,38 200,28 L200,40 L0,40 Z" fill="#06b6d4" />
           </svg>
-        </div>
-
-        {/* Theme + footer */}
-        <div className="p-4 pt-0 border-t-2 border-border">
-          <button
-            onClick={() => setTheme(isDark ? "light" : "dark")}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl border-2 border-border hover:bg-muted transition-all"
-            style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 700, boxShadow: "2px 2px 0 hsl(var(--border))" }}
-          >
-            <span style={{ color: isDark ? "#fbbf24" : "#6366f1" }}>
-              {isDark ? (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-                </svg>
+          <div className="px-3 pb-4">
+            <button onClick={toggleTheme}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-xl border-2 border-border bg-background hover:bg-muted transition-all"
+              style={{ fontFamily: MONO, fontSize: "0.62rem", fontWeight: 700, boxShadow: "2px 2px 0 hsl(var(--border))" }}>
+              {theme === "dark" ? (
+                <><IconSun /><span>Light Mode</span></>
               ) : (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                </svg>
+                <><IconMoon /><span>Dark Mode</span></>
               )}
-            </span>
-            {isDark ? "Light Mode" : "Dark Mode"}
-          </button>
+            </button>
+          </div>
         </div>
       </aside>
 
-      {/* Mobile Top Bar */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 h-14 border-b-2 border-border bg-background z-50 flex items-center justify-between px-5">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-            style={{ background: "linear-gradient(135deg, #f97316 0%, #8b5cf6 50%, #06b6d4 100%)" }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+      {/* ── Mobile Header ──────────────────── */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-card border-b-2 border-border z-40 flex items-center justify-between px-4">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center"
+            style={{ background: "linear-gradient(135deg,#f97316,#8b5cf6)" }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
             </svg>
           </div>
-          <span style={{ fontFamily: DISPLAY, fontSize: "0.8rem", fontWeight: 800 }}>Ouwibo</span>
+          <span style={{ fontFamily: DISPLAY, fontSize: "0.82rem", fontWeight: 800 }}>Ouwibo</span>
         </div>
-        <button
-          onClick={() => setTheme(isDark ? "light" : "dark")}
-          className="p-2 rounded-xl border-2 border-border"
-          style={{ boxShadow: "2px 2px 0 hsl(var(--border))" }}
-        >
-          {isDark ? (
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-            </svg>
-          ) : (
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-            </svg>
-          )}
+        <button onClick={() => setMobileOpen(true)} className="p-2 rounded-xl hover:bg-muted border-2 border-border transition-all">
+          <IconHam />
         </button>
       </header>
 
-      {/* Main content */}
-      <main className="flex-1 lg:ml-56 pt-14 lg:pt-0 min-h-screen pb-20 lg:pb-0">
-        <div className="max-w-6xl mx-auto px-4 sm:px-8 py-6">
-          {children}
+      {/* ── Mobile Drawer ──────────────────── */}
+      {mobileOpen && (
+        <div className="lg:hidden fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-foreground/30 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+          <aside className="absolute left-0 top-0 h-full w-64 bg-card border-r-2 border-border flex flex-col">
+            <div className="px-5 pt-6 pb-4 flex items-center justify-between border-b-2 border-border">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center"
+                  style={{ background: "linear-gradient(135deg,#f97316,#8b5cf6)" }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                  </svg>
+                </div>
+                <span style={{ fontFamily: DISPLAY, fontSize: "0.85rem", fontWeight: 800 }}>Ouwibo</span>
+              </div>
+              <button onClick={() => setMobileOpen(false)} className="p-1.5 rounded-lg hover:bg-muted border-2 border-border">
+                <IconClose />
+              </button>
+            </div>
+            <nav className="flex-1 px-3 py-4 space-y-1">
+              {navItems.map(item => {
+                const active = location === item.href;
+                return (
+                  <Link key={item.href} href={item.href}>
+                    <div className={cn(
+                      "flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all border-2",
+                      active ? "" : "border-transparent hover:bg-muted"
+                    )}
+                      style={active ? { background: item.colorMuted, borderColor: item.color, boxShadow: `2px 2px 0 ${item.color}40` } : {}}
+                      onClick={() => setMobileOpen(false)}>
+                      <span style={{ color: active ? item.color : undefined }} className={cn(!active && "text-muted-foreground")}>
+                        {item.icon(active)}
+                      </span>
+                      <span style={{ fontFamily: MONO, fontSize: "0.68rem", fontWeight: 700, color: active ? item.color : undefined }} className={cn(!active && "text-foreground")}>
+                        {item.label}
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </nav>
+            <div className="px-3 pb-6">
+              <button onClick={() => { toggleTheme(); setMobileOpen(false); }}
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-xl border-2 border-border bg-background hover:bg-muted transition-all"
+                style={{ fontFamily: MONO, fontSize: "0.62rem", fontWeight: 700, boxShadow: "2px 2px 0 hsl(var(--border))" }}>
+                {theme === "dark" ? <><IconSun /><span>Light Mode</span></> : <><IconMoon /><span>Dark Mode</span></>}
+              </button>
+            </div>
+          </aside>
         </div>
-      </main>
+      )}
 
-      {/* Mobile Bottom Nav */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 border-t-2 border-border bg-background z-50 flex">
-        {navItems.map(({ href, label, color, colorMuted, icon }) => {
-          const active = href === "/" ? loc === "/" : loc.startsWith(href);
+      {/* ── Mobile Bottom Nav ──────────────────── */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-card border-t-2 border-border z-40 flex items-center justify-around px-2">
+        {navItems.map(item => {
+          const active = location === item.href;
           return (
-            <Link key={href} href={href} className="flex-1">
-              <div className="flex flex-col items-center gap-1 py-2.5 transition-all"
-                style={active ? { background: colorMuted, borderTop: `2px solid ${color}` } : {}}>
-                <span className="transition-transform duration-200" style={{ transform: active ? "scale(1.15)" : "scale(1)" }}>
-                  {icon(active)}
+            <Link key={item.href} href={item.href}>
+              <div className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all"
+                style={active ? { background: item.colorMuted } : {}}>
+                <span style={{ color: active ? item.color : undefined }} className={cn(!active && "text-muted-foreground")}>
+                  {item.icon(active)}
                 </span>
-                <span style={{ fontFamily: MONO, fontSize: "0.5rem", fontWeight: 700, color: active ? color : undefined }}
-                  className={cn(!active && "text-muted-foreground")}>
-                  {label}
+                <span style={{ fontFamily: MONO, fontSize: "0.5rem", fontWeight: 700, color: active ? item.color : undefined }} className={cn(!active && "text-muted-foreground")}>
+                  {item.label}
                 </span>
               </div>
             </Link>
           );
         })}
       </nav>
+
+      {/* ── Main ──────────────────── */}
+      <main className="flex-1 lg:ml-52 pt-14 pb-20 lg:pt-0 lg:pb-0 min-h-screen">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 py-8">
+          {children}
+        </div>
+      </main>
     </div>
   );
 }
