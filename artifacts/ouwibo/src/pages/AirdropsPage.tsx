@@ -5,7 +5,7 @@ import {
   useCreateAirdrop, useUpdateAirdrop, useDeleteAirdrop,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Plus, Zap, CheckCircle, Trash2, Pencil, Search, Globe, Twitter, Send, Star } from "lucide-react";
+import { Plus, Zap, CheckCircle, Trash2, Pencil, Search, Globe, Twitter, Send, Star, ExternalLink, Users, ListChecks, TrendingUp, ChevronDown, ChevronUp } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,13 +18,17 @@ const MONO    = "'Space Mono', monospace";
 const DISPLAY = "'Unbounded', sans-serif";
 
 const PASTEL = { sky: "#b8d8f0", mint: "#b8e8c8", peach: "#f0c4a8", lavender: "#d4c0f0", yellow: "#f0e0a0", sage: "#c8dcc0" };
-const STATUS_STYLE: Record<string, { bg: string; label: string }> = {
-  active:    { bg: PASTEL.mint,     label: "Active"    },
-  upcoming:  { bg: PASTEL.yellow,   label: "Upcoming"  },
-  ended:     { bg: PASTEL.sage,     label: "Ended"     },
-  potential: { bg: PASTEL.lavender, label: "Potential" },
+const STATUS_STYLE: Record<string, { bg: string; color: string; label: string }> = {
+  active:    { bg: "#10b981", color: "#fff", label: "Active"    },
+  upcoming:  { bg: "#f59e0b", color: "#fff", label: "Upcoming"  },
+  ended:     { bg: "#6b7280", color: "#fff", label: "Ended"     },
+  potential: { bg: "#8b5cf6", color: "#fff", label: "Potential" },
 };
-const DIFF_STYLE: Record<string, string> = { easy: PASTEL.mint, medium: PASTEL.yellow, hard: PASTEL.peach };
+const DIFF_STYLE: Record<string, { bg: string; color: string }> = { 
+  easy: { bg: "#10b981", color: "#fff" }, 
+  medium: { bg: "#f59e0b", color: "#fff" }, 
+  hard: { bg: "#ef4444", color: "#fff" } 
+};
 const LOGO_COLORS = ["#d95c38","#3b82f6","#10b981","#8b5cf6","#f59e0b","#ec4899","#06b6d4","#f97316","#14b8a6","#a855f7"];
 const CATEGORIES = ["defi","nft","layer1","layer2","gaming","dao","infrastructure","wallet","exchange"];
 const CHAINS = ["ETH","SOL","BNB","ARB","OP","BASE","APT","SUI","AVAX","MATIC","HYP","MON","BERA","HYP"];
@@ -43,6 +47,8 @@ const DEFAULT: AirdropForm = { name:"",slug:"",description:"",logoColor:"#d95c38
   startDate:"",endDate:"" };
 
 type FilterStatus = "all" | "active" | "upcoming" | "ended" | "potential";
+type SortField = "rank" | "name" | "participants" | "tasks" | "reward";
+type SortOrder = "asc" | "desc";
 
 function AirdropFormDialog({ open, onClose, form, setForm, onSubmit, isPending, mode }: {
   open: boolean; onClose: () => void; form: AirdropForm; setForm: (v: AirdropForm) => void;
@@ -166,6 +172,8 @@ export default function AirdropsPage() {
   const [createForm, setCreateForm] = useState<AirdropForm>(DEFAULT);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<AirdropForm>(DEFAULT);
+  const [sortField, setSortField] = useState<SortField>("rank");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
 
   const params = filterStatus === "all" ? (search ? { search } : undefined) : (search ? { status: filterStatus, search } : { status: filterStatus });
   const { data: airdrops, isLoading } = useListAirdrops(params, {
@@ -211,10 +219,45 @@ export default function AirdropsPage() {
     });
   }
 
+  function handleSort(field: SortField) {
+    if (sortField === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortOrder("asc");
+    }
+  }
+
+  const sortedAirdrops = airdrops ? [...airdrops].sort((a, b) => {
+    let comparison = 0;
+    switch (sortField) {
+      case "name":
+        comparison = a.name.localeCompare(b.name);
+        break;
+      case "participants":
+        comparison = (a.participantsCount || 0) - (b.participantsCount || 0);
+        break;
+      case "tasks":
+        comparison = (a.taskCount || 0) - (b.taskCount || 0);
+        break;
+      case "reward":
+        comparison = (a.rewardEstimate || "").localeCompare(b.rewardEstimate || "");
+        break;
+      default:
+        comparison = (a.id || 0) - (b.id || 0);
+    }
+    return sortOrder === "asc" ? comparison : -comparison;
+  }) : [];
+
   const FILTERS: { label: string; value: FilterStatus }[] = [
     { label: "All", value: "all" }, { label: "Active", value: "active" },
     { label: "Upcoming", value: "upcoming" }, { label: "Ended", value: "ended" }, { label: "Potential", value: "potential" },
   ];
+
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortField !== field) return null;
+    return sortOrder === "asc" ? <ChevronUp size={12} className="ml-1" /> : <ChevronDown size={12} className="ml-1" />;
+  };
 
   return (
     <div>
@@ -252,87 +295,122 @@ export default function AirdropsPage() {
         </div>
       </div>
 
-      {/* Airdrop list — landscape cards */}
+      {/* Crypto-rank style table */}
       {isLoading ? (
-        <div className="space-y-3">{Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-2xl" />)}</div>
-      ) : airdrops && airdrops.length > 0 ? (
-        <div className="space-y-2">
-          {airdrops.map((airdrop, idx) => {
-            const st = STATUS_STYLE[airdrop.status] ?? { bg: PASTEL.sage, label: airdrop.status };
-            const diff = DIFF_STYLE[airdrop.difficulty] ?? PASTEL.sage;
-            return (
-              <div key={airdrop.id} className="neo-card group" data-testid={`airdrop-card-${airdrop.id}`}>
-                <div className="flex items-center gap-4 p-4">
-                  {/* Logo */}
-                  <div className="w-12 h-12 rounded-2xl border-2 border-foreground/20 flex items-center justify-center text-white font-bold shrink-0"
-                    style={{ backgroundColor: airdrop.logoColor, fontFamily: DISPLAY, fontSize: "1rem", boxShadow: "2px 2px 0 rgba(0,0,0,0.15)" }}>
-                    {airdrop.logoInitial}
+        <div className="space-y-2">{Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-lg" />)}</div>
+      ) : sortedAirdrops.length > 0 ? (
+        <div className="rounded-xl border-2 border-border overflow-hidden" style={{ boxShadow: "4px 4px 0 hsl(var(--border))" }}>
+          {/* Table Header */}
+          <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-muted/50 border-b-2 border-border items-center" style={{ fontFamily: MONO, fontSize: "0.6rem", fontWeight: 700, textTransform: "uppercase", color: "hsl(var(--muted-foreground))" }}>
+            <div className="col-span-1 text-center cursor-pointer hover:text-foreground transition-colors" onClick={() => handleSort("rank")}>
+              # <SortIcon field="rank" />
+            </div>
+            <div className="col-span-3 cursor-pointer hover:text-foreground transition-colors" onClick={() => handleSort("name")}>
+              Name <SortIcon field="name" />
+            </div>
+            <div className="col-span-1 text-center">Status</div>
+            <div className="col-span-1 text-center">Chain</div>
+            <div className="col-span-2 text-right cursor-pointer hover:text-foreground transition-colors" onClick={() => handleSort("reward")}>
+              Reward <SortIcon field="reward" />
+            </div>
+            <div className="col-span-1 text-right cursor-pointer hover:text-foreground transition-colors" onClick={() => handleSort("participants")}>
+              <Users size={10} className="inline mr-1" />Participants <SortIcon field="participants" />
+            </div>
+            <div className="col-span-1 text-right cursor-pointer hover:text-foreground transition-colors" onClick={() => handleSort("tasks")}>
+              <ListChecks size={10} className="inline mr-1" />Tasks <SortIcon field="tasks" />
+            </div>
+            <div className="col-span-1 text-center">Difficulty</div>
+            <div className="col-span-1 text-center">Action</div>
+          </div>
+
+          {/* Table Body */}
+          <div className="divide-y divide-border">
+            {sortedAirdrops.map((airdrop, idx) => {
+              const st = STATUS_STYLE[airdrop.status] ?? { bg: "#6b7280", color: "#fff", label: airdrop.status };
+              const diff = DIFF_STYLE[airdrop.difficulty] ?? { bg: "#6b7280", color: "#fff" };
+              return (
+                <div key={airdrop.id} className="grid grid-cols-12 gap-2 px-4 py-3 items-center hover:bg-muted/30 transition-colors group" data-testid={`airdrop-row-${airdrop.id}`}>
+                  {/* Rank */}
+                  <div className="col-span-1 text-center font-bold" style={{ fontFamily: MONO, fontSize: "0.75rem", color: "hsl(var(--muted-foreground))" }}>
+                    {idx + 1}
                   </div>
 
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <Link href={`/airdrops/${airdrop.id}`}>
-                        <span className="font-bold hover:text-primary transition-colors cursor-pointer" style={{ fontFamily: DISPLAY, fontSize: "0.88rem" }}>
-                          {airdrop.name}
-                        </span>
-                      </Link>
-                      {airdrop.isVerified && <CheckCircle size={12} className="text-primary shrink-0" />}
-                      {airdrop.isFeatured && <Star size={12} className="text-amber-500 shrink-0" />}
-                      <span className="px-2 py-0.5 rounded-full border-2 border-foreground/20 text-foreground/70"
-                        style={{ backgroundColor: st.bg, fontFamily: MONO, fontSize: "0.57rem", fontWeight: 700 }}>
-                        {st.label}
-                      </span>
-                      <span className="px-2 py-0.5 rounded-full border-2 border-foreground/15 text-foreground/60"
-                        style={{ backgroundColor: diff, fontFamily: MONO, fontSize: "0.57rem", fontWeight: 700 }}>
-                        {airdrop.difficulty}
-                      </span>
+                  {/* Name + Logo */}
+                  <div className="col-span-3 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold shrink-0"
+                      style={{ backgroundColor: airdrop.logoColor, fontFamily: DISPLAY, fontSize: "0.85rem" }}>
+                      {airdrop.logoInitial}
                     </div>
-                    {airdrop.description && (
-                      <p className="text-muted-foreground text-xs truncate mb-1.5">{airdrop.description}</p>
-                    )}
-                    <div className="flex items-center gap-3 flex-wrap" style={{ fontFamily: MONO, fontSize: "0.58rem" }}>
-                      <span className="text-muted-foreground">{airdrop.chain}</span>
-                      <span className="text-muted-foreground">{airdrop.category}</span>
-                      <span className="flex items-center gap-1 text-muted-foreground"><CheckCircle size={10} />{airdrop.taskCount} tasks</span>
-                      {airdrop.participantsCount > 0 && <span className="text-muted-foreground">{(airdrop.participantsCount / 1000).toFixed(0)}k participants</span>}
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <Link href={`/airdrops/${airdrop.id}`}>
+                          <span className="font-bold hover:text-primary transition-colors cursor-pointer truncate" style={{ fontFamily: DISPLAY, fontSize: "0.85rem" }}>
+                            {airdrop.name}
+                          </span>
+                        </Link>
+                        {airdrop.isVerified && <CheckCircle size={11} className="text-primary shrink-0" />}
+                        {airdrop.isFeatured && <Star size={11} className="text-amber-500 shrink-0" />}
+                      </div>
+                      <p className="text-muted-foreground truncate" style={{ fontFamily: MONO, fontSize: "0.6rem" }}>{airdrop.category}</p>
                     </div>
                   </div>
 
-                  {/* Reward + links */}
-                  <div className="shrink-0 text-right hidden sm:block">
-                    {airdrop.rewardEstimate && (
-                      <p className="font-bold text-primary mb-1" style={{ fontFamily: MONO, fontSize: "0.75rem" }}>{airdrop.rewardEstimate}</p>
-                    )}
-                    {airdrop.totalValue && (
-                      <p className="text-muted-foreground mb-1.5" style={{ fontFamily: MONO, fontSize: "0.6rem" }}>TVL {airdrop.totalValue}</p>
-                    )}
-                    <div className="flex items-center gap-1.5 justify-end">
-                      {airdrop.websiteUrl && <a href={airdrop.websiteUrl} target="_blank" rel="noopener noreferrer" className="w-6 h-6 rounded-lg border-2 border-foreground/15 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-all"><Globe size={11} /></a>}
-                      {airdrop.twitterUrl && <a href={airdrop.twitterUrl} target="_blank" rel="noopener noreferrer" className="w-6 h-6 rounded-lg border-2 border-foreground/15 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-all"><Twitter size={11} /></a>}
-                      {airdrop.telegramUrl && <a href={airdrop.telegramUrl} target="_blank" rel="noopener noreferrer" className="w-6 h-6 rounded-lg border-2 border-foreground/15 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-all"><Send size={11} /></a>}
-                    </div>
+                  {/* Status */}
+                  <div className="col-span-1 text-center">
+                    <span className="px-2 py-0.5 rounded-full text-xs font-bold" style={{ backgroundColor: st.bg, color: st.color, fontFamily: MONO, fontSize: "0.55rem" }}>
+                      {st.label}
+                    </span>
+                  </div>
+
+                  {/* Chain */}
+                  <div className="col-span-1 text-center" style={{ fontFamily: MONO, fontSize: "0.68rem", color: "hsl(var(--muted-foreground))" }}>
+                    {airdrop.chain}
+                  </div>
+
+                  {/* Reward */}
+                  <div className="col-span-2 text-right">
+                    <span className="font-bold text-primary" style={{ fontFamily: MONO, fontSize: "0.7rem" }}>
+                      {airdrop.rewardEstimate || "-"}
+                    </span>
+                  </div>
+
+                  {/* Participants */}
+                  <div className="col-span-1 text-right" style={{ fontFamily: MONO, fontSize: "0.68rem", color: "hsl(var(--muted-foreground))" }}>
+                    {airdrop.participantsCount > 0 ? `${(airdrop.participantsCount / 1000).toFixed(1)}k` : "-"}
+                  </div>
+
+                  {/* Tasks */}
+                  <div className="col-span-1 text-right" style={{ fontFamily: MONO, fontSize: "0.68rem", color: "hsl(var(--muted-foreground))" }}>
+                    {airdrop.taskCount || 0}
+                  </div>
+
+                  {/* Difficulty */}
+                  <div className="col-span-1 text-center">
+                    <span className="px-2 py-0.5 rounded-full text-xs font-bold" style={{ backgroundColor: diff.bg, color: diff.color, fontFamily: MONO, fontSize: "0.55rem" }}>
+                      {airdrop.difficulty}
+                    </span>
                   </div>
 
                   {/* Actions */}
-                  <div className="shrink-0 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="col-span-1 flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <Link href={`/airdrops/${airdrop.id}`}>
-                      <button className="px-3 py-1.5 rounded-xl border-2 border-foreground/20 text-foreground/70 hover:text-foreground hover:border-foreground/50 transition-all"
-                        style={{ fontFamily: MONO, fontSize: "0.6rem", fontWeight: 700 }}>
-                        Detail
+                      <button className="w-6 h-6 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-all" title="View details">
+                        <ExternalLink size={11} />
                       </button>
                     </Link>
                     <button onClick={() => { setEditingId(airdrop.id); setEditForm({ name: airdrop.name, slug: airdrop.slug, description: airdrop.description ?? "", logoColor: airdrop.logoColor, logoInitial: airdrop.logoInitial, websiteUrl: airdrop.websiteUrl ?? "", twitterUrl: airdrop.twitterUrl ?? "", telegramUrl: airdrop.telegramUrl ?? "", discordUrl: airdrop.discordUrl ?? "", category: airdrop.category, chain: airdrop.chain, status: airdrop.status, rewardEstimate: airdrop.rewardEstimate ?? "", totalValue: airdrop.totalValue ?? "", difficulty: airdrop.difficulty, isFeatured: airdrop.isFeatured, isVerified: airdrop.isVerified, startDate: airdrop.startDate ?? "", endDate: airdrop.endDate ?? "" }); }}
-                      className="w-7 h-7 rounded-xl border-2 border-foreground/15 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-all"
-                      data-testid={`button-edit-airdrop-${airdrop.id}`}><Pencil size={12} /></button>
+                      className="w-6 h-6 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-all" title="Edit">
+                      <Pencil size={11} />
+                    </button>
                     <button onClick={() => handleDelete(airdrop.id, airdrop.name)}
-                      className="w-7 h-7 rounded-xl border-2 border-foreground/15 flex items-center justify-center text-muted-foreground hover:text-red-500 hover:border-red-500/30 transition-all"
-                      data-testid={`button-delete-airdrop-${airdrop.id}`}><Trash2 size={12} /></button>
+                      className="w-6 h-6 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-red-500 hover:border-red-500/40 transition-all" title="Delete">
+                      <Trash2 size={11} />
+                    </button>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       ) : (
         <div className="py-20 text-center rounded-2xl border-2 border-dashed border-border">
