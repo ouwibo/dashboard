@@ -208,15 +208,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
         <Link href="/">
           <div className="flex items-center gap-2 cursor-pointer select-none">
-            <div
-              className="w-6 h-6 rounded-md flex items-center justify-center text-primary-foreground text-[9px] font-black"
-              style={{ background: "linear-gradient(135deg,hsl(var(--primary)),hsl(var(--primary)/0.6))", fontFamily: "font-sans" }}
-            >
-              O
+            <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shrink-0">
+              <Zap size={13} fill="currentColor" />
             </div>
             <div className="hidden sm:flex flex-col leading-none">
-              <span className="font-black text-[11px]" style={{ fontFamily: "font-sans" }}>Ouwibo</span>
-              <span className="text-[8px] text-muted-foreground" style={{ fontFamily: "font-sans" }}>Cloud</span>
+              <span className="font-black text-[11px]">Ouwibo</span>
+              <span className="text-[8px] text-muted-foreground">Cloud</span>
             </div>
           </div>
         </Link>
@@ -293,7 +290,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       >
         <div className="hidden lg:block" style={{ height: 52 }} />
         <div className="h-13 lg:hidden" />
-        <div className="flex-1 mx-auto w-full max-w-5xl px-4 py-5 pb-20 lg:pb-6">
+        <div className="flex-1 px-4 py-5 pb-20 lg:pb-6">
           {children}
         </div>
       </main>
