@@ -11,6 +11,7 @@ import NewsPage from "@/pages/NewsPage";
 import ChatPage from "@/pages/ChatPage";
 import SettingsPage from "@/pages/SettingsPage";
 import NotFound from "@/pages/not-found";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 const MONO    = "'Space Mono', monospace";
 const DISPLAY = "'Unbounded', sans-serif";
@@ -62,6 +63,7 @@ function App() {
             <Router />
           </WouterRouter>
           <Toaster />
+          <SpeedInsights />
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>
