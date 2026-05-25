@@ -4,45 +4,52 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import Layout from "@/components/Layout";
-import HomePage from "@/pages/HomePage";
+import DashboardPage from "@/pages/DashboardPage";
 import AirdropsPage from "@/pages/AirdropsPage";
 import AirdropDetailPage from "@/pages/AirdropDetailPage";
 import NewsPage from "@/pages/NewsPage";
+import ChatPage from "@/pages/ChatPage";
+import SettingsPage from "@/pages/SettingsPage";
 import ArticlePage from "@/pages/ArticlePage";
-import AdminLoginPage from "@/pages/AdminLoginPage";
 import AdminPage from "@/pages/AdminPage";
+import AdminLoginPage from "@/pages/AdminLoginPage";
 import NotFound from "@/pages/not-found";
 
-const qc = new QueryClient({ defaultOptions: { queries: { staleTime: 30000, retry: 1 } } });
+const qc = new QueryClient();
 
-function Router() {
+function App() {
   return (
-    <Layout>
-      <Switch>
-        <Route path="/"                component={HomePage}        />
-        <Route path="/airdrops"        component={AirdropsPage}    />
-        <Route path="/airdrops/:id"    component={AirdropDetailPage} />
-        <Route path="/news"            component={NewsPage}        />
-        <Route path="/article/:slug"   component={ArticlePage}     />
-        <Route path="/admin/login"     component={AdminLoginPage}  />
-        <Route path="/admin"           component={AdminPage}       />
-        <Route                         component={NotFound}        />
-      </Switch>
-    </Layout>
-  );
-}
-
-export default function App() {
-  return (
-    <QueryClientProvider client={qc}>
-      <ThemeProvider>
+    <WouterRouter>
+      <QueryClientProvider client={qc}>
         <TooltipProvider>
-          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-            <Router />
-          </WouterRouter>
-          <Toaster />
+          <ThemeProvider>
+            <Switch>
+              {/* Admin — no sidebar */}
+              <Route path="/admin/login" component={AdminLoginPage} />
+
+              {/* All other routes — inside sidebar Layout */}
+              <Route>
+                <Layout>
+                  <Switch>
+                    <Route path="/"                component={DashboardPage}    />
+                    <Route path="/airdrops"         component={AirdropsPage}     />
+                    <Route path="/airdrops/:slug"   component={AirdropDetailPage}/>
+                    <Route path="/news"             component={NewsPage}         />
+                    <Route path="/article/:slug"    component={ArticlePage}      />
+                    <Route path="/chat"             component={ChatPage}         />
+                    <Route path="/admin"            component={AdminPage}        />
+                    <Route path="/settings"         component={SettingsPage}     />
+                    <Route component={NotFound} />
+                  </Switch>
+                </Layout>
+              </Route>
+            </Switch>
+            <Toaster />
+          </ThemeProvider>
         </TooltipProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+      </QueryClientProvider>
+    </WouterRouter>
   );
 }
+
+export default App;
