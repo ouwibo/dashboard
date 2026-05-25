@@ -1,10 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "wouter";
-import {
-  useListAirdrops, getListAirdropsQueryKey,
-  useCreateAirdrop, useUpdateAirdrop, useDeleteAirdrop,
-} from "@workspace/api-client-react";
-import { useQueryClient } from "@tanstack/react-query";
 import { Plus, Zap, CheckCircle, Trash2, Pencil, Search, Globe, Twitter, Send, Star, ExternalLink, Users, ListChecks, TrendingUp, ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -13,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { mockApi, isDemoMode } from "@/lib/demoMode";
+import { mockAirdrops } from "@/lib/mockData";
 
 const MONO    = "'Space Mono', monospace";
 const DISPLAY = "'Unbounded', sans-serif";
@@ -62,266 +57,27 @@ interface Airdrop {
   createdAt: string;
 }
 
-interface AirdropForm {
-  name: string; slug: string; description: string; logoColor: string; logoInitial: string;
-  websiteUrl: string; twitterUrl: string; telegramUrl: string; discordUrl: string;
-  category: string; chain: string; status: string; rewardEstimate: string; totalValue: string;
-  difficulty: string; isFeatured: boolean; isVerified: boolean; startDate: string; endDate: string;
-}
-const DEFAULT: AirdropForm = { name:"",slug:"",description:"",logoColor:"#d95c38",logoInitial:"",
-  websiteUrl:"",twitterUrl:"",telegramUrl:"",discordUrl:"",category:"defi",chain:"ETH",
-  status:"active",rewardEstimate:"",totalValue:"",difficulty:"medium",isFeatured:false,isVerified:false,
-  startDate:"",endDate:"" };
-
 type FilterStatus = "all" | "active" | "upcoming" | "ended" | "potential";
 type SortField = "rank" | "name" | "participants" | "tasks" | "reward";
 type SortOrder = "asc" | "desc";
 
-function AirdropFormDialog({ open, onClose, form, setForm, onSubmit, isPending, mode }: {
-  open: boolean; onClose: () => void; form: AirdropForm; setForm: (v: AirdropForm) => void;
-  onSubmit: () => void; isPending: boolean; mode: "create" | "edit";
-}) {
-  return (
-    <Dialog open={open} onOpenChange={v => !v && onClose()}>
-      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto"
-        style={{ border: "2px solid hsl(var(--border))", boxShadow: "6px 6px 0 hsl(var(--border))", borderRadius: "18px" }}>
-        <DialogHeader>
-          <DialogTitle style={{ fontFamily: DISPLAY, fontSize: "0.95rem" }}>
-            {mode === "create" ? "Add Airdrop" : "Edit Airdrop"}
-          </DialogTitle>
-        </DialogHeader>
-        <div className="space-y-3 py-2">
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label style={{ fontFamily: MONO, fontSize: "0.58rem", fontWeight: 700, textTransform: "uppercase" }}>Name *</Label>
-              <Input className="mt-1" value={form.name} onChange={e => setForm({ ...form, name: e.target.value, logoInitial: form.logoInitial || e.target.value.charAt(0).toUpperCase(), slug: form.slug || e.target.value.toLowerCase().replace(/\s+/g, "-") })}
-                placeholder="e.g. LayerZero" style={{ border: "2px solid hsl(var(--border))", borderRadius: "10px" }} />
-            </div>
-            <div>
-              <Label style={{ fontFamily: MONO, fontSize: "0.58rem", fontWeight: 700, textTransform: "uppercase" }}>Slug *</Label>
-              <Input className="mt-1" value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })}
-                placeholder="layerzero" style={{ border: "2px solid hsl(var(--border))", borderRadius: "10px" }} />
-            </div>
-          </div>
-          <div>
-            <Label style={{ fontFamily: MONO, fontSize: "0.58rem", fontWeight: 700, textTransform: "uppercase" }}>Description</Label>
-            <Input className="mt-1" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
-              placeholder="Short description" style={{ border: "2px solid hsl(var(--border))", borderRadius: "10px" }} />
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            <div>
-              <Label style={{ fontFamily: MONO, fontSize: "0.58rem", fontWeight: 700, textTransform: "uppercase" }}>Category</Label>
-              <Select value={form.category} onValueChange={v => setForm({ ...form, category: v })}>
-                <SelectTrigger className="mt-1" style={{ border: "2px solid hsl(var(--border))", borderRadius: "10px", fontFamily: MONO, fontSize: "0.65rem" }}><SelectValue /></SelectTrigger>
-                <SelectContent>{CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label style={{ fontFamily: MONO, fontSize: "0.58rem", fontWeight: 700, textTransform: "uppercase" }}>Chain</Label>
-              <Select value={form.chain} onValueChange={v => setForm({ ...form, chain: v })}>
-                <SelectTrigger className="mt-1" style={{ border: "2px solid hsl(var(--border))", borderRadius: "10px", fontFamily: MONO, fontSize: "0.65rem" }}><SelectValue /></SelectTrigger>
-                <SelectContent>{CHAINS.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label style={{ fontFamily: MONO, fontSize: "0.58rem", fontWeight: 700, textTransform: "uppercase" }}>Status</Label>
-              <Select value={form.status} onValueChange={v => setForm({ ...form, status: v })}>
-                <SelectTrigger className="mt-1" style={{ border: "2px solid hsl(var(--border))", borderRadius: "10px", fontFamily: MONO, fontSize: "0.65rem" }}><SelectValue /></SelectTrigger>
-                <SelectContent>{STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label style={{ fontFamily: MONO, fontSize: "0.58rem", fontWeight: 700, textTransform: "uppercase" }}>Reward Estimate</Label>
-              <Input className="mt-1" value={form.rewardEstimate} onChange={e => setForm({ ...form, rewardEstimate: e.target.value })}
-                placeholder="$100 - $1,000" style={{ border: "2px solid hsl(var(--border))", borderRadius: "10px" }} />
-            </div>
-            <div>
-              <Label style={{ fontFamily: MONO, fontSize: "0.58rem", fontWeight: 700, textTransform: "uppercase" }}>Difficulty</Label>
-              <Select value={form.difficulty} onValueChange={v => setForm({ ...form, difficulty: v })}>
-                <SelectTrigger className="mt-1" style={{ border: "2px solid hsl(var(--border))", borderRadius: "10px", fontFamily: MONO, fontSize: "0.65rem" }}><SelectValue /></SelectTrigger>
-                <SelectContent>{DIFFICULTIES.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label style={{ fontFamily: MONO, fontSize: "0.58rem", fontWeight: 700, textTransform: "uppercase" }}>Website URL</Label>
-              <Input className="mt-1" value={form.websiteUrl} onChange={e => setForm({ ...form, websiteUrl: e.target.value })}
-                placeholder="https://..." style={{ border: "2px solid hsl(var(--border))", borderRadius: "10px" }} />
-            </div>
-            <div>
-              <Label style={{ fontFamily: MONO, fontSize: "0.58rem", fontWeight: 700, textTransform: "uppercase" }}>Twitter URL</Label>
-              <Input className="mt-1" value={form.twitterUrl} onChange={e => setForm({ ...form, twitterUrl: e.target.value })}
-                placeholder="https://twitter.com/..." style={{ border: "2px solid hsl(var(--border))", borderRadius: "10px" }} />
-            </div>
-          </div>
-          <div>
-            <Label style={{ fontFamily: MONO, fontSize: "0.58rem", fontWeight: 700, textTransform: "uppercase" }}>Logo Color</Label>
-            <div className="flex gap-2 mt-2 flex-wrap">
-              {LOGO_COLORS.map(c => (
-                <button key={c} onClick={() => setForm({ ...form, logoColor: c })}
-                  className={cn("w-6 h-6 rounded-full border-2 transition-all", form.logoColor === c ? "border-foreground scale-110" : "border-foreground/20 hover:scale-105")}
-                  style={{ backgroundColor: c }} />
-              ))}
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <label className="flex items-center gap-2 cursor-pointer" style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 700 }}>
-              <input type="checkbox" checked={form.isFeatured} onChange={e => setForm({ ...form, isFeatured: e.target.checked })} className="rounded" />
-              Featured
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer" style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 700 }}>
-              <input type="checkbox" checked={form.isVerified} onChange={e => setForm({ ...form, isVerified: e.target.checked })} className="rounded" />
-              Verified
-            </label>
-          </div>
-        </div>
-        <DialogFooter className="gap-2">
-          <button onClick={onClose} className="px-4 py-2 rounded-full border-2 border-border hover:bg-muted transition-all"
-            style={{ fontFamily: MONO, fontSize: "0.7rem", fontWeight: 700 }}>Cancel</button>
-          <button onClick={onSubmit} disabled={!form.name || !form.slug || isPending}
-            className="px-4 py-2 rounded-full bg-primary text-white border-2 border-border disabled:opacity-50 hover:-translate-y-px transition-all"
-            style={{ fontFamily: MONO, fontSize: "0.7rem", fontWeight: 700, boxShadow: "3px 3px 0 hsl(var(--border))" }}>
-            {isPending ? "Saving…" : mode === "create" ? "Add Airdrop" : "Save"}
-          </button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
 export default function AirdropsPage() {
-  const [demoMode, setDemoMode] = useState(false);
+  const [airdrops, setAirdrops] = useState<Airdrop[]>(mockAirdrops);
   const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");
-  const [search, setSearch] = useState("");
-  const [showCreate, setShowCreate] = useState(false);
-  const [createForm, setCreateForm] = useState<AirdropForm>(DEFAULT);
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editForm, setEditForm] = useState<AirdropForm>(DEFAULT);
   const [sortField, setSortField] = useState<SortField>("rank");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
-  
-  // Local state for demo mode
-  const [localAirdrops, setLocalAirdrops] = useState<Airdrop[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Check demo mode on mount
-  useEffect(() => {
-    isDemoMode().then(setDemoMode);
-  }, []);
-
-  // Load data on mount and when filters change
-  useEffect(() => {
-    async function loadData() {
-      setIsLoading(true);
-      try {
-        if (demoMode) {
-          const params = filterStatus === "all" ? (search ? { search } : undefined) : (search ? { status: filterStatus, search } : { status: filterStatus });
-          const data = await mockApi.listAirdrops(params as Record<string, string>);
-          setLocalAirdrops(data as Airdrop[]);
-        }
-      } catch (error) {
-        console.error("Failed to load airdrops:", error);
-      }
-      setIsLoading(false);
-    }
-    loadData();
-  }, [demoMode, filterStatus, search]);
-
-  // React-query hooks for production mode
-  const params = filterStatus === "all" ? (search ? { search } : undefined) : (search ? { status: filterStatus, search } : { status: filterStatus });
-  const { data: queryAirdrops } = useListAirdrops(demoMode ? false : params, {
-    query: { queryKey: getListAirdropsQueryKey(params), enabled: !demoMode }
+  const [search, setSearch] = useState("");
+  const [showCreate, setShowCreate] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [createForm, setCreateForm] = useState({
+    name: "", slug: "", description: "", logoColor: "#d95c38", logoInitial: "",
+    websiteUrl: "", twitterUrl: "", telegramUrl: "", discordUrl: "",
+    category: "defi", chain: "ETH", status: "active", rewardEstimate: "", totalValue: "",
+    difficulty: "medium", isFeatured: false, isVerified: false, startDate: "", endDate: ""
   });
-  const queryClient = useQueryClient();
+  const [editForm, setEditForm] = useState(createForm);
+  
   const { toast } = useToast();
-
-  const createAirdrop = useCreateAirdrop();
-  const updateAirdrop = useUpdateAirdrop();
-  const deleteAirdrop = useDeleteAirdrop();
-
-  const airdrops = demoMode ? localAirdrops : queryAirdrops;
-
-  function invalidate() {
-    if (demoMode) {
-      // Reload local data
-      mockApi.listAirdrops(filterStatus === "all" ? undefined : { status: filterStatus }).then(data => {
-        setLocalAirdrops(data as Airdrop[]);
-      });
-    } else {
-      queryClient.invalidateQueries({ queryKey: ["listAirdrops"] });
-      queryClient.invalidateQueries({ queryKey: getListAirdropsQueryKey() });
-    }
-  }
-
-  async function handleCreate() {
-    if (demoMode) {
-      try {
-        await mockApi.createAirdrop({
-          ...createForm,
-          category: createForm.category,
-          chain: createForm.chain,
-          status: createForm.status,
-          difficulty: createForm.difficulty,
-        });
-        setShowCreate(false);
-        setCreateForm(DEFAULT);
-        invalidate();
-        toast({ title: "Airdrop added!" });
-      } catch {
-        toast({ title: "Failed to add", variant: "destructive" });
-      }
-    } else {
-      createAirdrop.mutate(
-        { data: { ...createForm, isFeatured: createForm.isFeatured, isVerified: createForm.isVerified, category: createForm.category as "defi", chain: createForm.chain, status: createForm.status as "active", difficulty: createForm.difficulty as "easy" } as Parameters<typeof createAirdrop.mutate>[0]["data"] },
-        {
-          onSuccess: () => { invalidate(); setShowCreate(false); setCreateForm(DEFAULT); toast({ title: "Airdrop added!" }); },
-          onError: () => toast({ title: "Failed to add", variant: "destructive" }),
-        }
-      );
-    }
-  }
-
-  async function handleEdit() {
-    if (!editingId) return;
-    if (demoMode) {
-      try {
-        await mockApi.updateAirdrop(editingId, editForm);
-        setEditingId(null);
-        invalidate();
-        toast({ title: "Updated!" });
-      } catch {
-        toast({ title: "Failed to update", variant: "destructive" });
-      }
-    } else {
-      updateAirdrop.mutate(
-        { id: editingId, data: { ...editForm } as Parameters<typeof updateAirdrop.mutate>[0]["data"] },
-        {
-          onSuccess: () => { invalidate(); setEditingId(null); toast({ title: "Updated!" }); },
-          onError: () => toast({ title: "Failed to update", variant: "destructive" }),
-        }
-      );
-    }
-  }
-
-  async function handleDelete(id: number, name: string) {
-    if (demoMode) {
-      try {
-        await mockApi.deleteAirdrop(id);
-        invalidate();
-        toast({ title: `"${name}" removed` });
-      } catch {
-        toast({ title: "Failed to delete", variant: "destructive" });
-      }
-    } else {
-      deleteAirdrop.mutate({ id }, {
-        onSuccess: () => { invalidate(); toast({ title: `"${name}" removed` }); },
-        onError: () => toast({ title: "Failed to delete", variant: "destructive" }),
-      });
-    }
-  }
 
   function handleSort(field: SortField) {
     if (sortField === field) {
@@ -332,31 +88,56 @@ export default function AirdropsPage() {
     }
   }
 
-  const sortedAirdrops = airdrops ? [...airdrops].sort((a, b) => {
+  const filteredAirdrops = airdrops.filter(a => {
+    if (filterStatus !== "all" && a.status !== filterStatus) return false;
+    if (search && !a.name.toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  });
+
+  const sortedAirdrops = [...filteredAirdrops].sort((a, b) => {
     let comparison = 0;
     switch (sortField) {
-      case "name":
-        comparison = a.name.localeCompare(b.name);
-        break;
-      case "participants":
-        comparison = (a.participantsCount || 0) - (b.participantsCount || 0);
-        break;
-      case "tasks":
-        comparison = (a.taskCount || 0) - (b.taskCount || 0);
-        break;
-      case "reward":
-        comparison = (a.rewardEstimate || "").localeCompare(b.rewardEstimate || "");
-        break;
-      default:
-        comparison = (a.id || 0) - (b.id || 0);
+      case "name": comparison = a.name.localeCompare(b.name); break;
+      case "participants": comparison = a.participantsCount - b.participantsCount; break;
+      case "tasks": comparison = a.taskCount - b.taskCount; break;
+      case "reward": comparison = (a.rewardEstimate || "").localeCompare(b.rewardEstimate || ""); break;
+      default: comparison = a.id - b.id;
     }
     return sortOrder === "asc" ? comparison : -comparison;
-  }) : [];
+  });
 
-  const FILTERS: { label: string; value: FilterStatus }[] = [
-    { label: "All", value: "all" }, { label: "Active", value: "active" },
-    { label: "Upcoming", value: "upcoming" }, { label: "Ended", value: "ended" }, { label: "Potential", value: "potential" },
-  ];
+  function handleCreate() {
+    if (!createForm.name.trim()) {
+      toast({ title: "Name is required", variant: "destructive" });
+      return;
+    }
+    const newAirdrop: Airdrop = {
+      id: Math.max(...airdrops.map(a => a.id)) + 1,
+      slug: createForm.slug || createForm.name.toLowerCase().replace(/\s+/g, "-"),
+      logoColor: createForm.logoColor,
+      logoInitial: createForm.logoInitial || createForm.name.charAt(0).toUpperCase(),
+      participantsCount: 0,
+      taskCount: 0,
+      createdAt: new Date().toISOString(),
+      ...createForm,
+    } as Airdrop;
+    setAirdrops([...airdrops, newAirdrop]);
+    setShowCreate(false);
+    setCreateForm({ name: "", slug: "", description: "", logoColor: "#d95c38", logoInitial: "", websiteUrl: "", twitterUrl: "", telegramUrl: "", discordUrl: "", category: "defi", chain: "ETH", status: "active", rewardEstimate: "", totalValue: "", difficulty: "medium", isFeatured: false, isVerified: false, startDate: "", endDate: "" });
+    toast({ title: "Airdrop added!" });
+  }
+
+  function handleEdit() {
+    if (!editingId) return;
+    setAirdrops(airdrops.map(a => a.id === editingId ? { ...a, ...editForm } : a));
+    setEditingId(null);
+    toast({ title: "Updated!" });
+  }
+
+  function handleDelete(id: number, name: string) {
+    setAirdrops(airdrops.filter(a => a.id !== id));
+    toast({ title: `"${name}" removed` });
+  }
 
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) return null;
@@ -364,192 +145,253 @@ export default function AirdropsPage() {
   };
 
   return (
-    <div>
-      {/* Demo Mode Banner */}
-      {demoMode && (
-        <div className="mb-4 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-100 text-amber-800 border-2 border-amber-300"
-          style={{ fontFamily: MONO, fontSize: "0.72rem" }}>
-          <AlertCircle size={14} className="shrink-0" />
-          <span><strong>Demo Mode</strong> — Showing sample data. Connect a backend API for live data.</span>
-        </div>
-      )}
-      
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-end justify-between mb-6">
+      <div className="flex items-end justify-between">
         <div>
-          <h1 style={{ fontFamily: DISPLAY, fontSize: "1.5rem", fontWeight: 700, lineHeight: 1.15 }}>Airdrops</h1>
-          <p className="text-muted-foreground mt-0.5" style={{ fontFamily: MONO, fontSize: "0.7rem" }}>{airdrops?.length ?? 0} tracked</p>
+          <h1 style={{ fontFamily: DISPLAY, fontSize: "1.8rem", fontWeight: 800, letterSpacing: "-0.02em" }}>
+            Airdrops
+          </h1>
+          <p className="text-muted-foreground mt-1" style={{ fontFamily: MONO, fontSize: "0.72rem" }}>
+            Track and manage crypto airdrops
+          </p>
         </div>
-        <button onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 bg-primary text-white px-4 py-2.5 rounded-full hover:-translate-y-px transition-all"
+        <button
+          onClick={() => setShowCreate(true)}
+          className="neo-button px-4 py-2 rounded-xl bg-primary text-white flex items-center gap-2"
           style={{ border: "2px solid hsl(var(--border))", boxShadow: "3px 3px 0 hsl(var(--border))", fontFamily: MONO, fontSize: "0.7rem", fontWeight: 700 }}
-          data-testid="button-add-airdrop">
+        >
           <Plus size={14} /> Add Airdrop
         </button>
       </div>
 
-      {/* Search + filter */}
-      <div className="flex items-center gap-3 mb-5 flex-wrap">
-        <div className="relative flex-1 min-w-48">
-          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Search airdrops…"
-            className="w-full pl-8 pr-4 py-2 rounded-xl border-2 border-border bg-background focus:outline-none focus:border-primary transition-colors"
-            style={{ fontFamily: MONO, fontSize: "0.72rem", boxShadow: "2px 2px 0 hsl(var(--border))" }} />
+      {/* Search + Filter */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search airdrops..."
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl border-2 border-border bg-background"
+            style={{ fontFamily: MONO, fontSize: "0.72rem", boxShadow: "3px 3px 0 hsl(var(--border))" }}
+          />
         </div>
-        <div className="flex gap-1.5 flex-wrap">
-          {FILTERS.map(f => (
-            <button key={f.value} onClick={() => setFilterStatus(f.value)}
-              className={cn("px-3 py-1.5 rounded-full border-2 transition-all", filterStatus === f.value ? "border-foreground bg-foreground text-background" : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/40")}
-              style={{ fontFamily: MONO, fontSize: "0.62rem", fontWeight: 700, boxShadow: filterStatus === f.value ? "2px 2px 0 hsl(var(--border))" : undefined }}>
-              {f.label}
+        <div className="flex gap-2">
+          {["all", "active", "upcoming", "ended", "potential"].map(status => (
+            <button
+              key={status}
+              onClick={() => setFilterStatus(status as FilterStatus)}
+              className={cn(
+                "px-3 py-2 rounded-xl border-2 border-border transition-all capitalize",
+                filterStatus === status ? "bg-foreground text-background" : "bg-background hover:bg-muted"
+              )}
+              style={{ fontFamily: MONO, fontSize: "0.68rem", fontWeight: 700, boxShadow: "2px 2px 0 hsl(var(--border))" }}
+            >
+              {status}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Crypto-rank style table */}
-      {isLoading ? (
-        <div className="space-y-2">{Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-lg" />)}</div>
-      ) : sortedAirdrops.length > 0 ? (
-        <div className="rounded-xl border-2 border-border overflow-hidden" style={{ boxShadow: "4px 4px 0 hsl(var(--border))" }}>
-          {/* Table Header */}
-          <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-muted/50 border-b-2 border-border items-center" style={{ fontFamily: MONO, fontSize: "0.6rem", fontWeight: 700, textTransform: "uppercase", color: "hsl(var(--muted-foreground))" }}>
-            <div className="col-span-1 text-center cursor-pointer hover:text-foreground transition-colors" onClick={() => handleSort("rank")}>
-              # <SortIcon field="rank" />
-            </div>
-            <div className="col-span-3 cursor-pointer hover:text-foreground transition-colors" onClick={() => handleSort("name")}>
-              Name <SortIcon field="name" />
-            </div>
-            <div className="col-span-1 text-center">Status</div>
-            <div className="col-span-1 text-center">Chain</div>
-            <div className="col-span-2 text-right cursor-pointer hover:text-foreground transition-colors" onClick={() => handleSort("reward")}>
-              Reward <SortIcon field="reward" />
-            </div>
-            <div className="col-span-1 text-right cursor-pointer hover:text-foreground transition-colors" onClick={() => handleSort("participants")}>
-              <Users size={10} className="inline mr-1" />Participants <SortIcon field="participants" />
-            </div>
-            <div className="col-span-1 text-right cursor-pointer hover:text-foreground transition-colors" onClick={() => handleSort("tasks")}>
-              <ListChecks size={10} className="inline mr-1" />Tasks <SortIcon field="tasks" />
-            </div>
-            <div className="col-span-1 text-center">Difficulty</div>
-            <div className="col-span-1 text-center">Action</div>
-          </div>
-
-          {/* Table Body */}
-          <div className="divide-y divide-border">
-            {sortedAirdrops.map((airdrop, idx) => {
-              const st = STATUS_STYLE[airdrop.status] ?? { bg: "#6b7280", color: "#fff", label: airdrop.status };
-              const diff = DIFF_STYLE[airdrop.difficulty] ?? { bg: "#6b7280", color: "#fff" };
-              return (
-                <div key={airdrop.id} className="grid grid-cols-12 gap-2 px-4 py-3 items-center hover:bg-muted/30 transition-colors group" data-testid={`airdrop-row-${airdrop.id}`}>
-                  {/* Rank */}
-                  <div className="col-span-1 text-center font-bold" style={{ fontFamily: MONO, fontSize: "0.75rem", color: "hsl(var(--muted-foreground))" }}>
-                    {idx + 1}
-                  </div>
-
-                  {/* Name + Logo */}
-                  <div className="col-span-3 flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold shrink-0"
-                      style={{ backgroundColor: airdrop.logoColor, fontFamily: DISPLAY, fontSize: "0.85rem" }}>
-                      {airdrop.logoInitial}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <Link href={`/airdrops/${airdrop.id}`}>
-                          <span className="font-bold hover:text-primary transition-colors cursor-pointer truncate" style={{ fontFamily: DISPLAY, fontSize: "0.85rem" }}>
-                            {airdrop.name}
-                          </span>
-                        </Link>
-                        {airdrop.isVerified && <CheckCircle size={11} className="text-primary shrink-0" />}
-                        {airdrop.isFeatured && <Star size={11} className="text-amber-500 shrink-0" />}
+      {/* Table */}
+      <div className="rounded-2xl border-2 border-border overflow-hidden" style={{ boxShadow: "4px 4px 0 hsl(var(--border))" }}>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-muted/50 border-b-2 border-border">
+                <th className="text-left p-4 cursor-pointer hover:bg-muted transition-colors" onClick={() => handleSort("rank")} style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase" }}>
+                  # <SortIcon field="rank" />
+                </th>
+                <th className="text-left p-4 cursor-pointer hover:bg-muted transition-colors" onClick={() => handleSort("name")} style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase" }}>
+                  Name <SortIcon field="name" />
+                </th>
+                <th className="text-left p-4" style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase" }}>Status</th>
+                <th className="text-left p-4" style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase" }}>Chain</th>
+                <th className="text-left p-4" style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase" }}>Reward</th>
+                <th className="text-right p-4 cursor-pointer hover:bg-muted transition-colors" onClick={() => handleSort("participants")} style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase" }}>
+                  Users <SortIcon field="participants" />
+                </th>
+                <th className="text-right p-4 cursor-pointer hover:bg-muted transition-colors" onClick={() => handleSort("tasks")} style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase" }}>
+                  Tasks <SortIcon field="tasks" />
+                </th>
+                <th className="text-center p-4" style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase" }}>Difficulty</th>
+                <th className="text-center p-4" style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase" }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sortedAirdrops.map((airdrop, idx) => (
+                <tr key={airdrop.id} className="border-b border-border hover:bg-muted/30 transition-colors">
+                  <td className="p-4" style={{ fontFamily: MONO, fontSize: "0.75rem", fontWeight: 700 }}>{idx + 1}</td>
+                  <td className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold"
+                        style={{ backgroundColor: airdrop.logoColor, fontFamily: DISPLAY, fontSize: "0.9rem", border: "2px solid hsl(var(--border))", boxShadow: "2px 2px 0 hsl(var(--border))" }}
+                      >
+                        {airdrop.logoInitial}
                       </div>
-                      <p className="text-muted-foreground truncate" style={{ fontFamily: MONO, fontSize: "0.6rem" }}>{airdrop.category}</p>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span style={{ fontFamily: DISPLAY, fontSize: "0.85rem", fontWeight: 700 }}>{airdrop.name}</span>
+                          {airdrop.isVerified && <CheckCircle size={14} className="text-primary" />}
+                        </div>
+                        <div className="text-muted-foreground" style={{ fontFamily: MONO, fontSize: "0.6rem" }}>{airdrop.category}</div>
+                      </div>
                     </div>
-                  </div>
-
-                  {/* Status */}
-                  <div className="col-span-1 text-center">
-                    <span className="px-2 py-0.5 rounded-full text-xs font-bold" style={{ backgroundColor: st.bg, color: st.color, fontFamily: MONO, fontSize: "0.55rem" }}>
-                      {st.label}
+                  </td>
+                  <td className="p-4">
+                    <span className="px-2.5 py-1 rounded-full text-xs font-bold" style={{ backgroundColor: STATUS_STYLE[airdrop.status]?.bg || "#6b7280", color: STATUS_STYLE[airdrop.status]?.color || "#fff", fontFamily: MONO }}>
+                      {STATUS_STYLE[airdrop.status]?.label || airdrop.status}
                     </span>
-                  </div>
-
-                  {/* Chain */}
-                  <div className="col-span-1 text-center" style={{ fontFamily: MONO, fontSize: "0.68rem", color: "hsl(var(--muted-foreground))" }}>
-                    {airdrop.chain}
-                  </div>
-
-                  {/* Reward */}
-                  <div className="col-span-2 text-right">
-                    <span className="font-bold text-primary" style={{ fontFamily: MONO, fontSize: "0.7rem" }}>
-                      {airdrop.rewardEstimate || "-"}
-                    </span>
-                  </div>
-
-                  {/* Participants */}
-                  <div className="col-span-1 text-right" style={{ fontFamily: MONO, fontSize: "0.68rem", color: "hsl(var(--muted-foreground))" }}>
-                    {airdrop.participantsCount > 0 ? `${(airdrop.participantsCount / 1000).toFixed(1)}k` : "-"}
-                  </div>
-
-                  {/* Tasks */}
-                  <div className="col-span-1 text-right" style={{ fontFamily: MONO, fontSize: "0.68rem", color: "hsl(var(--muted-foreground))" }}>
-                    {airdrop.taskCount || 0}
-                  </div>
-
-                  {/* Difficulty */}
-                  <div className="col-span-1 text-center">
-                    <span className="px-2 py-0.5 rounded-full text-xs font-bold" style={{ backgroundColor: diff.bg, color: diff.color, fontFamily: MONO, fontSize: "0.55rem" }}>
+                  </td>
+                  <td className="p-4" style={{ fontFamily: MONO, fontSize: "0.72rem" }}>{airdrop.chain}</td>
+                  <td className="p-4" style={{ fontFamily: MONO, fontSize: "0.72rem", color: "hsl(var(--primary))" }}>{airdrop.rewardEstimate || "-"}</td>
+                  <td className="p-4 text-right" style={{ fontFamily: MONO, fontSize: "0.72rem" }}>{(airdrop.participantsCount / 1000).toFixed(0)}K</td>
+                  <td className="p-4 text-right" style={{ fontFamily: MONO, fontSize: "0.72rem" }}>{airdrop.taskCount}</td>
+                  <td className="p-4 text-center">
+                    <span className="px-2 py-1 rounded-full text-xs font-bold" style={{ backgroundColor: DIFF_STYLE[airdrop.difficulty]?.bg || "#6b7280", color: DIFF_STYLE[airdrop.difficulty]?.color || "#fff", fontFamily: MONO }}>
                       {airdrop.difficulty}
                     </span>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="col-span-1 flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Link href={`/airdrops/${airdrop.id}`}>
-                      <button className="w-6 h-6 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-all" title="View details">
-                        <ExternalLink size={11} />
+                  </td>
+                  <td className="p-4">
+                    <div className="flex items-center justify-center gap-1">
+                      <Link href={`/airdrops/${airdrop.id}`}>
+                        <button className="p-2 rounded-lg hover:bg-muted transition-colors" title="View details">
+                          <ExternalLink size={14} />
+                        </button>
+                      </Link>
+                      <button
+                        onClick={() => { setEditForm({ ...airdrop }); setEditingId(airdrop.id); }}
+                        className="p-2 rounded-lg hover:bg-muted transition-colors"
+                        title="Edit"
+                      >
+                        <Pencil size={14} />
                       </button>
-                    </Link>
-                    <button onClick={() => { setEditingId(airdrop.id); setEditForm({ name: airdrop.name, slug: airdrop.slug, description: airdrop.description ?? "", logoColor: airdrop.logoColor, logoInitial: airdrop.logoInitial, websiteUrl: airdrop.websiteUrl ?? "", twitterUrl: airdrop.twitterUrl ?? "", telegramUrl: airdrop.telegramUrl ?? "", discordUrl: airdrop.discordUrl ?? "", category: airdrop.category, chain: airdrop.chain, status: airdrop.status, rewardEstimate: airdrop.rewardEstimate ?? "", totalValue: airdrop.totalValue ?? "", difficulty: airdrop.difficulty, isFeatured: airdrop.isFeatured, isVerified: airdrop.isVerified, startDate: airdrop.startDate ?? "", endDate: airdrop.endDate ?? "" }); }}
-                      className="w-6 h-6 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-all" title="Edit">
-                      <Pencil size={11} />
-                    </button>
-                    <button onClick={() => handleDelete(airdrop.id, airdrop.name)}
-                      className="w-6 h-6 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-red-500 hover:border-red-500/40 transition-all" title="Delete">
-                      <Trash2 size={11} />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+                      <button
+                        onClick={() => handleDelete(airdrop.id, airdrop.name)}
+                        className="p-2 rounded-lg hover:bg-destructive/10 text-destructive transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {sortedAirdrops.length === 0 && (
+          <div className="p-8 text-center text-muted-foreground" style={{ fontFamily: MONO, fontSize: "0.75rem" }}>
+            No airdrops found. Add one to get started!
           </div>
-        </div>
-      ) : (
-        <div className="py-20 text-center rounded-2xl border-2 border-dashed border-border">
-          <Zap size={40} className="mx-auto text-muted-foreground mb-3" />
-          <p className="font-bold mb-1" style={{ fontFamily: DISPLAY, fontSize: "0.9rem" }}>No airdrops found</p>
-          <p className="text-muted-foreground mb-5" style={{ fontFamily: MONO, fontSize: "0.7rem" }}>
-            {filterStatus !== "all" || search ? "Try a different filter" : "Add the first airdrop"}
-          </p>
-          {filterStatus === "all" && !search && (
-            <button onClick={() => setShowCreate(true)}
-              className="inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-full"
-              style={{ border: "2px solid hsl(var(--border))", boxShadow: "3px 3px 0 hsl(var(--border))", fontFamily: MONO, fontSize: "0.7rem", fontWeight: 700 }}>
-              <Plus size={14} /> Add Airdrop
-            </button>
-          )}
-        </div>
-      )}
+        )}
+      </div>
 
-      <AirdropFormDialog open={showCreate} onClose={() => setShowCreate(false)} form={createForm} setForm={setCreateForm} onSubmit={handleCreate} isPending={createAirdrop.isPending} mode="create" />
-      {editingId !== null && <AirdropFormDialog open={true} onClose={() => setEditingId(null)} form={editForm} setForm={setEditForm} onSubmit={handleEdit} isPending={updateAirdrop.isPending} mode="edit" />}
-      {demoMode && (
-        <div className="flex items-center gap-2 bg-amber-500 text-white px-3 py-1.5 rounded-full border-2 border-amber-600 mt-4">
-          <AlertCircle size={12} className="flex-shrink-0" />
-          <span className="text-sm">Demo Mode — Showing sample data. Connect a backend API for live data.</span>
-        </div>
-      )}
+      {/* Create Dialog */}
+      <Dialog open={showCreate} onOpenChange={setShowCreate}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle style={{ fontFamily: DISPLAY }}>Add Airdrop</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label style={{ fontFamily: MONO, fontSize: "0.65rem" }}>Name *</Label>
+                <Input value={createForm.name} onChange={e => setCreateForm({ ...createForm, name: e.target.value })} className="mt-1" />
+              </div>
+              <div>
+                <Label style={{ fontFamily: MONO, fontSize: "0.65rem" }}>Status</Label>
+                <Select value={createForm.status} onValueChange={v => setCreateForm({ ...createForm, status: v })}>
+                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                  <SelectContent>{STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div>
+              <Label style={{ fontFamily: MONO, fontSize: "0.65rem" }}>Description</Label>
+              <Input value={createForm.description} onChange={e => setCreateForm({ ...createForm, description: e.target.value })} className="mt-1" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label style={{ fontFamily: MONO, fontSize: "0.65rem" }}>Chain</Label>
+                <Select value={createForm.chain} onValueChange={v => setCreateForm({ ...createForm, chain: v })}>
+                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                  <SelectContent>{CHAINS.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label style={{ fontFamily: MONO, fontSize: "0.65rem" }}>Difficulty</Label>
+                <Select value={createForm.difficulty} onValueChange={v => setCreateForm({ ...createForm, difficulty: v })}>
+                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                  <SelectContent>{DIFFICULTIES.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div>
+              <Label style={{ fontFamily: MONO, fontSize: "0.65rem" }}>Reward Estimate</Label>
+              <Input value={createForm.rewardEstimate} onChange={e => setCreateForm({ ...createForm, rewardEstimate: e.target.value })} placeholder="$100 - $1,000" className="mt-1" />
+            </div>
+          </div>
+          <DialogFooter>
+            <button onClick={() => setShowCreate(false)} className="px-4 py-2 rounded-xl border-2 border-border" style={{ fontFamily: MONO }}>Cancel</button>
+            <button onClick={handleCreate} className="px-4 py-2 rounded-xl bg-primary text-white" style={{ fontFamily: MONO }}>Add</button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Dialog */}
+      <Dialog open={editingId !== null} onOpenChange={() => setEditingId(null)}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle style={{ fontFamily: DISPLAY }}>Edit Airdrop</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label style={{ fontFamily: MONO, fontSize: "0.65rem" }}>Name</Label>
+                <Input value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} className="mt-1" />
+              </div>
+              <div>
+                <Label style={{ fontFamily: MONO, fontSize: "0.65rem" }}>Status</Label>
+                <Select value={editForm.status} onValueChange={v => setEditForm({ ...editForm, status: v })}>
+                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                  <SelectContent>{STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div>
+              <Label style={{ fontFamily: MONO, fontSize: "0.65rem" }}>Description</Label>
+              <Input value={editForm.description} onChange={e => setEditForm({ ...editForm, description: e.target.value })} className="mt-1" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label style={{ fontFamily: MONO, fontSize: "0.65rem" }}>Chain</Label>
+                <Select value={editForm.chain} onValueChange={v => setEditForm({ ...editForm, chain: v })}>
+                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                  <SelectContent>{CHAINS.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label style={{ fontFamily: MONO, fontSize: "0.65rem" }}>Difficulty</Label>
+                <Select value={editForm.difficulty} onValueChange={v => setEditForm({ ...editForm, difficulty: v })}>
+                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                  <SelectContent>{DIFFICULTIES.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div>
+              <Label style={{ fontFamily: MONO, fontSize: "0.65rem" }}>Reward Estimate</Label>
+              <Input value={editForm.rewardEstimate} onChange={e => setEditForm({ ...editForm, rewardEstimate: e.target.value })} className="mt-1" />
+            </div>
+          </div>
+          <DialogFooter>
+            <button onClick={() => setEditingId(null)} className="px-4 py-2 rounded-xl border-2 border-border" style={{ fontFamily: MONO }}>Cancel</button>
+            <button onClick={handleEdit} className="px-4 py-2 rounded-xl bg-primary text-white" style={{ fontFamily: MONO }}>Save</button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,8 +1,7 @@
-import { useGetStats, useListAirdrops, useListActivity, getListAirdropsQueryKey } from "@workspace/api-client-react";
 import { Zap, TrendingUp, Clock, CheckCircle, Star, Globe, Twitter, Send, ExternalLink } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 import { cn } from "@/lib/utils";
+import { mockAirdrops, mockActivity } from "@/lib/mockData";
 
 const MONO    = "'Space Mono', monospace";
 const DISPLAY = "'Unbounded', sans-serif";
@@ -17,18 +16,25 @@ const STATUS_STYLE: Record<string, { bg: string; label: string }> = {
 const DIFF_STYLE: Record<string, string> = { easy: PASTEL.mint, medium: PASTEL.yellow, hard: PASTEL.peach };
 const ACT_STYLE: Record<string, string> = { airdrop_added: PASTEL.sky, airdrop_updated: PASTEL.yellow };
 
-const STAT_CARDS = [
-  { label: "Total Airdrops", key: "totalAirdrops",   icon: Zap,         bg: PASTEL.sky },
-  { label: "Active Now",     key: "activeAirdrops",  icon: TrendingUp,  bg: PASTEL.mint },
-  { label: "Upcoming",       key: "upcomingAirdrops",icon: Clock,       bg: PASTEL.yellow },
-  { label: "Tasks Tracked",  key: "totalTasks",      icon: CheckCircle, bg: PASTEL.lavender },
-];
-
 export default function DashboardPage() {
-  const { data: stats, isLoading: statsLoading } = useGetStats();
-  const { data: featured } = useListAirdrops({ featured: true });
-  const { data: active }   = useListAirdrops({ status: "active" }, { query: { queryKey: getListAirdropsQueryKey({ status: "active" }) } });
-  const { data: activity } = useListActivity();
+  // Calculate stats from mock data
+  const stats = {
+    totalAirdrops: mockAirdrops.length,
+    activeAirdrops: mockAirdrops.filter(a => a.status === "active").length,
+    upcomingAirdrops: mockAirdrops.filter(a => a.status === "upcoming").length,
+    totalTasks: mockAirdrops.reduce((sum, a) => sum + a.taskCount, 0),
+  };
+
+  const featured = mockAirdrops.filter(a => a.isFeatured);
+  const active = mockAirdrops.filter(a => a.status === "active");
+  const activity = mockActivity;
+
+  const STAT_CARDS = [
+    { label: "Total Airdrops", value: stats.totalAirdrops, icon: Zap, bg: PASTEL.sky },
+    { label: "Active Now", value: stats.activeAirdrops, icon: TrendingUp, bg: PASTEL.mint },
+    { label: "Upcoming", value: stats.upcomingAirdrops, icon: Clock, bg: PASTEL.yellow },
+    { label: "Tasks Tracked", value: stats.totalTasks, icon: CheckCircle, bg: PASTEL.lavender },
+  ];
 
   return (
     <div>
@@ -54,24 +60,17 @@ export default function DashboardPage() {
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {STAT_CARDS.map(card => {
-          const value = stats ? (stats as Record<string, number>)[card.key] : null;
-          return (
-            <div key={card.key} className="neo-card p-5" style={{ backgroundColor: card.bg }}>
-              {statsLoading ? <Skeleton className="h-16 w-full rounded-xl" /> : (
-                <>
-                  <div className="flex items-start justify-between mb-3">
-                    <p style={{ fontFamily: MONO, fontSize: "0.58rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.07em" }} className="text-foreground/60">{card.label}</p>
-                    <div className="w-7 h-7 rounded-xl border-2 border-foreground/20 flex items-center justify-center bg-white/40">
-                      <card.icon size={13} className="text-foreground/70" />
-                    </div>
-                  </div>
-                  <p style={{ fontFamily: DISPLAY, fontSize: "2rem", fontWeight: 700, lineHeight: 1 }}>{value ?? 0}</p>
-                </>
-              )}
+        {STAT_CARDS.map(card => (
+          <div key={card.label} className="neo-card p-5" style={{ backgroundColor: card.bg }}>
+            <div className="flex items-start justify-between mb-3">
+              <p style={{ fontFamily: MONO, fontSize: "0.58rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.07em" }} className="text-foreground/60">{card.label}</p>
+              <div className="w-7 h-7 rounded-xl border-2 border-foreground/20 flex items-center justify-center bg-white/40">
+                <card.icon size={13} className="text-foreground/70" />
+              </div>
             </div>
-          );
-        })}
+            <p style={{ fontFamily: DISPLAY, fontSize: "2rem", fontWeight: 700, lineHeight: 1 }}>{card.value}</p>
+          </div>
+        ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -87,9 +86,7 @@ export default function DashboardPage() {
               View All <ExternalLink size={11} />
             </Link>
           </div>
-          {!featured ? (
-            <div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-2xl" />)}</div>
-          ) : featured.length > 0 ? (
+          {featured.length > 0 ? (
             <div className="space-y-2">
               {featured.slice(0, 5).map((airdrop, idx) => {
                 const st = STATUS_STYLE[airdrop.status] ?? { bg: PASTEL.sage, label: airdrop.status };
@@ -128,34 +125,30 @@ export default function DashboardPage() {
         {/* Activity feed */}
         <div className="neo-card p-5">
           <p className="mb-4" style={{ fontFamily: DISPLAY, fontSize: "0.85rem", fontWeight: 700 }}>Recent Activity</p>
-          {!activity ? (
-            <div className="space-y-2">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-10 w-full rounded-xl" />)}</div>
-          ) : (
-            <div className="space-y-0">
-              {activity.slice(0, 8).map((item, idx) => {
-                const bg = ACT_STYLE[item.type] ?? PASTEL.sage;
-                return (
-                  <div key={item.id} className={cn("flex items-start gap-2 py-2.5", idx < 7 && "border-b border-border/40")}>
-                    <div className="w-5 h-5 rounded-full border-2 border-foreground/15 flex items-center justify-center shrink-0 mt-0.5"
-                      style={{ backgroundColor: bg }}>
-                      <Zap size={9} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs leading-tight text-foreground/80">{item.message}</p>
-                      <p className="text-muted-foreground mt-0.5" style={{ fontFamily: MONO, fontSize: "0.55rem" }}>
-                        {new Date(item.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                      </p>
-                    </div>
+          <div className="space-y-0">
+            {activity.slice(0, 8).map((item, idx) => {
+              const bg = ACT_STYLE[item.type] ?? PASTEL.sage;
+              return (
+                <div key={item.id} className={cn("flex items-start gap-2 py-2.5", idx < 7 && "border-b border-border/40")}>
+                  <div className="w-5 h-5 rounded-full border-2 border-foreground/15 flex items-center justify-center shrink-0 mt-0.5"
+                    style={{ backgroundColor: bg }}>
+                    <Zap size={9} />
                   </div>
-                );
-              })}
-            </div>
-          )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs leading-tight text-foreground/80">{item.message}</p>
+                    <p className="text-muted-foreground mt-0.5" style={{ fontFamily: MONO, fontSize: "0.55rem" }}>
+                      {new Date(item.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
 
       {/* Active airdrop list */}
-      {active && active.length > 0 && (
+      {active.length > 0 && (
         <div className="neo-card p-5 mt-4">
           <div className="flex items-center justify-between mb-4">
             <p style={{ fontFamily: DISPLAY, fontSize: "0.85rem", fontWeight: 700 }}>🔥 Active Right Now</p>
