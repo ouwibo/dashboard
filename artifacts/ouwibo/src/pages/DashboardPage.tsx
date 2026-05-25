@@ -59,70 +59,52 @@ function SectionHeader({ title, href }: { title: string; href?: string }) {
 
 /* ── Stat Card ── */
 const STAT_DEFS = [
-  { label: "TOTAL AIRDROPS", color: "#f97316", icon: "⚡" },
-  { label: "ACTIVE",         color: "#8b5cf6", icon: "🟢" },
-  { label: "UPCOMING",       color: "#06b6d4", icon: "🕐" },
-  { label: "TASKS TRACKED",  color: "#10b981", icon: "✅" },
+  { label: "TOTAL AIRDROPS", icon: "⚡" },
+  { label: "ACTIVE",         icon: "🟢" },
+  { label: "UPCOMING",       icon: "🕐" },
+  { label: "TASKS TRACKED",  icon: "✅" },
 ];
 function StatCard({ def, value, delay }: { def: typeof STAT_DEFS[0]; value: number; delay: number }) {
   const ref = useAnim("anim-scale", delay);
   return (
-    <div ref={ref} className="anim rounded-2xl border-2 border-border bg-card p-5 relative overflow-hidden"
-      style={{ boxShadow: "3px 3px 0 hsl(var(--border))" }}>
-      <div className="absolute top-0 right-0 w-20 h-20 rounded-full opacity-10 -translate-y-6 translate-x-6"
-        style={{ backgroundColor: def.color }} />
-      <p className="text-xs font-bold text-muted-foreground mb-2" style={{ fontFamily: MONO }}>{def.label}</p>
-      <p className="text-4xl font-black mb-1" style={{ fontFamily: DISPLAY, color: def.color }}>{value}</p>
-      <div className="w-8 h-1 rounded-full" style={{ backgroundColor: def.color }} />
+    <div ref={ref} className="anim rounded-xl border border-border bg-card p-3.5 relative overflow-hidden"
+      style={{ boxShadow: "2px 2px 0 hsl(var(--border))" }}>
+      <p className="text-[10px] font-bold text-muted-foreground mb-1.5" style={{ fontFamily: MONO }}>{def.label}</p>
+      <p className="text-2xl font-black text-primary" style={{ fontFamily: DISPLAY }}>{value}</p>
     </div>
   );
 }
 
-/* ── Airdrop Card (Whendrops post-card style) ── */
+/* ── Airdrop Card ── */
 function AirdropCard({ airdrop, index }: { airdrop: any; index: number }) {
-  const ref = useAnim("anim-up", index * 80);
+  const ref = useAnim("anim-up", index * 70);
   const color = CARD_COLORS[index % CARD_COLORS.length];
   const st = STATUS[airdrop.status] ?? STATUS.potential;
   return (
-    <div ref={ref} className="anim rounded-2xl border-2 border-border bg-card overflow-hidden hover:-translate-y-1 transition-transform duration-200"
-      style={{ boxShadow: "3px 3px 0 hsl(var(--border))" }}>
-      {/* Thumbnail area */}
-      <div className="relative h-36 flex items-center justify-center"
-        style={{ background: `linear-gradient(135deg, ${color}cc, ${color}44)` }}>
-        <span className="text-5xl font-black text-white select-none drop-shadow-lg" style={{ fontFamily: DISPLAY }}>
+    <div ref={ref} className="anim rounded-xl border border-border bg-card overflow-hidden hover:-translate-y-0.5 transition-transform duration-200"
+      style={{ boxShadow: "2px 2px 0 hsl(var(--border))" }}>
+      <div className="relative h-24 flex items-center justify-center"
+        style={{ background: `linear-gradient(135deg, ${color}bb, ${color}33)` }}>
+        <span className="text-3xl font-black text-white select-none drop-shadow-md" style={{ fontFamily: DISPLAY }}>
           {airdrop.logoInitial}
         </span>
-        {/* Status badge */}
-        <span className="absolute top-3 left-3 text-[10px] font-bold px-2.5 py-1 rounded-full border"
-          style={{ backgroundColor: st.bg, color: st.text, fontFamily: MONO, borderColor: st.text + "33" }}>
+        <span className="absolute top-2 left-2 text-[9px] font-bold px-2 py-0.5 rounded-full border"
+          style={{ backgroundColor: st.bg, color: st.text, fontFamily: MONO, borderColor: st.text + "22" }}>
           {st.label}
         </span>
-        {/* Verified badge */}
         {airdrop.isVerified && (
-          <span className="absolute top-3 right-3 w-6 h-6 rounded-full bg-white/90 flex items-center justify-center text-xs">
-            ✓
-          </span>
+          <span className="absolute top-2 right-2 w-5 h-5 rounded-full bg-white/90 flex items-center justify-center text-[10px] text-green-600">✓</span>
         )}
       </div>
-
-      {/* Content */}
-      <div className="p-4">
-        <p className="text-[10px] text-muted-foreground mb-1" style={{ fontFamily: MONO }}>
-          {airdrop.category} · {airdrop.chain}
-        </p>
-        <h3 className="font-black text-sm text-foreground mb-1 leading-tight" style={{ fontFamily: DISPLAY }}>
-          {airdrop.name}
-        </h3>
-        <p className="text-xs text-muted-foreground line-clamp-2 mb-3" style={{ fontFamily: MONO }}>
-          {airdrop.description}
-        </p>
+      <div className="p-3">
+        <p className="text-[9px] text-muted-foreground mb-0.5" style={{ fontFamily: MONO }}>{airdrop.category} · {airdrop.chain}</p>
+        <h3 className="font-black text-[12px] text-foreground mb-1 leading-tight" style={{ fontFamily: DISPLAY }}>{airdrop.name}</h3>
+        <p className="text-[10px] text-muted-foreground line-clamp-2 mb-2.5" style={{ fontFamily: MONO }}>{airdrop.description}</p>
         <div className="flex items-center justify-between">
-          <span className="text-xs font-bold" style={{ color, fontFamily: MONO }}>
-            {airdrop.rewardEstimate ?? "TBD"}
-          </span>
+          <span className="text-[10px] font-bold text-primary" style={{ fontFamily: MONO }}>{airdrop.rewardEstimate ?? "TBD"}</span>
           <a href={airdrop.referralUrl || airdrop.websiteUrl} target="_blank" rel="noopener noreferrer"
-            className="text-[10px] font-bold px-3 py-1.5 rounded-full text-white transition-opacity hover:opacity-80"
-            style={{ backgroundColor: color, fontFamily: MONO }}>
+            className="text-[9px] font-bold px-2.5 py-1 rounded-full text-primary-foreground bg-primary hover:opacity-85 transition-opacity"
+            style={{ fontFamily: MONO }}>
             Join →
           </a>
         </div>
@@ -131,48 +113,40 @@ function AirdropCard({ airdrop, index }: { airdrop: any; index: number }) {
   );
 }
 
-/* ── Featured Card (pinned post style) ── */
+/* ── Featured Card ── */
 function FeaturedCard({ airdrop }: { airdrop: any }) {
   const ref = useAnim("anim-up", 0);
   const color = CARD_COLORS[0];
   const st = STATUS[airdrop.status] ?? STATUS.potential;
   return (
-    <div ref={ref} className="anim rounded-2xl border-2 border-border bg-card overflow-hidden mb-8"
-      style={{ boxShadow: "4px 4px 0 hsl(var(--border))" }}>
+    <div ref={ref} className="anim rounded-xl border border-border bg-card overflow-hidden mb-6"
+      style={{ boxShadow: "2px 2px 0 hsl(var(--border))" }}>
       <div className="flex flex-col sm:flex-row">
-        {/* Thumbnail */}
-        <div className="sm:w-72 h-48 sm:h-auto flex-shrink-0 flex items-center justify-center relative"
-          style={{ background: `linear-gradient(135deg, ${color}cc, ${color}55)` }}>
-          <span className="text-7xl font-black text-white select-none drop-shadow-xl" style={{ fontFamily: DISPLAY }}>
+        <div className="sm:w-52 h-36 sm:h-auto flex-shrink-0 flex items-center justify-center relative"
+          style={{ background: `linear-gradient(135deg, ${color}bb, ${color}44)` }}>
+          <span className="text-4xl font-black text-white select-none drop-shadow-lg" style={{ fontFamily: DISPLAY }}>
             {airdrop.logoInitial}
           </span>
-          <span className="absolute bottom-3 left-3 text-[10px] font-bold px-2.5 py-1 rounded-full bg-white/90"
+          <span className="absolute bottom-2 left-2 text-[9px] font-bold px-2 py-0.5 rounded-full bg-white/90"
             style={{ color, fontFamily: MONO }}>
             Featured ★
           </span>
         </div>
-        {/* Content */}
-        <div className="p-6 flex flex-col justify-center flex-1">
-          <p className="text-[10px] text-muted-foreground mb-2" style={{ fontFamily: MONO }}>
-            {airdrop.category} · {airdrop.chain}
-          </p>
-          <h3 className="font-black text-2xl text-foreground mb-2 leading-tight" style={{ fontFamily: DISPLAY }}>
-            {airdrop.name}
-          </h3>
-          <p className="text-sm text-muted-foreground mb-4" style={{ fontFamily: MONO }}>
-            {airdrop.description}
-          </p>
-          <div className="flex items-center gap-3 flex-wrap">
-            <span className="text-xs font-bold px-3 py-1 rounded-full border"
-              style={{ backgroundColor: st.bg, color: st.text, fontFamily: MONO, borderColor: st.text + "33" }}>
+        <div className="p-4 flex flex-col justify-center flex-1">
+          <p className="text-[9px] text-muted-foreground mb-1" style={{ fontFamily: MONO }}>{airdrop.category} · {airdrop.chain}</p>
+          <h3 className="font-black text-lg text-foreground mb-1.5 leading-tight" style={{ fontFamily: DISPLAY }}>{airdrop.name}</h3>
+          <p className="text-xs text-muted-foreground mb-3" style={{ fontFamily: MONO }}>{airdrop.description}</p>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[9px] font-bold px-2 py-0.5 rounded-full border"
+              style={{ backgroundColor: st.bg, color: st.text, fontFamily: MONO, borderColor: st.text + "22" }}>
               {st.label}
             </span>
-            <span className="text-xs font-bold" style={{ color, fontFamily: MONO }}>
+            <span className="text-[10px] font-bold text-primary" style={{ fontFamily: MONO }}>
               Est. {airdrop.rewardEstimate ?? "TBD"}
             </span>
             <a href={airdrop.referralUrl || airdrop.websiteUrl} target="_blank" rel="noopener noreferrer"
-              className="ml-auto text-xs font-bold px-4 py-2 rounded-full text-white"
-              style={{ backgroundColor: color, fontFamily: MONO }}>
+              className="ml-auto text-[10px] font-bold px-3 py-1.5 rounded-full text-primary-foreground bg-primary hover:opacity-85 transition-opacity"
+              style={{ fontFamily: MONO }}>
               Join Airdrop →
             </a>
           </div>
@@ -264,34 +238,30 @@ export default function DashboardPage() {
   ];
 
   const greetRef = useAnim("anim-up", 0);
-
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
 
   return (
     <div>
       {/* Greeting */}
-      <div ref={greetRef} className="anim mb-8">
-        <p className="text-xs text-muted-foreground mb-1" style={{ fontFamily: MONO }}>
-          {greeting} 👋
-        </p>
-        <h1 className="text-3xl font-black text-foreground" style={{ fontFamily: DISPLAY }}>
-          Ouwibo <span style={{ WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-            backgroundImage: "linear-gradient(135deg,#f97316,#8b5cf6,#06b6d4)", backgroundClip: "text" }}>Dashboard</span>
+      <div ref={greetRef} className="anim mb-5">
+        <p className="text-[10px] text-muted-foreground mb-1" style={{ fontFamily: MONO }}>{greeting} 👋</p>
+        <h1 className="text-2xl font-black text-foreground" style={{ fontFamily: DISPLAY }}>
+          Ouwibo <span className="text-primary">Cloud</span>
         </h1>
-        <p className="text-sm text-muted-foreground mt-1" style={{ fontFamily: MONO }}>
+        <p className="text-xs text-muted-foreground mt-0.5" style={{ fontFamily: MONO }}>
           Track and join the best crypto airdrops
         </p>
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         {STAT_DEFS.map((def, i) => (
-          <StatCard key={def.label} def={def} value={statValues[i]} delay={i * 80} />
+          <StatCard key={def.label} def={def} value={statValues[i]} delay={i * 70} />
         ))}
       </div>
 
-      {/* Featured / Pinned Airdrop */}
+      {/* Featured */}
       {featured.length > 0 && (
         <div>
           <SectionHeader title="Pinned Airdrop" />
@@ -299,11 +269,11 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Airdrop Grid */}
+      {/* Grid */}
       {rest.length > 0 && (
-        <div className="mb-8">
+        <div className="mb-6">
           <SectionHeader title="Latest Airdrops" href="/airdrops" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {rest.slice(0, 6).map((a, i) => (
               <AirdropCard key={a.id} airdrop={a} index={i} />
             ))}
@@ -311,19 +281,15 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Empty state */}
       {airdrops.length === 0 && (
-        <div className="text-center py-20 text-muted-foreground">
-          <p className="text-5xl mb-4">🪂</p>
-          <p className="font-black text-xl mb-2" style={{ fontFamily: DISPLAY }}>No Airdrops Yet</p>
-          <p className="text-sm" style={{ fontFamily: MONO }}>Add airdrops in mockData.ts to get started</p>
+        <div className="text-center py-16 text-muted-foreground">
+          <p className="text-4xl mb-3">🪂</p>
+          <p className="font-black text-base mb-1" style={{ fontFamily: DISPLAY }}>No Airdrops Yet</p>
+          <p className="text-xs" style={{ fontFamily: MONO }}>Add airdrops in mockData.ts to get started</p>
         </div>
       )}
 
-      {/* Activity Feed */}
       <ActivityFeed />
-
-      {/* Crypto Ticker */}
       <CryptoTicker />
     </div>
   );

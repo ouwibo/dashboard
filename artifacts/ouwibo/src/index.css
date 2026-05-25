@@ -60,8 +60,7 @@
 /* ═══════════════════════════════════════════
    LIGHT / DAY THEME
 ═══════════════════════════════════════════ */
-:root,
-[data-theme="light"] {
+:root {
   --button-outline: rgba(0,0,0,.15);
   --badge-outline: rgba(0,0,0,.08);
   --opaque-button-border-intensity: -8;
@@ -70,39 +69,39 @@
 
   --background: 34 28% 93%;
   --foreground: 0 0% 12%;
-  --border: 0 0% 14%;
+  --border: 0 0% 80%;
 
   --card: 0 0% 100%;
   --card-foreground: 0 0% 12%;
-  --card-border: 0 0% 14%;
+  --card-border: 0 0% 80%;
 
   --sidebar: 0 0% 99%;
   --sidebar-foreground: 0 0% 12%;
   --sidebar-border: 0 0% 88%;
-  --sidebar-primary: 24 62% 48%;
+  --sidebar-primary: 24 62% 44%;
   --sidebar-primary-foreground: 0 0% 100%;
   --sidebar-accent: 34 28% 90%;
   --sidebar-accent-foreground: 0 0% 12%;
-  --sidebar-ring: 24 62% 48%;
+  --sidebar-ring: 24 62% 44%;
 
   --popover: 0 0% 100%;
   --popover-foreground: 0 0% 12%;
-  --popover-border: 0 0% 14%;
+  --popover-border: 0 0% 80%;
 
-  --primary: 24 62% 48%;
+  --primary: 24 62% 44%;
   --primary-foreground: 0 0% 100%;
   --secondary: 34 28% 88%;
   --secondary-foreground: 0 0% 12%;
   --muted: 34 20% 88%;
-  --muted-foreground: 0 0% 42%;
+  --muted-foreground: 0 0% 45%;
   --accent: 34 28% 86%;
   --accent-foreground: 0 0% 12%;
   --destructive: 0 72% 52%;
   --destructive-foreground: 0 0% 100%;
-  --input: 0 0% 14%;
-  --ring: 24 62% 48%;
+  --input: 0 0% 80%;
+  --ring: 24 62% 44%;
 
-  --chart-1: 24 62% 48%;
+  --chart-1: 24 62% 44%;
   --chart-2: 150 45% 42%;
   --chart-3: 210 55% 52%;
   --chart-4: 265 48% 56%;
@@ -112,16 +111,16 @@
   --app-font-display: 'Unbounded', sans-serif;
   --app-font-serif: Georgia, serif;
   --app-font-mono: 'Space Mono', monospace;
-  --radius: 1.125rem;
+  --radius: 1rem;
 
   --shadow-2xs: 2px 2px 0 rgba(0,0,0,0.18);
   --shadow-xs:  2px 2px 0 rgba(0,0,0,0.18);
   --shadow-sm:  2px 2px 0 rgba(0,0,0,0.18);
-  --shadow:     4px 4px 0 rgba(0,0,0,0.16);
-  --shadow-md:  4px 4px 0 rgba(0,0,0,0.16);
-  --shadow-lg:  6px 6px 0 rgba(0,0,0,0.14);
-  --shadow-xl:  6px 6px 0 rgba(0,0,0,0.14);
-  --shadow-2xl: 6px 6px 0 rgba(0,0,0,0.14);
+  --shadow:     3px 3px 0 rgba(0,0,0,0.16);
+  --shadow-md:  3px 3px 0 rgba(0,0,0,0.16);
+  --shadow-lg:  4px 4px 0 rgba(0,0,0,0.14);
+  --shadow-xl:  4px 4px 0 rgba(0,0,0,0.14);
+  --shadow-2xl: 4px 4px 0 rgba(0,0,0,0.14);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 
@@ -135,8 +134,7 @@
 }
 
 /* ═══════════════════════════════════════════
-   SHARED DARK BASE (all dark themes inherit)
-   Applied via .dark class for Tailwind compat
+   DARK MODE BASE — neutral cool-dark, no tint
 ═══════════════════════════════════════════ */
 .dark {
   --button-outline: rgba(255,255,255,.10);
@@ -145,21 +143,39 @@
   --elevate-1: rgba(255,255,255,.03);
   --elevate-2: rgba(255,255,255,.07);
 
-  --foreground: 220 15% 86%;
-  --border: 220 18% 20%;
-  --card-foreground: 220 15% 86%;
-  --card-border: 220 18% 16%;
-  --popover-foreground: 220 15% 86%;
-  --popover-border: 220 18% 16%;
-  --primary-foreground: 0 0% 100%;
-  --secondary-foreground: 220 12% 78%;
-  --muted-foreground: 220 8% 50%;
-  --accent-foreground: 220 15% 86%;
-  --sidebar-foreground: 220 15% 84%;
+  --background:   220 15% 8%;
+  --foreground:   220 14% 86%;
+  --border:       220 14% 20%;
+
+  --card:         220 14% 11%;
+  --card-foreground: 220 14% 86%;
+  --card-border:  220 14% 18%;
+
+  --sidebar:      220 16% 9%;
+  --sidebar-foreground: 220 12% 84%;
+  --sidebar-border: 220 14% 16%;
+  --sidebar-primary: 24 60% 50%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent-foreground: 220 15% 84%;
-  --destructive: 0 72% 58%;
+  --sidebar-accent: 220 14% 14%;
+  --sidebar-accent-foreground: 220 12% 84%;
+  --sidebar-ring: 24 60% 50%;
+
+  --popover:      220 14% 11%;
+  --popover-foreground: 220 14% 86%;
+  --popover-border: 220 14% 18%;
+
+  --primary:      24 60% 50%;
+  --primary-foreground: 0 0% 100%;
+  --secondary:    220 12% 14%;
+  --secondary-foreground: 220 10% 78%;
+  --muted:        220 12% 12%;
+  --muted-foreground: 220 8% 52%;
+  --accent:       220 14% 15%;
+  --accent-foreground: 220 14% 86%;
+  --destructive:  0 72% 58%;
   --destructive-foreground: 0 0% 100%;
+  --input:        220 14% 20%;
+  --ring:         24 60% 50%;
 
   --chart-1: hsl(var(--primary));
   --chart-2: 152 42% 46%;
@@ -171,16 +187,16 @@
   --app-font-display: 'Unbounded', sans-serif;
   --app-font-serif: Georgia, serif;
   --app-font-mono: 'Space Mono', monospace;
-  --radius: 1.125rem;
+  --radius: 1rem;
 
   --shadow-2xs: 2px 2px 0 rgba(0,0,0,0.55);
   --shadow-xs:  2px 2px 0 rgba(0,0,0,0.55);
   --shadow-sm:  2px 2px 0 rgba(0,0,0,0.55);
-  --shadow:     4px 4px 0 rgba(0,0,0,0.50);
-  --shadow-md:  4px 4px 0 rgba(0,0,0,0.50);
-  --shadow-lg:  6px 6px 0 rgba(0,0,0,0.45);
-  --shadow-xl:  6px 6px 0 rgba(0,0,0,0.45);
-  --shadow-2xl: 6px 6px 0 rgba(0,0,0,0.45);
+  --shadow:     3px 3px 0 rgba(0,0,0,0.50);
+  --shadow-md:  3px 3px 0 rgba(0,0,0,0.50);
+  --shadow-lg:  4px 4px 0 rgba(0,0,0,0.45);
+  --shadow-xl:  4px 4px 0 rgba(0,0,0,0.45);
+  --shadow-2xl: 4px 4px 0 rgba(0,0,0,0.45);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 
@@ -194,144 +210,26 @@
 }
 
 /* ═══════════════════════════════════════════
-   MIDNIGHT — deep navy, steel blue accent
+   ACCENT COLOR OVERRIDES
+   Only --primary and ring vars change.
+   Backgrounds stay neutral.
 ═══════════════════════════════════════════ */
-[data-theme="midnight"] {
-  --background:   222 38% 5%;
-  --card:         222 32% 9%;
-  --sidebar:      222 35% 6%;
-  --sidebar-border: 222 22% 14%;
-  --sidebar-accent: 222 28% 13%;
-  --sidebar-primary: 220 58% 58%;
-  --sidebar-ring:  220 58% 58%;
-  --popover:       222 32% 9%;
-  --secondary:     222 24% 14%;
-  --muted:         222 22% 12%;
-  --accent:        220 28% 15%;
-  --input:         220 18% 20%;
-  --primary:       220 58% 58%;
-  --ring:          220 58% 58%;
-}
+[data-accent="orange"] { --primary: 24 60% 50%; --ring: 24 60% 50%; --sidebar-primary: 24 60% 50%; --sidebar-ring: 24 60% 50%; }
+[data-accent="blue"]   { --primary: 220 60% 58%; --ring: 220 60% 58%; --sidebar-primary: 220 60% 58%; --sidebar-ring: 220 60% 58%; }
+[data-accent="purple"] { --primary: 265 50% 60%; --ring: 265 50% 60%; --sidebar-primary: 265 50% 60%; --sidebar-ring: 265 50% 60%; }
+[data-accent="green"]  { --primary: 152 44% 44%; --ring: 152 44% 44%; --sidebar-primary: 152 44% 44%; --sidebar-ring: 152 44% 44%; }
+[data-accent="cyan"]   { --primary: 193 52% 46%; --ring: 193 52% 46%; --sidebar-primary: 193 52% 46%; --sidebar-ring: 193 52% 46%; }
+[data-accent="rose"]   { --primary: 340 50% 52%; --ring: 340 50% 52%; --sidebar-primary: 340 50% 52%; --sidebar-ring: 340 50% 52%; }
+[data-accent="gold"]   { --primary: 42 56% 48%;  --ring: 42 56% 48%;  --sidebar-primary: 42 56% 48%;  --sidebar-ring: 42 56% 48%; }
 
-/* ═══════════════════════════════════════════
-   AURORA — deep violet, muted purple accent
-═══════════════════════════════════════════ */
-[data-theme="aurora"] {
-  --background:   265 30% 5%;
-  --card:         265 25% 9%;
-  --sidebar:      265 28% 6%;
-  --sidebar-border: 265 20% 13%;
-  --sidebar-accent: 265 24% 12%;
-  --sidebar-primary: 265 48% 60%;
-  --sidebar-ring:  265 48% 60%;
-  --popover:       265 25% 9%;
-  --secondary:     265 20% 13%;
-  --muted:         265 18% 11%;
-  --accent:        265 24% 14%;
-  --input:         265 16% 19%;
-  --primary:       265 48% 60%;
-  --ring:          265 48% 60%;
-}
-
-/* ═══════════════════════════════════════════
-   FOREST — dark moss, muted emerald accent
-═══════════════════════════════════════════ */
-[data-theme="forest"] {
-  --background:   150 30% 5%;
-  --card:         150 25% 8%;
-  --sidebar:      150 28% 6%;
-  --sidebar-border: 150 20% 12%;
-  --sidebar-accent: 150 24% 11%;
-  --sidebar-primary: 152 44% 43%;
-  --sidebar-ring:  152 44% 43%;
-  --popover:       150 25% 8%;
-  --secondary:     150 20% 12%;
-  --muted:         150 18% 10%;
-  --accent:        152 24% 13%;
-  --input:         150 16% 18%;
-  --primary:       152 44% 43%;
-  --ring:          152 44% 43%;
-}
-
-/* ═══════════════════════════════════════════
-   OCEAN — dark depths, muted cyan accent
-═══════════════════════════════════════════ */
-[data-theme="ocean"] {
-  --background:   200 38% 5%;
-  --card:         200 32% 9%;
-  --sidebar:      200 35% 6%;
-  --sidebar-border: 200 22% 13%;
-  --sidebar-accent: 200 28% 12%;
-  --sidebar-primary: 193 52% 46%;
-  --sidebar-ring:  193 52% 46%;
-  --popover:       200 32% 9%;
-  --secondary:     200 24% 13%;
-  --muted:         200 22% 11%;
-  --accent:        195 28% 14%;
-  --input:         200 18% 19%;
-  --primary:       193 52% 46%;
-  --ring:          193 52% 46%;
-}
-
-/* ═══════════════════════════════════════════
-   EMBER — charcoal warm, muted orange accent
-═══════════════════════════════════════════ */
-[data-theme="ember"] {
-  --background:   26 32% 6%;
-  --card:         26 26% 10%;
-  --sidebar:      26 30% 7%;
-  --sidebar-border: 26 20% 14%;
-  --sidebar-accent: 26 24% 13%;
-  --sidebar-primary: 24 60% 50%;
-  --sidebar-ring:  24 60% 50%;
-  --popover:       26 26% 10%;
-  --secondary:     26 20% 14%;
-  --muted:         26 18% 12%;
-  --accent:        24 24% 16%;
-  --input:         26 16% 20%;
-  --primary:       24 60% 50%;
-  --ring:          24 60% 50%;
-}
-
-/* ═══════════════════════════════════════════
-   ROSE — dark garnet, muted rose accent
-═══════════════════════════════════════════ */
-[data-theme="rose"] {
-  --background:   340 30% 5%;
-  --card:         340 25% 9%;
-  --sidebar:      340 28% 6%;
-  --sidebar-border: 340 20% 13%;
-  --sidebar-accent: 340 24% 12%;
-  --sidebar-primary: 340 48% 50%;
-  --sidebar-ring:  340 48% 50%;
-  --popover:       340 25% 9%;
-  --secondary:     340 20% 13%;
-  --muted:         340 18% 11%;
-  --accent:        340 22% 14%;
-  --input:         340 16% 19%;
-  --primary:       340 48% 50%;
-  --ring:          340 48% 50%;
-}
-
-/* ═══════════════════════════════════════════
-   GOLD — dark bronze, muted amber accent
-═══════════════════════════════════════════ */
-[data-theme="gold"] {
-  --background:   44 32% 5%;
-  --card:         44 26% 9%;
-  --sidebar:      44 30% 6%;
-  --sidebar-border: 44 20% 13%;
-  --sidebar-accent: 44 24% 12%;
-  --sidebar-primary: 42 56% 46%;
-  --sidebar-ring:  42 56% 46%;
-  --popover:       44 26% 9%;
-  --secondary:     44 20% 13%;
-  --muted:         44 18% 11%;
-  --accent:        42 22% 14%;
-  --input:         44 16% 19%;
-  --primary:       42 56% 46%;
-  --ring:          42 56% 46%;
-}
+/* Light mode: slightly darker accent for better contrast on white */
+:root[data-accent="orange"] { --primary: 24 65% 42%; --ring: 24 65% 42%; --sidebar-primary: 24 65% 42%; --sidebar-ring: 24 65% 42%; }
+:root[data-accent="blue"]   { --primary: 220 65% 48%; --ring: 220 65% 48%; --sidebar-primary: 220 65% 48%; --sidebar-ring: 220 65% 48%; }
+:root[data-accent="purple"] { --primary: 265 55% 52%; --ring: 265 55% 52%; --sidebar-primary: 265 55% 52%; --sidebar-ring: 265 55% 52%; }
+:root[data-accent="green"]  { --primary: 152 50% 36%; --ring: 152 50% 36%; --sidebar-primary: 152 50% 36%; --sidebar-ring: 152 50% 36%; }
+:root[data-accent="cyan"]   { --primary: 193 58% 38%; --ring: 193 58% 38%; --sidebar-primary: 193 58% 38%; --sidebar-ring: 193 58% 38%; }
+:root[data-accent="rose"]   { --primary: 340 55% 44%; --ring: 340 55% 44%; --sidebar-primary: 340 55% 44%; --sidebar-ring: 340 55% 44%; }
+:root[data-accent="gold"]   { --primary: 42 62% 40%;  --ring: 42 62% 40%;  --sidebar-primary: 42 62% 40%;  --sidebar-ring: 42 62% 40%; }
 
 /* ═══════════════════════════════════════════
    ORB FLOAT ANIMATIONS
