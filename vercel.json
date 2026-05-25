@@ -4,6 +4,21 @@
   "outputDirectory": "artifacts/ouwibo/dist/public",
   "installCommand": "pnpm install",
   "framework": "vite",
+  "functions": {
+    "api/**/*.ts": {
+      "runtime": "@vercel/node@3"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
+    },
+    {
+      "source": "/((?!api|assets|favicon|opengraph|robots).*)",
+      "destination": "/index.html"
+    }
+  ],
   "redirects": [
     {
       "source": "/:path*",
@@ -15,12 +30,6 @@
       ],
       "destination": "https://ouwibo.bond/:path*",
       "permanent": true
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/((?!assets|favicon|opengraph|robots).*)",
-      "destination": "/index.html"
     }
   ]
 }

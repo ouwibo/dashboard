@@ -62,11 +62,31 @@ export default function ChatPage() {
     setMessages(prev => [...prev, userMsg]);
     setIsLoading(true);
 
-    // Simulate AI thinking
-    await new Promise(r => setTimeout(r, 800 + Math.random() * 700));
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: content,
+          history: messages.slice(-10), // Send last 10 messages for context
+        }),
+      });
 
-    const response = getMockResponse(content);
-    setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: "assistant", content: response }]);
+      if (!response.ok) {
+        throw new Error("Failed to get response");
+      }
+
+      const data = await response.json();
+      setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: "assistant", content: data.message }]);
+    } catch (error) {
+      console.error("Chat error:", error);
+      setMessages(prev => [...prev, {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: "Sorry, I'm having trouble connecting right now. Please try again! 🙏"
+      }]);
+    }
+
     setIsLoading(false);
   }
 
