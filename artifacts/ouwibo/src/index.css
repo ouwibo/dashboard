@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@700;900&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
@@ -67,13 +67,13 @@
   --elevate-1: rgba(0,0,0,.03);
   --elevate-2: rgba(0,0,0,.07);
 
-  --background: 34 28% 93%;
-  --foreground: 0 0% 12%;
-  --border: 0 0% 80%;
+  --background: 0 0% 98%;
+  --foreground: 0 0% 9%;
+  --border: 0 0% 88%;
 
   --card: 0 0% 100%;
-  --card-foreground: 0 0% 12%;
-  --card-border: 0 0% 80%;
+  --card-foreground: 0 0% 9%;
+  --card-border: 0 0% 88%;
 
   --sidebar: 0 0% 99%;
   --sidebar-foreground: 0 0% 12%;
@@ -92,8 +92,8 @@
   --primary-foreground: 0 0% 100%;
   --secondary: 34 28% 88%;
   --secondary-foreground: 0 0% 12%;
-  --muted: 34 20% 88%;
-  --muted-foreground: 0 0% 45%;
+  --muted: 0 0% 94%;
+  --muted-foreground: 0 0% 48%;
   --accent: 34 28% 86%;
   --accent-foreground: 0 0% 12%;
   --destructive: 0 72% 52%;
@@ -107,17 +107,17 @@
   --chart-4: 265 48% 56%;
   --chart-5: 38 68% 52%;
 
-  --app-font-sans: 'Inter', sans-serif;
-  --app-font-display: 'Unbounded', sans-serif;
+  --app-font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Helvetica Neue", sans-serif;
+  --app-font-display: -apple-system, BlinkMacSystemFont, "Inter", "Helvetica Neue", sans-serif;
   --app-font-serif: Georgia, serif;
-  --app-font-mono: 'Space Mono', monospace;
-  --radius: 1rem;
+  --app-font-mono: "SF Mono", ui-monospace, "Cascadia Code", monospace;
+  --radius: 0.625rem;
 
-  --shadow-2xs: 2px 2px 0 rgba(0,0,0,0.18);
-  --shadow-xs:  2px 2px 0 rgba(0,0,0,0.18);
-  --shadow-sm:  2px 2px 0 rgba(0,0,0,0.18);
-  --shadow:     3px 3px 0 rgba(0,0,0,0.16);
-  --shadow-md:  3px 3px 0 rgba(0,0,0,0.16);
+  --shadow-2xs: 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-xs:  0 1px 3px rgba(0,0,0,0.08);
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.10), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow:     0 2px 8px rgba(0,0,0,0.10), 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md:  0 4px 12px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.06);
   --shadow-lg:  4px 4px 0 rgba(0,0,0,0.14);
   --shadow-xl:  4px 4px 0 rgba(0,0,0,0.14);
   --shadow-2xl: 4px 4px 0 rgba(0,0,0,0.14);
@@ -143,13 +143,13 @@
   --elevate-1: rgba(255,255,255,.03);
   --elevate-2: rgba(255,255,255,.07);
 
-  --background:   220 15% 8%;
-  --foreground:   220 14% 86%;
-  --border:       220 14% 20%;
+  --background:   0 0% 7%;
+  --foreground:   0 0% 92%;
+  --border:       0 0% 18%;
 
-  --card:         220 14% 11%;
-  --card-foreground: 220 14% 86%;
-  --card-border:  220 14% 18%;
+  --card:         0 0% 10%;
+  --card-foreground: 0 0% 92%;
+  --card-border:  0 0% 18%;
 
   --sidebar:      220 16% 9%;
   --sidebar-foreground: 220 12% 84%;
@@ -168,8 +168,8 @@
   --primary-foreground: 0 0% 100%;
   --secondary:    220 12% 14%;
   --secondary-foreground: 220 10% 78%;
-  --muted:        220 12% 12%;
-  --muted-foreground: 220 8% 52%;
+  --muted:        0 0% 13%;
+  --muted-foreground: 0 0% 52%;
   --accent:       220 14% 15%;
   --accent-foreground: 220 14% 86%;
   --destructive:  0 72% 58%;
@@ -330,18 +330,18 @@
   }
 
   .neo-badge {
-    font-family: 'Space Mono', monospace;
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
     font-size: 0.65rem;
-    border: 1.5px solid hsl(var(--border));
+    border: 1px solid hsl(var(--border));
     border-radius: 999px;
-    padding: 0.2rem 0.65rem;
+    padding: 0.2rem 0.6rem;
     display: inline-flex;
     align-items: center;
-    font-weight: 700;
+    font-weight: 600;
   }
 
-  .font-display     { font-family: 'Unbounded', sans-serif; }
-  .font-mono-custom { font-family: 'Space Mono', monospace; }
+  .font-display { font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif; font-weight: 700; }
+  .font-mono-custom { font-family: "SF Mono", ui-monospace, monospace; }
 
   .no-default-hover-elevate {}
   .no-default-active-elevate {}

@@ -403,3 +403,218 @@ export const mockActivity: any[] = [
   { id: 4, type: "status_change", message: "Scroll airdrop status updated to Active", createdAt: new Date(Date.now() - 172800000).toISOString() },
   { id: 5, type: "airdrop_added", message: "Grass Season 2 rewards campaign active", createdAt: new Date(Date.now() - 259200000).toISOString() },
 ];
+
+export const mockArticles: any[] = [
+  {
+    id: "s1",
+    slug: "hyperliquid-airdrop-guide-2025",
+    title: "How to Maximize Your Hyperliquid Airdrop: Full 2025 Guide",
+    excerpt: "Hyperliquid distributed $1.2B in HYPE tokens. Here's what you need to do now to qualify for Season 2 rewards.",
+    content: `Hyperliquid's HYPE token airdrop in late 2024 became one of the largest in crypto history, distributing over $1.2 billion in value to early users. With Season 2 rewards still being discussed by the team, now is the best time to build your on-chain history on the platform.
+
+## Getting Started
+
+The first step is to bridge ETH or USDC to the Hyperliquid L1 using the official bridge at app.hyperliquid.xyz. Gas fees are near zero, and bridging takes under a minute. Start with at least $100 to make your activity meaningful.
+
+## Trading Volume
+
+Consistent trading volume is the most important factor for reward qualification. Aim for at least 10 trades per week across different perpetual markets. The BTC-PERP and ETH-PERP pairs have the most liquidity. Using limit orders rather than market orders helps you avoid fees and may signal more sophisticated usage.
+
+## Vault Participation
+
+Depositing into Hyperliquid vaults is another way to accumulate points. The HLP (Hyperliquidity Provider) vault earns a share of trading fees and is considered one of the safest yield strategies on the platform. Even a small deposit shows long-term commitment to the ecosystem.
+
+## Key Takeaways
+
+Stay consistent, trade regularly, and interact with as many features as possible. The Hyperliquid team has explicitly rewarded genuine users over wash traders, so quality activity matters more than raw volume.`,
+    category: "Guide",
+    tags: ["hyperliquid", "hype", "airdrop", "defi", "trading"],
+    author: "OuwiboCloud",
+    coverImage: "",
+    publishedAt: new Date(Date.now() - 1 * 24 * 3600000).toISOString(),
+    readTime: 6,
+    featured: true,
+  },
+  {
+    id: "s2",
+    slug: "monad-testnet-farming-strategy",
+    title: "Monad Testnet Is Live — Your Step-by-Step Farming Strategy",
+    excerpt: "Monad promises 10,000 TPS on an EVM chain. The testnet is live and airdrop hunters are already accumulating.",
+    content: `Monad has been one of the most anticipated Layer 1 launches in the past two years. With $225M raised and backing from top-tier VCs, the project is building an EVM-compatible chain that claims to process 10,000 transactions per second with 1-second finality.
+
+## Why Monad Could Be Huge
+
+The key innovation in Monad is parallel execution — transactions that don't touch the same state can be processed simultaneously. This is a fundamentally different approach from Ethereum's sequential execution, and early benchmarks have been impressive. A large, well-funded launch typically means a substantial airdrop for early testnet users.
+
+## Testnet Tasks
+
+Start by getting testnet MON from the official faucet. Then interact with the official swap interface, bridge tokens between networks, deploy a simple smart contract using Remix, and participate in any official partner protocols. Each unique interaction type helps build a diverse activity profile.
+
+## Risk and Reward
+
+No airdrop is guaranteed, but Monad's combination of funding, technology, and ecosystem growth makes it one of the highest-conviction opportunities for 2025. Budget 20-30 minutes per week for testnet activity and you'll have a strong qualification profile by mainnet.`,
+    category: "Layer 1",
+    tags: ["monad", "testnet", "airdrop", "layer1", "evm"],
+    author: "OuwiboCloud",
+    coverImage: "",
+    publishedAt: new Date(Date.now() - 3 * 24 * 3600000).toISOString(),
+    readTime: 5,
+    featured: false,
+  },
+  {
+    id: "s3",
+    slug: "defi-airdrop-landscape-2025",
+    title: "The DeFi Airdrop Landscape in 2025: Trends, Winners, and What's Next",
+    excerpt: "After Hyperliquid's massive distribution, projects are rethinking how they reward early users. Here's what to expect.",
+    content: `The crypto airdrop meta has evolved significantly over the past year. Where 2022 and 2023 were defined by simple wallet-based distributions, 2024 and 2025 have introduced sophisticated point systems, activity scoring, and Sybil detection that reward genuine users over farmers.
+
+## The Shift to Quality Over Quantity
+
+Projects like Hyperliquid and EigenLayer pioneered a new approach: track user behavior over months, filter out obvious manipulation, and reward long-term contributors. This has been largely positive for the ecosystem — it means airdrop hunters need to actually use protocols, not just hold tokens.
+
+## Layer 2 Opportunities
+
+The Ethereum Layer 2 ecosystem remains the richest hunting ground. ZKsync, Scroll, and Linea all have active incentive programs. Starknet's second-phase distribution is rumored for Q3 2025. The common thread: these chains need transaction volume to prove their value proposition, and they're willing to pay for it.
+
+## Emerging Sectors
+
+Beyond L2s, watch the AI x crypto sector closely. Projects building on-chain inference, decentralized compute, and model training marketplaces are flush with venture funding and likely to launch tokens in the second half of 2025.`,
+    category: "Analysis",
+    tags: ["defi", "airdrop", "layer2", "trends", "2025"],
+    author: "OuwiboCloud",
+    coverImage: "",
+    publishedAt: new Date(Date.now() - 5 * 24 * 3600000).toISOString(),
+    readTime: 7,
+    featured: false,
+  },
+  {
+    id: "s4",
+    slug: "berachain-proof-of-liquidity-explained",
+    title: "Berachain's Proof of Liquidity: Why It's Different and How to Farm It",
+    excerpt: "Berachain just launched mainnet with a novel consensus mechanism that ties block production directly to liquidity provision.",
+    content: `Berachain launched its mainnet in early 2025 with a mechanism it calls Proof of Liquidity (PoL). Unlike traditional Proof of Stake where validators simply lock tokens, PoL requires validators to direct a portion of block rewards toward whitelisted liquidity pools. This creates a direct flywheel between DeFi activity and network security.
+
+## The BGT Token
+
+The Berachain Governance Token (BGT) is non-transferable and can only be earned by providing liquidity to approved vaults. BGT can be burned 1:1 for BERA, the transferable gas token. This mechanics design forces genuine economic activity rather than passive staking.
+
+## Best Vaults for BGT Accumulation
+
+The Bex (native DEX) liquidity pools, Bend (money market), and Berps (perpetuals) are the primary sources of BGT emissions. Concentrating liquidity in the BERA/HONEY and WBTC/HONEY pools has historically generated the highest BGT yields.
+
+## Looking Ahead
+
+With the ecosystem still young, early liquidity providers are likely to benefit most from future incentive campaigns and protocol integrations. The Berachain team has hinted at additional reward distributions for long-term community members.`,
+    category: "DeFi",
+    tags: ["berachain", "bgt", "liquidity", "proof-of-liquidity", "defi"],
+    author: "OuwiboCloud",
+    coverImage: "",
+    publishedAt: new Date(Date.now() - 7 * 24 * 3600000).toISOString(),
+    readTime: 5,
+    featured: false,
+  },
+  {
+    id: "s5",
+    slug: "zksync-elastic-chain-airdrop-update",
+    title: "ZKsync Elastic Chain: What the Upgrade Means for Future Airdrop Eligibility",
+    excerpt: "Matter Labs launched the Elastic Chain architecture in 2025. Here's how it changes the reward landscape for users.",
+    content: `ZKsync's transition to the Elastic Chain architecture marks a significant milestone. Rather than a single L2, ZKsync is now a network of ZK-powered chains that share security and liquidity. The ZK token launched in 2024, but the team has indicated that additional distributions tied to ecosystem growth are planned.
+
+## What Changed with Elastic Chain
+
+The Elastic Chain allows third-party developers to launch their own ZK chains secured by Ethereum's finality. These chains share a common bridge, sequencer pool, and proof system. Activity on any chain in the network may count toward future reward calculations.
+
+## Current Opportunities
+
+The most straightforward way to build ZKsync activity is using the native bridge, trading on SyncSwap or Mute.io, borrowing on EraLend, and minting NFTs on platforms like Element Market. Diversity of interaction matters more than raw dollar amounts.
+
+## Outlook
+
+ZKsync has one of the most active developer ecosystems in the L2 space. While the initial ZK airdrop disappointed some heavy farmers, the team's long-term vision and EF funding suggest this ecosystem is worth continued investment of time.`,
+    category: "Layer 2",
+    tags: ["zksync", "elastic-chain", "l2", "airdrop", "zk"],
+    author: "OuwiboCloud",
+    coverImage: "",
+    publishedAt: new Date(Date.now() - 10 * 24 * 3600000).toISOString(),
+    readTime: 4,
+    featured: false,
+  },
+  {
+    id: "s6",
+    slug: "eigenlayer-restaking-rewards-guide",
+    title: "EigenLayer Restaking: How to Earn Operator Rewards in 2025",
+    excerpt: "EigenLayer has over $15B in restaked ETH. Here's how to position yourself for ongoing rewards and future distributions.",
+    content: `EigenLayer's restaking protocol has become one of the largest TVL holders in all of DeFi. By allowing ETH stakers to secure additional protocols (Active Validation Services, or AVSes) with their existing stake, EigenLayer has opened a new yield layer on top of standard Ethereum validation rewards.
+
+## Core Restaking Options
+
+You can restake natively (requires 32 ETH as a validator), through liquid staking tokens (stETH, cbETH, rETH), or through Liquid Restaking Tokens (LRTs) like eETH, ezETH, and pzETH. Each path has different risk and reward profiles.
+
+## EIGEN Token Utility
+
+The EIGEN token was distributed to early restakers and serves as the slashing-resistant governance token for the EigenLayer ecosystem. Each new AVS may conduct its own distribution to active restakers, creating a compounding opportunity for early participants.
+
+## Risk Considerations
+
+Restaking introduces slashing risk from the additional AVSes you opt into. Start with conservative AVS selections — those audited by major security firms — and diversify across multiple AVSes once you're comfortable with the mechanics.`,
+    category: "DeFi",
+    tags: ["eigenlayer", "restaking", "eth", "yield", "avs"],
+    author: "OuwiboCloud",
+    coverImage: "",
+    publishedAt: new Date(Date.now() - 14 * 24 * 3600000).toISOString(),
+    readTime: 6,
+    featured: false,
+  },
+  {
+    id: "s7",
+    slug: "crypto-airdrop-tax-guide-2025",
+    title: "How to Handle Airdrop Taxes in 2025: What You Need to Know",
+    excerpt: "Tax authorities are increasingly focused on crypto airdrops. Here's a practical guide to staying compliant.",
+    content: `As crypto airdrop distributions grow larger, tax authorities in the US, EU, and Asia are scrutinizing how they're reported. Getting this wrong can be expensive — and the IRS has been issuing John Doe summons to major exchanges to identify large crypto earners.
+
+## The Basic Rule
+
+In most jurisdictions, receiving a crypto airdrop is a taxable event. The fair market value of the tokens on the day you receive them is considered ordinary income. If you later sell those tokens, you also owe capital gains tax on any appreciation (or can deduct losses).
+
+## Record Keeping
+
+The most important thing you can do is maintain accurate records. Note the date, the number of tokens, and the USD price on the day of receipt for every airdrop. Tools like CoinTracker, Koinly, and TaxBit can automate much of this by connecting to your wallets.
+
+## Strategies for Minimizing Tax Impact
+
+Some users donate appreciated airdrop tokens directly to charity, which avoids capital gains on the appreciation. Others use tax-loss harvesting to offset gains. Consult a tax professional who specializes in crypto before making major decisions.`,
+    category: "Guide",
+    tags: ["tax", "airdrop", "compliance", "irs", "finance"],
+    author: "OuwiboCloud",
+    coverImage: "",
+    publishedAt: new Date(Date.now() - 18 * 24 * 3600000).toISOString(),
+    readTime: 5,
+    featured: false,
+  },
+  {
+    id: "s8",
+    slug: "grass-despin-network-airdrop",
+    title: "Grass & DeSpin: How Bandwidth Sharing Networks Are Rewarding Users",
+    excerpt: "A new category of Web3 protocol rewards users for sharing unused internet bandwidth. Here's how to participate.",
+    content: `Bandwidth sharing networks represent a genuinely novel category in the Web3 space. Rather than requiring expensive hardware or large capital deposits, projects like Grass and DeSpin allow ordinary users to earn tokens by sharing their idle internet bandwidth with AI companies and researchers who need residential IP addresses for data collection.
+
+## How Grass Works
+
+Install the browser extension, keep it running, and your idle bandwidth is routed to partner companies for web scraping and data collection. You earn points that convert to GRASS tokens. Season 1 distributed approximately $400 in value to median participants, with heavy users earning significantly more.
+
+## DeSpin Node Network
+
+DeSpin takes a slightly different approach, routing bandwidth for VPN users and content delivery. Their rewards are tied to both uptime and data transferred. Running a DeSpin node on a home server or always-on computer maximizes earnings.
+
+## The Big Picture
+
+These protocols are part of the broader DePIN (Decentralized Physical Infrastructure) trend — using token incentives to build real-world utility networks. The sector has attracted billions in VC investment and is likely to see continued growth through 2026.`,
+    category: "News",
+    tags: ["grass", "despin", "depin", "bandwidth", "passive-income"],
+    author: "OuwiboCloud",
+    coverImage: "",
+    publishedAt: new Date(Date.now() - 22 * 24 * 3600000).toISOString(),
+    readTime: 4,
+    featured: false,
+  },
+];
