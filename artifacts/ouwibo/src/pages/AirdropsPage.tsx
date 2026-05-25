@@ -256,6 +256,15 @@ export default function AirdropsPage() {
                   </td>
                   <td className="p-4">
                     <div className="flex items-center justify-center gap-1">
+                      <a
+                        href={airdrop.referralUrl || airdrop.websiteUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 transition-colors"
+                        style={{ fontFamily: MONO }}
+                      >
+                        Join
+                      </a>
                       <Link href={`/airdrops/${airdrop.id}`}>
                         <button className="p-2 rounded-lg hover:bg-muted transition-colors" title="View details">
                           <ExternalLink size={14} />

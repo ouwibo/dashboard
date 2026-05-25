@@ -114,6 +114,15 @@ export default function AirdropDetailPage() {
 
       {/* Social Links */}
       <div className="flex gap-3 flex-wrap">
+        <a
+          href={airdrop.referralUrl || airdrop.websiteUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold flex items-center gap-2 hover:bg-primary/90 transition-colors"
+          style={{ fontFamily: MONO, fontSize: "0.85rem", boxShadow: "3px 3px 0 hsl(var(--border))" }}
+        >
+          <Zap size={16} /> Join Airdrop
+        </a>
         {airdrop.websiteUrl && (
           <a href={airdrop.websiteUrl} target="_blank" rel="noopener noreferrer" className="neo-button px-4 py-2 rounded-xl flex items-center gap-2 bg-background border-2 border-border" style={{ boxShadow: "3px 3px 0 hsl(var(--border))", fontFamily: MONO, fontSize: "0.72rem" }}>
             <Globe size={14} /> Website
