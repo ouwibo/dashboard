@@ -4,6 +4,19 @@
   "outputDirectory": "artifacts/ouwibo/dist/public",
   "installCommand": "pnpm install",
   "framework": "vite",
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.ouwibo.bond"
+        }
+      ],
+      "destination": "https://ouwibo.bond/:path*",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/((?!assets|favicon|opengraph|robots).*)",
