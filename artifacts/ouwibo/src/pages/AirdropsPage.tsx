@@ -3,10 +3,16 @@ import { Link } from "wouter";
 import { cn } from "@/lib/utils";
 import { mockAirdrops } from "@/lib/mockData";
 import type { Airdrop } from "@/lib/mockData";
-import { Star, ChevronRight, Search } from "lucide-react";
+import { Star, ChevronRight, Search, CheckCircle2, HelpCircle, Banknote } from "lucide-react";
+
+/* ── Status icons (SVG, no emoji) ── */
+const STATUS_ICON = {
+  "Confirmed":       <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />,
+  "Potential":       <HelpCircle   className="w-4 h-4 text-amber-500   shrink-0" />,
+  "Reward Available":<Banknote     className="w-4 h-4 text-blue-400    shrink-0" />,
+} as const;
 
 /* ═══════ Constants ═══════ */
-const STATUS_EMOJI  = { "Confirmed":"👌", "Potential":"🤔", "Reward Available":"🤑" } as const;
 const STATUS_CLS    = { "Confirmed":"text-foreground", "Potential":"text-foreground", "Reward Available":"text-blue-400 font-semibold" } as const;
 const REWARD_CLS: Record<string,string> = {
   "Airdrop":           "text-foreground",
@@ -28,8 +34,30 @@ const TYPE_CLS: Record<string,string> = {
   "Bounty":        "bg-yellow-500/20 text-yellow-400",
 };
 
+/* ── Project logo with img fallback ── */
+function ProjectLogo({ airdrop }: { airdrop: Airdrop }) {
+  const [failed, setFailed] = useState(false);
+  return (
+    <div
+      className="w-9 h-9 rounded-full flex items-center justify-center text-white text-[11px] font-bold shrink-0 overflow-hidden"
+      style={{ background: airdrop.logoColor }}
+    >
+      {airdrop.logoUrl && !failed ? (
+        <img
+          src={airdrop.logoUrl}
+          alt={airdrop.name}
+          className="w-full h-full object-cover"
+          onError={() => setFailed(true)}
+        />
+      ) : (
+        <span>{airdrop.logoInitial}</span>
+      )}
+    </div>
+  );
+}
+
 /* ─── Grid column template shared by header + rows ─── */
-const GRID = "grid grid-cols-[32px_220px_1fr_190px_120px_160px_140px] items-center gap-x-3";
+const GRID = "grid grid-cols-[36px_260px_1fr_210px_130px_180px] items-center gap-x-3";
 
 /* ═══════ Sub-components ═══════ */
 
@@ -88,7 +116,7 @@ function AirdropRow({ a, bookmarked, onBookmark }: {
       {/* 2 — Name */}
       <div className="flex items-center gap-2.5 min-w-0">
         <div className="relative shrink-0">
-          <LogoCircle a={a} size={34} />
+          <ProjectLogo airdrop={a} />
           {a.isNew && (
             <span className="absolute -top-1 -right-1 text-[7px] font-bold bg-emerald-500 text-white px-1 py-px rounded-sm leading-none">
               NEW
@@ -139,7 +167,7 @@ function AirdropRow({ a, bookmarked, onBookmark }: {
       {/* 4 — Updated Status */}
       <div className="flex flex-col gap-px">
         <div className="flex items-center gap-1">
-          <span className="text-[13px] leading-none">{STATUS_EMOJI[a.status]}</span>
+          <span className="text-[13px] leading-none">{STATUS_ICON[a.status]}</span>
           <span className={cn("text-[11px] font-medium leading-tight", STATUS_CLS[a.status])}>
             {a.status}
           </span>
@@ -174,11 +202,6 @@ function AirdropRow({ a, bookmarked, onBookmark }: {
           </div>
         )}
       </div>
-
-      {/* 7 — Moni Score */}
-      <div className="pr-2">
-        <MoniBar score={a.moniScore} />
-      </div>
     </div>
   );
 }
@@ -194,7 +217,7 @@ function MobileCard({ a, bookmarked, onBookmark }: { a: Airdrop; bookmarked: boo
           <Star size={13} className={bookmarked ? "fill-amber-400 text-amber-400" : ""} />
         </button>
         <div className="relative shrink-0">
-          <LogoCircle a={a} size={36} />
+          <ProjectLogo airdrop={a} />
           {a.isNew && (
             <span className="absolute -top-1 -right-1 text-[7px] font-bold bg-emerald-500 text-white px-1 py-px rounded-sm">NEW</span>
           )}
@@ -205,13 +228,10 @@ function MobileCard({ a, bookmarked, onBookmark }: { a: Airdrop; bookmarked: boo
             {a.ticker && <span className="text-[10px] text-muted-foreground">{a.ticker}</span>}
           </div>
           <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
-            <span className="text-[11px]">{STATUS_EMOJI[a.status]}</span>
+            <span className="text-[11px]">{STATUS_ICON[a.status]}</span>
             <span className={cn("text-[10px] font-medium", STATUS_CLS[a.status])}>{a.status}</span>
             <span className="text-muted-foreground text-[10px]">· {a.statusDate}</span>
           </div>
-        </div>
-        <div className="shrink-0 text-right">
-          <MoniBar score={a.moniScore} />
         </div>
       </div>
 
@@ -328,7 +348,6 @@ export default function AirdropsPage() {
           <p className="text-[10px] font-bold text-muted-foreground tracking-wider uppercase">Updated Status</p>
           <p className="text-[10px] font-bold text-muted-foreground tracking-wider uppercase">Reward</p>
           <p className="text-[10px] font-bold text-muted-foreground tracking-wider uppercase">Raise / Funds</p>
-          <p className="text-[10px] font-bold text-muted-foreground tracking-wider uppercase">Moni Score</p>
         </div>
 
         {/* Rows */}
