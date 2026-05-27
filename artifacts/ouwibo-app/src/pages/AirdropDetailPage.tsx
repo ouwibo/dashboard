@@ -290,57 +290,61 @@ export default function AirdropDetailPage() {
           {/* Social Links */}
           <MiniCard>
             <SectionHeader icon={<Globe className="w-4 h-4 text-primary" />} title="Links & Community" />
-            <div className="p-3 grid grid-cols-2 gap-2">
+            <div className="divide-y divide-border/40">
               {airdrop.website && (
                 <a href={airdrop.website} target="_blank" rel="noopener noreferrer"
-                   className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-muted/30 border border-border/40 hover:bg-muted/60 hover:border-border transition-all group">
-                  <div className="w-7 h-7 rounded-lg bg-blue-500/15 flex items-center justify-center shrink-0">
-                    <Globe className="w-3.5 h-3.5 text-blue-400" />
+                   className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30 transition-colors group">
+                  <div className="w-8 h-8 rounded-lg bg-blue-500/15 flex items-center justify-center shrink-0">
+                    <Globe className="w-4 h-4 text-blue-400" />
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-bold truncate">Website</p>
-                    <p className="text-[9px] text-muted-foreground truncate">Official site</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[12px] font-bold">Website</p>
+                    <p className="text-[10px] text-muted-foreground truncate">{airdrop.website.replace("https://", "")}</p>
+                    <p className="text-[10px] text-muted-foreground/60">Official project website</p>
                   </div>
-                  <ExternalLink className="w-3 h-3 text-muted-foreground/40 group-hover:text-muted-foreground ml-auto shrink-0 transition-colors" />
+                  <ExternalLink className="w-3.5 h-3.5 text-muted-foreground/30 group-hover:text-primary shrink-0 transition-colors" />
                 </a>
               )}
               {airdrop.twitter && (
                 <a href={`https://twitter.com/${airdrop.twitter}`} target="_blank" rel="noopener noreferrer"
-                   className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-muted/30 border border-border/40 hover:bg-muted/60 hover:border-border transition-all group">
-                  <div className="w-7 h-7 rounded-lg bg-sky-500/15 flex items-center justify-center shrink-0">
-                    <Twitter className="w-3.5 h-3.5 text-sky-400" />
+                   className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30 transition-colors group">
+                  <div className="w-8 h-8 rounded-lg bg-sky-500/15 flex items-center justify-center shrink-0">
+                    <Twitter className="w-4 h-4 text-sky-400" />
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-bold truncate">Twitter / X</p>
-                    <p className="text-[9px] text-muted-foreground truncate">@{airdrop.twitter}</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[12px] font-bold">Twitter / X</p>
+                    <p className="text-[10px] text-muted-foreground truncate">@{airdrop.twitter}</p>
+                    <p className="text-[10px] text-muted-foreground/60">Updates & announcements</p>
                   </div>
-                  <ExternalLink className="w-3 h-3 text-muted-foreground/40 group-hover:text-muted-foreground ml-auto shrink-0 transition-colors" />
+                  <ExternalLink className="w-3.5 h-3.5 text-muted-foreground/30 group-hover:text-sky-400 shrink-0 transition-colors" />
                 </a>
               )}
               {airdrop.telegram && (
                 <a href={airdrop.telegram} target="_blank" rel="noopener noreferrer"
-                   className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-muted/30 border border-border/40 hover:bg-muted/60 hover:border-border transition-all group">
-                  <div className="w-7 h-7 rounded-lg bg-blue-400/15 flex items-center justify-center shrink-0">
-                    <Send className="w-3.5 h-3.5 text-blue-400" />
+                   className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30 transition-colors group">
+                  <div className="w-8 h-8 rounded-lg bg-blue-400/15 flex items-center justify-center shrink-0">
+                    <Send className="w-4 h-4 text-blue-400" />
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-bold truncate">Telegram</p>
-                    <p className="text-[9px] text-muted-foreground truncate">Community</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[12px] font-bold">Telegram</p>
+                    <p className="text-[10px] text-muted-foreground truncate">{airdrop.telegram.replace("https://t.me/", "t.me/")}</p>
+                    <p className="text-[10px] text-muted-foreground/60">Community & chat group</p>
                   </div>
-                  <ExternalLink className="w-3 h-3 text-muted-foreground/40 group-hover:text-muted-foreground ml-auto shrink-0 transition-colors" />
+                  <ExternalLink className="w-3.5 h-3.5 text-muted-foreground/30 group-hover:text-blue-400 shrink-0 transition-colors" />
                 </a>
               )}
               {airdrop.discord && (
                 <a href={airdrop.discord} target="_blank" rel="noopener noreferrer"
-                   className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-muted/30 border border-border/40 hover:bg-muted/60 hover:border-border transition-all group">
-                  <div className="w-7 h-7 rounded-lg bg-indigo-500/15 flex items-center justify-center shrink-0">
-                    <Hash className="w-3.5 h-3.5 text-indigo-400" />
+                   className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30 transition-colors group">
+                  <div className="w-8 h-8 rounded-lg bg-indigo-500/15 flex items-center justify-center shrink-0">
+                    <Hash className="w-4 h-4 text-indigo-400" />
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-bold truncate">Discord</p>
-                    <p className="text-[9px] text-muted-foreground truncate">Server</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[12px] font-bold">Discord</p>
+                    <p className="text-[10px] text-muted-foreground truncate">{airdrop.discord.replace("https://", "")}</p>
+                    <p className="text-[10px] text-muted-foreground/60">Official Discord server</p>
                   </div>
-                  <ExternalLink className="w-3 h-3 text-muted-foreground/40 group-hover:text-muted-foreground ml-auto shrink-0 transition-colors" />
+                  <ExternalLink className="w-3.5 h-3.5 text-muted-foreground/30 group-hover:text-indigo-400 shrink-0 transition-colors" />
                 </a>
               )}
             </div>

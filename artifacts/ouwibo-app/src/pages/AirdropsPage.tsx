@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "wouter";
 import { cn } from "@/lib/utils";
 import { mockAirdrops } from "@/lib/mockData";
@@ -309,19 +309,7 @@ export default function AirdropsPage() {
   const [search,    setSearch]    = useState("");
   const [view,      setView]      = useState<"list" | "cards">("list");
   const [bookmarks, setBookmarks] = useState<Set<number>>(new Set());
-  const [isMobile,  setIsMobile]  = useState(
-    typeof window !== "undefined" ? window.matchMedia("(max-width: 1023px)").matches : false
-  );
-
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 1023px)");
-    const fn = (e: MediaQueryListEvent | MediaQueryList) => setIsMobile(e.matches);
-    fn(mq);
-    mq.addEventListener("change", fn);
-    return () => mq.removeEventListener("change", fn);
-  }, []);
-
-  const effectiveView = isMobile ? "cards" : view;
+  const effectiveView = view;
 
   const toggle = (id: number) =>
     setBookmarks(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
