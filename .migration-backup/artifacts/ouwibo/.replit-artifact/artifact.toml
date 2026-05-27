@@ -1,6 +1,6 @@
 kind = "web"
-previewPath = "/"
-title = "Ouwibo Dashboard"
+previewPath = "/__backup-ouwibo"
+title = "Ouwibo Dashboard (backup)"
 version = "1.0.0"
 id = "artifacts/ouwibo"
 router = "path"
@@ -11,21 +11,12 @@ version = "1.0.0"
 
 [[services]]
 name = "web"
-paths = [ "/" ]
-localPort = 24060
+paths = [ "/__backup-ouwibo" ]
+localPort = 24061
 
 [services.development]
 run = "pnpm --filter @workspace/ouwibo run dev"
 
-[services.production]
-build = [ "pnpm", "--filter", "@workspace/ouwibo", "run", "build" ]
-publicDir = "artifacts/ouwibo/dist/public"
-serve = "static"
-
-[[services.production.rewrites]]
-from = "/*"
-to = "/index.html"
-
 [services.env]
-PORT = "24060"
-BASE_PATH = "/"
+PORT = "24061"
+BASE_PATH = "/__backup-ouwibo"

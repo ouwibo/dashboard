@@ -1,6 +1,6 @@
-# [Project name]
+# Ouwibo
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Ouwibo is a Crypto Airdrop Tracker & News dashboard that lets users discover, track, and complete crypto airdrop tasks.
 
 ## Run & Operate
 
@@ -14,6 +14,7 @@ _Replace the heading above with the project's name, and this line with one sente
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
+- Frontend: React + Vite, TailwindCSS v4, shadcn/ui, Wouter routing, React Query
 - API: Express 5
 - DB: PostgreSQL + Drizzle ORM
 - Validation: Zod (`zod/v4`), `drizzle-zod`
@@ -22,15 +23,29 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/ouwibo-app/` — React/Vite frontend (port 23361, preview at `/`)
+- `artifacts/api-server/` — Express API server (port 8080, prefix `/api`)
+- `lib/api-spec/openapi.yaml` — OpenAPI spec (source of truth for API)
+- `lib/api-client-react/src/generated/` — generated React Query hooks (do not hand-edit)
+- `lib/api-zod/src/generated/` — generated Zod validation schemas (do not hand-edit)
+- `lib/db/src/schema/` — Drizzle ORM schema (airdrops, airdrop_tasks, activity tables)
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Contract-first API: OpenAPI spec → codegen → typed hooks + Zod validators
+- Frontend uses Wouter (lightweight React router) instead of React Router
+- No authentication — public read, no user accounts
+- Activity feed is manually seeded; not auto-generated from mutations yet
+- AI Chat page uses mock responses unless an LLM API key is configured
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- **Dashboard**: Stats overview (total/active/upcoming/ended airdrops), top-ranked airdrops list, latest news section
+- **Airdrops**: Browse and filter all airdrops by status, category, chain; search by name
+- **Airdrop Detail**: View tasks, links, requirements, and metadata for each airdrop
+- **News**: Crypto news and analysis articles
+- **AI Chat**: Ask questions about airdrops (mock responses, LLM-ready)
+- **Settings**: Theme and app preferences
 
 ## User preferences
 
@@ -38,7 +53,10 @@ _Populate as you build — explicit user instructions worth remembering across s
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- The `.migration-backup/` folder contains the original imported project — these workflows intentionally fail (they're archive copies, not active)
+- After any OpenAPI spec change, always re-run codegen before editing routes or frontend
+- `artifacts/ouwibo` slug is reserved by the backup artifact; active frontend uses `ouwibo-app`
+- Seed data is in the DB from initial setup; re-running seeds will duplicate rows (no unique constraint on slug)
 
 ## Pointers
 
