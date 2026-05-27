@@ -1,7 +1,9 @@
 import { Link } from "wouter";
 import { mockAirdrops } from "@/lib/mockData";
 import type { Airdrop } from "@/lib/mockData";
-import { TrendingUp, Zap, Clock, CheckCircle2, ChevronRight, Gift } from "lucide-react";
+import { getAllArticles } from "@/lib/articleStore";
+import { ArticleCard } from "@/components/ArticleCard";
+import { TrendingUp, Zap, Clock, CheckCircle2, ChevronRight, Gift, Newspaper } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /* ── Moni score gradient bar (mini) ── */
@@ -68,6 +70,7 @@ export default function DashboardPage() {
   const top     = [...airdrops].sort((a, b) => (b.moniScore ?? 0) - (a.moniScore ?? 0)).slice(0, 6);
   const newest  = airdrops.filter(a => a.isNew).slice(0, 4);
   const rewardA = airdrops.filter(a => a.status === "Reward Available");
+  const latestArticles = getAllArticles().slice(0, 4);
 
   /* greeting */
   const hour = new Date().getHours();
@@ -143,5 +146,24 @@ export default function DashboardPage() {
               </div>
             )}
           </div></div></div></div>
+
+      {/* ── Latest News ── */}
+      {latestArticles.length > 0 && (
+        <div className="border border-border rounded-xl bg-card/60 backdrop-blur-sm overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
+            <div className="flex items-center gap-2">
+              <Newspaper className="w-4 h-4 text-primary" />
+              <span className="text-[13px] font-semibold">Latest News & Analysis</span>
+            </div>
+            <Link href="/news" className="text-[11px] text-primary hover:underline">All news →</Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-3">
+            {latestArticles.map(a => (
+              <ArticleCard key={a.id} article={a} />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
