@@ -1,7 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { useState, useEffect } from "react";
-import { useTheme, ACCENT_LIST } from "@/components/ThemeProvider";
-import AnimatedBackground from "@/components/AnimatedBackground";
+import { useTheme } from "@/components/ThemeProvider";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -68,58 +67,41 @@ function ScrollTop() {
   );
 }
 
-/* ── Appearance panel (dark/light + accent dots) ── */
+/* ── Appearance panel (dark/light only) ── */
 function AppearancePanel({ expanded }: { expanded: boolean }) {
-  const { mode, accent, setMode, setAccent } = useTheme();
+  const { mode, setMode } = useTheme();
   const isDark = mode === "dark";
 
   return (
     <div className="px-2 py-2 border-t border-border/40">
-      {/* Dark / Light toggle */}
-      <div className="flex items-center gap-2 px-2 mb-2">
-        <button
-          onClick={() => setMode(isDark ? "light" : "dark")}
-          className={cn(
-            "flex items-center gap-2 flex-1 px-3 py-2 rounded-xl border border-border/60 transition-all text-muted-foreground hover:text-foreground hover:bg-muted",
-          )}
-        >
-          {isDark ? (
-            <Moon size={13} className="shrink-0" />
-          ) : (
-            <Sun size={13} className="shrink-0" />
-          )}
-          {expanded && (
-            <span className="text-[10px] font-bold">
-              {isDark ? "Dark" : "Light"}
-            </span>
-          )}
-        </button>
-      </div>
-
-      {/* Accent color dots */}
-      <div
+      <button
+        onClick={() => setMode(isDark ? "light" : "dark")}
         className={cn(
-          "flex gap-1.5 px-2",
-          expanded ? "justify-start" : "justify-center flex-col items-center",
+          "group flex w-full items-center gap-2 rounded-xl border border-border/50 bg-background/35 px-3 py-2 text-muted-foreground",
+          "transition-[background-color,color,border-color,transform] duration-200 ease-out hover:-translate-y-0.5 hover:bg-muted hover:text-foreground",
+          expanded ? "justify-start" : "justify-center",
         )}
+        aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       >
-        {ACCENT_LIST.map((a) => (
-          <button
-            key={a.id}
-            onClick={() => setAccent(a.id)}
-            title={a.label}
-            className="rounded-full transition-all hover:scale-110"
-            style={{
-              width: 14,
-              height: 14,
-              backgroundColor: a.hex,
-              outline: accent === a.id ? `2px solid ${a.hex}` : "none",
-              outlineOffset: 2,
-              flexShrink: 0,
-            }}
-          />
-        ))}
-      </div>
+        <span className="relative flex h-4 w-4 items-center justify-center">
+          {isDark ? (
+            <Moon
+              size={14}
+              className="transition-transform duration-300 group-hover:-rotate-12"
+            />
+          ) : (
+            <Sun
+              size={14}
+              className="transition-transform duration-300 group-hover:rotate-45"
+            />
+          )}
+        </span>
+        {expanded && (
+          <span className="text-[10px] font-bold">
+            {isDark ? "Night mode" : "Light mode"}
+          </span>
+        )}
+      </button>
     </div>
   );
 }
@@ -239,8 +221,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <AnimatedBackground />
-
       {/* ── Navbar ── */}
       <header className="fixed top-0 left-0 right-0 z-50 h-13 bg-background/80 backdrop-blur-xl border-b border-border/60 flex items-center gap-2.5 px-3">
         <button
@@ -296,7 +276,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       {/* ── Desktop Sidebar ── */}
       <aside
-        className="fixed top-13 left-0 bottom-0 z-40 border-r border-border/50 bg-sidebar/85 backdrop-blur-xl hidden lg:flex flex-col transition-all duration-300 overflow-hidden"
+        className="fixed top-13 left-0 bottom-0 z-40 border-r border-border/50 bg-sidebar/90 backdrop-blur-xl hidden lg:flex flex-col transition-[width] duration-300 ease-out overflow-hidden"
         style={{ width: SIDEBAR_W }}
       >
         <SidebarContents expanded={expanded} />
@@ -310,7 +290,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         >
           <div className="absolute inset-0 bg-background/50 backdrop-blur-sm" />
           <aside
-            className="absolute top-0 left-0 bottom-0 w-60 bg-sidebar/95 backdrop-blur-xl border-r border-border/50 flex flex-col"
+            className="absolute top-0 left-0 bottom-0 w-60 bg-sidebar/95 backdrop-blur-xl border-r border-border/50 flex flex-col animate-slide-in-left"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-4 h-13 border-b border-border/40">
