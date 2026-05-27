@@ -1,5 +1,6 @@
 import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -24,7 +25,7 @@ function App() {
               <Route path="/admin/login" component={AdminLoginPage} />
 
               {/* All other routes — inside sidebar Layout */}
-              <Route><Layout><Switch><Route path="/"                component={DashboardPage}    /><Route path="/airdrops"         component={AirdropsPage}     /><Route path="/airdrops/:slug"   component={AirdropDetailPage}/><Route path="/news"             component={NewsPage}         /><Route path="/article/:slug"    component={ArticlePage}      /><Route path="/chat"             component={ChatPage}         /><Route path="/admin"            component={AdminPage}        /><Route path="/settings"         component={SettingsPage}     /><Route component={NotFound} /></Switch></Layout></Route></Switch><Toaster /></ThemeProvider></TooltipProvider></QueryClientProvider></WouterRouter>
+              <Route><Layout><Switch><Route path="/"                component={DashboardPage}    /><Route path="/airdrops"         component={AirdropsPage}     /><Route path="/airdrops/:slug"   component={AirdropDetailPage}/><Route path="/news"             component={NewsPage}         /><Route path="/article/:slug"    component={ArticlePage}      /><Route path="/chat"             component={ChatPage}         /><Route path="/admin"            component={AdminPage}        /><Route path="/settings"         component={SettingsPage}     /><Route component={NotFound} /></Switch></Layout></Route></Switch><Toaster /><SpeedInsights /></ThemeProvider></TooltipProvider></QueryClientProvider></WouterRouter>
   );
 }
 
