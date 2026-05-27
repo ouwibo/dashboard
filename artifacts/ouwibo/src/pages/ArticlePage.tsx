@@ -1,8 +1,32 @@
 import { useParams, Link } from "wouter";
+import type { ReactNode } from "react";
 import { getAllArticles } from "@/lib/articleStore";
 import { ArticleCard } from "@/components/ArticleCard";
 import AdSlot from "@/components/AdSlot";
 import { ArrowLeft, Clock, Calendar, Tag } from "lucide-react";
+
+/* Inline markdown — handles **bold**, *italic*, `code`, and [text](url). */
+function renderInline(text: string): ReactNode[] {
+  const out: ReactNode[] = [];
+  const re = /(\*\*[^*]+\*\*|`[^`]+`|\*[^*]+\*|\[[^\]]+\]\([^)]+\))/g;
+  let last = 0;
+  let key = 0;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) out.push(text.slice(last, m.index));
+    const t = m[0];
+    if (t.startsWith("**")) out.push(<strong key={key++}>{t.slice(2, -2)}</strong>);
+    else if (t.startsWith("`")) out.push(<code key={key++}>{t.slice(1, -1)}</code>);
+    else if (t.startsWith("[")) {
+      const linkM = /^\[([^\]]+)\]\(([^)]+)\)$/.exec(t);
+      if (linkM) out.push(<a key={key++} href={linkM[2]} target="_blank" rel="noopener noreferrer">{linkM[1]}</a>);
+      else out.push(t);
+    } else out.push(<em key={key++}>{t.slice(1, -1)}</em>);
+    last = m.index + t.length;
+  }
+  if (last < text.length) out.push(text.slice(last));
+  return out;
+}
 
 export default function ArticlePage() {
   const { slug } = useParams<{ slug: string }>();
@@ -54,12 +78,12 @@ export default function ArticlePage() {
           prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground
         ">
           {article.content.split("\n\n").map((para, i) => {
-            if (para.startsWith("# "))    return <h1 key={i}>{para.slice(2)}</h1>;
-            if (para.startsWith("## "))   return <h2 key={i}>{para.slice(3)}</h2>;
-            if (para.startsWith("### "))  return <h3 key={i}>{para.slice(4)}</h3>;
-            if (para.startsWith("> "))    return <blockquote key={i}><p>{para.slice(2)}</p></blockquote>;
-            if (para.startsWith("- "))    return <ul key={i}>{para.split("\n").filter(Boolean).map((l, j) => <li key={j}>{l.slice(2)}</li>)}</ul>;
-            return <p key={i}>{para}</p>;
+            if (para.startsWith("# "))    return <h1 key={i}>{renderInline(para.slice(2))}</h1>;
+            if (para.startsWith("## "))   return <h2 key={i}>{renderInline(para.slice(3))}</h2>;
+            if (para.startsWith("### "))  return <h3 key={i}>{renderInline(para.slice(4))}</h3>;
+            if (para.startsWith("> "))    return <blockquote key={i}><p>{renderInline(para.slice(2))}</p></blockquote>;
+            if (para.startsWith("- "))    return <ul key={i}>{para.split("\n").filter(Boolean).map((l, j) => <li key={j}>{renderInline(l.slice(2))}</li>)}</ul>;
+            return <p key={i}>{renderInline(para)}</p>;
           })}
         </div>
 
