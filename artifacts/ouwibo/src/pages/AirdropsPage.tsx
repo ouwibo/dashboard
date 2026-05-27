@@ -99,60 +99,93 @@ function TableRow({ a, bookmarked, onToggle }: { a: Airdrop; bookmarked: boolean
   const extra   = a.tasks.length - 1;
 
   return (
-    <div className={cn(GRID, "group border-b border-border/40 last:border-0 hover:bg-muted/30 transition-colors")}>
-      {/* Star */}
-      <div className="flex items-center justify-center h-full px-2 py-3"><button onClick={onToggle} className={cn("transition-colors", bookmarked ? "text-amber-400" : "text-muted-foreground/40 hover:text-amber-300")}><Star className="w-3.5 h-3.5" fill={bookmarked ? "currentColor" : "none"} /></button></div>
+    <Link href={`/airdrops/${a.slug}`} className="block">
+      <div className={cn(GRID, "group relative border-b border-border/40 last:border-0 cursor-pointer transition-all duration-300 ease-out hover:bg-gradient-to-r hover:from-primary/[0.04] hover:via-transparent hover:to-primary/[0.04] hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)] active:scale-[0.998]")}>
+        {/* Left accent bar on hover */}
+        <span className="pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 h-0 w-[2px] bg-gradient-to-b from-primary via-primary/60 to-transparent transition-all duration-300 group-hover:h-[70%]" />
 
-      {/* Name */}
-      <div className="flex items-center gap-2.5 py-3 pr-2 min-w-0"><ProjectLogo airdrop={a} size={34} /><div className="min-w-0"><div className="flex items-center gap-1 flex-wrap"><span className="font-semibold text-[13px] truncate">{a.name}</span>
-            {a.isNew && (
-              <span className="text-[8px] bg-emerald-500 text-white px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wide shrink-0">
-                New
-              </span>
-            )}
-          </div>
-          {a.ticker && <span className="text-[10px] text-muted-foreground">{a.ticker}</span>}
-        </div></div>
+        {/* Star */}
+        <div className="flex items-center justify-center h-full px-2 py-3">
+          <button
+            onClick={e => { e.preventDefault(); e.stopPropagation(); onToggle(); }}
+            className={cn("transition-all duration-200 hover:scale-125", bookmarked ? "text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.5)]" : "text-muted-foreground/40 hover:text-amber-300")}
+          >
+            <Star className="w-3.5 h-3.5" fill={bookmarked ? "currentColor" : "none"} />
+          </button>
+        </div>
 
-      {/* Task Type */}
-      <div className="py-3 pr-3 min-w-0">
-        {topTask ? (
-          <div className="space-y-1"><p className="text-[10px] text-muted-foreground leading-none">
-              Cost: <span className={topTask.cost === 0 ? "text-emerald-500 font-medium" : "text-amber-400 font-medium"}>
-                {topTask.cost === 0 ? "Free" : `$${topTask.cost}`}
-              </span><span className="mx-1.5 opacity-30">·</span>
-              Time: <span className="text-foreground/70">{topTask.timeMin} min</span></p><div className="flex items-center gap-1.5 flex-nowrap overflow-hidden"><span className="text-[12px] font-medium truncate flex-shrink">{topTask.name}</span>
-              {extra > 0 && <span className="text-[9px] text-cyan-400 font-bold shrink-0">+{extra}</span>}
-              <Link href={`/airdrops/${a.slug}`} className="ml-auto shrink-0" onClick={e => e.stopPropagation()}><span className="inline-flex items-center gap-0.5 text-[10px] bg-primary text-primary-foreground px-2 py-1 rounded-md font-semibold hover:opacity-90 transition-opacity">
-                  View <ChevronRight className="w-2.5 h-2.5" /></span></Link></div><div className="flex items-center gap-1 flex-nowrap overflow-hidden">
-              {topTask.types.slice(0, 2).map(t => (
-                <span key={t} className={cn("text-[9px] font-medium px-1.5 py-0.5 rounded", TYPE_CLS[t] ?? "bg-muted text-muted-foreground")}>
-                  {t}
+        {/* Name */}
+        <div className="flex items-center gap-2.5 py-3 pr-2 min-w-0">
+          <div className="transition-transform duration-300 group-hover:scale-105"><ProjectLogo airdrop={a} size={34} /></div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-1 flex-wrap">
+              <span className="font-bold text-[13px] truncate tracking-tight group-hover:text-primary transition-colors duration-200">{a.name}</span>
+              {a.isNew && (
+                <span className="text-[8px] bg-gradient-to-r from-emerald-500 to-emerald-400 text-white px-1.5 py-0.5 rounded-full font-black uppercase tracking-wider shrink-0 shadow-sm shadow-emerald-500/30">
+                  New
                 </span>
-              ))}
-            </div></div>
-        ) : (
-          <span className="text-[11px] text-muted-foreground/60">No active tasks</span>
-        )}
+              )}
+            </div>
+            {a.ticker && <span className="text-[10px] text-muted-foreground font-medium">{a.ticker}</span>}
+          </div>
+        </div>
+
+        {/* Task Type */}
+        <div className="py-3 pr-3 min-w-0">
+          {topTask ? (
+            <div className="space-y-1">
+              <p className="text-[10px] text-muted-foreground leading-none">
+                Cost: <span className={topTask.cost === 0 ? "text-emerald-500 font-bold" : "text-amber-400 font-bold"}>
+                  {topTask.cost === 0 ? "Free" : `$${topTask.cost}`}
+                </span><span className="mx-1.5 opacity-30">·</span>
+                Time: <span className="text-foreground/70 font-medium">{topTask.timeMin} min</span>
+              </p>
+              <div className="flex items-center gap-1.5 flex-nowrap overflow-hidden">
+                <span className="text-[12px] font-semibold truncate flex-shrink">{topTask.name}</span>
+                {extra > 0 && <span className="text-[9px] text-cyan-400 font-black shrink-0">+{extra}</span>}
+                <span className="ml-auto shrink-0 inline-flex items-center gap-0.5 text-[10px] bg-primary text-primary-foreground px-2 py-1 rounded-md font-bold opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 shadow-sm shadow-primary/30">
+                  View <ChevronRight className="w-2.5 h-2.5" />
+                </span>
+              </div>
+              <div className="flex items-center gap-1 flex-nowrap overflow-hidden">
+                {topTask.types.slice(0, 2).map(t => (
+                  <span key={t} className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded", TYPE_CLS[t] ?? "bg-muted text-muted-foreground")}>
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <span className="text-[11px] text-muted-foreground/60">No active tasks</span>
+          )}
+        </div>
+
+        {/* Updated Status */}
+        <div className="py-3 pr-2">
+          <div className="flex items-center gap-1.5 mb-0.5">
+            {STATUS_ICON[a.status]}
+            <span className={cn("text-[11px] font-bold truncate", STATUS_CLS[a.status])}>{a.status}</span>
+          </div>
+          <p className="text-[10px] text-muted-foreground pl-5">{a.statusDate}</p>
+        </div>
+
+        {/* Reward Type */}
+        <div className="py-3 pr-2">
+          <span className={cn("text-[11px] font-bold", REWARD_CLS[a.rewardType] ?? "text-foreground")}>
+            {a.rewardType}
+          </span>
+        </div>
+
+        {/* Raise / Backers */}
+        <div className="py-3 pr-3">
+          {a.raiseFunds
+            ? <p className="text-[12px] font-bold mb-1">{a.raiseFunds}</p>
+            : <p className="text-[11px] text-muted-foreground mb-1">—</p>
+          }
+          <BackerRow backers={a.backers} extra={a.backersExtra} />
+        </div>
       </div>
-
-      {/* Updated Status */}
-      <div className="py-3 pr-2"><div className="flex items-center gap-1.5 mb-0.5">
-          {STATUS_ICON[a.status]}
-          <span className={cn("text-[11px] font-medium truncate", STATUS_CLS[a.status])}>{a.status}</span></div><p className="text-[10px] text-muted-foreground pl-5">{a.statusDate}</p></div>
-
-      {/* Reward Type */}
-      <div className="py-3 pr-2"><span className={cn("text-[11px] font-medium", REWARD_CLS[a.rewardType] ?? "text-foreground")}>
-          {a.rewardType}
-        </span></div>
-
-      {/* Raise / Backers */}
-      <div className="py-3 pr-3">
-        {a.raiseFunds
-          ? <p className="text-[12px] font-semibold mb-1">{a.raiseFunds}</p>
-          : <p className="text-[11px] text-muted-foreground mb-1">—</p>
-        }
-        <BackerRow backers={a.backers} extra={a.backersExtra} /></div></div>
+    </Link>
   );
 }
 
@@ -162,50 +195,90 @@ function TableRow({ a, bookmarked, onToggle }: { a: Airdrop; bookmarked: boolean
 function AirdropCard({ a, bookmarked, onToggle }: { a: Airdrop; bookmarked: boolean; onToggle: () => void }) {
   const topTask = a.tasks[0];
   return (
-    <div className="flex flex-col border border-border/60 rounded-2xl bg-card overflow-hidden hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-200 group">
-      {/* Header */}
-      <div className="p-4 pb-3"><div className="flex items-start justify-between mb-3"><div className="flex items-center gap-3"><ProjectLogo airdrop={a} size={44} /><div><div className="flex items-center gap-1.5 flex-wrap"><span className="font-bold text-[14px] leading-tight">{a.name}</span>
-                {a.isNew && (
-                  <span className="text-[8px] bg-emerald-500 text-white px-1.5 py-0.5 rounded-full font-bold uppercase">New</span>
+    <Link href={`/airdrops/${a.slug}`} className="block group">
+      <div className="relative flex flex-col rounded-2xl bg-card overflow-hidden cursor-pointer transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/20 active:translate-y-0 active:scale-[0.99] border border-border/60 hover:border-transparent">
+        {/* Gradient border ring on hover */}
+        <span className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-br from-primary/40 via-primary/10 to-cyan-400/30 -z-10 blur-sm" />
+        <span className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-transparent group-hover:ring-primary/30 transition-all duration-300" />
+
+        {/* Header */}
+        <div className="p-4 pb-3 relative">
+          <div className="flex items-start justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <div className="transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3"><ProjectLogo airdrop={a} size={44} /></div>
+              <div>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="font-black text-[15px] leading-tight tracking-tight group-hover:text-primary transition-colors duration-200">{a.name}</span>
+                  {a.isNew && (
+                    <span className="text-[8px] bg-gradient-to-r from-emerald-500 to-emerald-400 text-white px-1.5 py-0.5 rounded-full font-black uppercase tracking-wider shadow-sm shadow-emerald-500/40">New</span>
+                  )}
+                </div>
+                {a.ticker && <span className="text-[11px] text-muted-foreground font-semibold">{a.ticker}</span>}
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1">{STATUS_ICON[a.status]}</div>
+              <button
+                onClick={e => { e.preventDefault(); e.stopPropagation(); onToggle(); }}
+                className={cn("transition-all duration-200 hover:scale-125", bookmarked ? "text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.6)]" : "text-muted-foreground/30 hover:text-amber-300")}
+              >
+                <Star className="w-3.5 h-3.5" fill={bookmarked ? "currentColor" : "none"} />
+              </button>
+            </div>
+          </div>
+
+          {/* Status + reward + funds */}
+          <div className="flex items-center gap-2 text-[11px] mb-3 flex-wrap">
+            <span className={cn("font-bold", STATUS_CLS[a.status])}>{a.status}</span>
+            <span className="text-muted-foreground/40">·</span>
+            <span className={cn("font-bold", REWARD_CLS[a.rewardType] ?? "")}>{a.rewardType}</span>
+            {a.raiseFunds && (
+              <><span className="text-muted-foreground/40">·</span><span className="font-black text-foreground">{a.raiseFunds}</span></>
+            )}
+          </div>
+
+          {/* Top task card */}
+          {topTask ? (
+            <div className="bg-muted/40 border border-border/40 rounded-xl p-3 mb-3 group-hover:bg-muted/60 group-hover:border-border/60 transition-colors duration-300">
+              <div className="flex items-start justify-between gap-2 mb-1.5">
+                <span className="text-[12px] font-bold leading-tight">{topTask.name}</span>
+                {a.tasks.length > 1 && (
+                  <span className="text-[9px] text-cyan-400 font-black shrink-0">+{a.tasks.length - 1}</span>
                 )}
               </div>
-              {a.ticker && <span className="text-[11px] text-muted-foreground">{a.ticker}</span>}
-            </div></div><div className="flex items-center gap-1.5"><div className="flex items-center gap-1">
-              {STATUS_ICON[a.status]}
-            </div><button onClick={onToggle} className={cn(bookmarked ? "text-amber-400" : "text-muted-foreground/30 hover:text-amber-300")}><Star className="w-3.5 h-3.5" fill={bookmarked ? "currentColor" : "none"} /></button></div></div>
-
-        {/* Status + reward + funds */}
-        <div className="flex items-center gap-2 text-[11px] mb-3 flex-wrap"><span className={cn("font-medium", STATUS_CLS[a.status])}>{a.status}</span><span className="text-muted-foreground/40">·</span><span className={cn("font-medium", REWARD_CLS[a.rewardType] ?? "")}>{a.rewardType}</span>
-          {a.raiseFunds && (
-            <><span className="text-muted-foreground/40">·</span><span className="font-semibold text-foreground">{a.raiseFunds}</span></>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {topTask.types.map(t => (
+                  <span key={t} className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded-md", TYPE_CLS[t] ?? "bg-muted text-muted-foreground")}>
+                    {t}
+                  </span>
+                ))}
+                <span className="text-muted-foreground/40 mx-0.5">·</span>
+                <span className={cn("text-[10px] font-black", topTask.cost === 0 ? "text-emerald-500" : "text-amber-400")}>
+                  {topTask.cost === 0 ? "Free" : `$${topTask.cost}`}
+                </span>
+                <span className="text-muted-foreground/40">·</span>
+                <span className="text-[10px] text-muted-foreground font-semibold">{topTask.timeMin} min</span>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-muted/20 border border-border/30 rounded-xl p-3 mb-3 flex items-center justify-center">
+              <span className="text-[11px] text-muted-foreground">No active tasks — check back soon</span>
+            </div>
           )}
+
+          {/* Backers */}
+          <BackerRow backers={a.backers} extra={a.backersExtra} />
         </div>
 
-        {/* Top task card */}
-        {topTask ? (
-          <div className="bg-muted/40 border border-border/40 rounded-xl p-3 mb-3"><div className="flex items-start justify-between gap-2 mb-1.5"><span className="text-[12px] font-semibold leading-tight">{topTask.name}</span>
-              {a.tasks.length > 1 && (
-                <span className="text-[9px] text-cyan-400 font-bold shrink-0">+{a.tasks.length - 1}</span>
-              )}
-            </div><div className="flex items-center gap-1.5 flex-wrap">
-              {topTask.types.map(t => (
-                <span key={t} className={cn("text-[9px] font-medium px-1.5 py-0.5 rounded-md", TYPE_CLS[t] ?? "bg-muted text-muted-foreground")}>
-                  {t}
-                </span>
-              ))}
-              <span className="text-muted-foreground/40 mx-0.5">·</span><span className={cn("text-[10px] font-semibold", topTask.cost === 0 ? "text-emerald-500" : "text-amber-400")}>
-                {topTask.cost === 0 ? "Free" : `$${topTask.cost}`}
-              </span><span className="text-muted-foreground/40">·</span><span className="text-[10px] text-muted-foreground">{topTask.timeMin} min</span></div></div>
-        ) : (
-          <div className="bg-muted/20 border border-border/30 rounded-xl p-3 mb-3 flex items-center justify-center"><span className="text-[11px] text-muted-foreground">No active tasks — check back soon</span></div>
-        )}
-
-        {/* Backers */}
-        <BackerRow backers={a.backers} extra={a.backersExtra} /></div>
-
-      {/* Footer */}
-      <div className="mt-auto border-t border-border/40 px-4 py-2.5 flex items-center justify-between bg-muted/10"><span className="text-[10px] text-muted-foreground">{a.statusDate}</span><Link href={`/airdrops/${a.slug}`}><span className="text-[11px] font-semibold text-primary group-hover:underline flex items-center gap-0.5">
-            View Details <ChevronRight className="w-3 h-3" /></span></Link></div></div>
+        {/* Footer */}
+        <div className="mt-auto border-t border-border/40 px-4 py-2.5 flex items-center justify-between bg-muted/10 group-hover:bg-primary/5 transition-colors duration-300">
+          <span className="text-[10px] text-muted-foreground font-semibold">{a.statusDate}</span>
+          <span className="text-[11px] font-black text-primary flex items-center gap-0.5 transition-transform duration-300 group-hover:translate-x-0.5">
+            View Details <ChevronRight className="w-3 h-3 transition-transform duration-300 group-hover:translate-x-0.5" />
+          </span>
+        </div>
+      </div>
+    </Link>
   );
 }
 
