@@ -221,6 +221,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      {/* ── Premium background glows ── */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden>
+        <div className="absolute bottom-[-10%] left-[-5%] w-[55vw] h-[55vw] max-w-[700px] max-h-[700px] rounded-full bg-primary/[0.07] blur-[120px]" />
+        <div className="absolute top-[-10%] right-[-5%] w-[40vw] h-[40vw] max-w-[500px] max-h-[500px] rounded-full bg-blue-500/[0.05] blur-[100px]" />
+        <div className="absolute top-[40%] left-[30%] w-[30vw] h-[30vw] max-w-[400px] max-h-[400px] rounded-full bg-primary/[0.03] blur-[130px]" />
+      </div>
       {/* ── Navbar ── */}
       <header className="fixed top-0 left-0 right-0 z-50 h-13 bg-background/80 backdrop-blur-xl border-b border-border/60 flex items-center gap-2.5 px-3">
         <button
