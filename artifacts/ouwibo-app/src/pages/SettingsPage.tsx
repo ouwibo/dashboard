@@ -17,7 +17,7 @@ function NeoSection({ title, bg, children, icon: Icon }: { title: string; bg: st
 }
 
 export default function SettingsPage() {
-  const { theme, toggleTheme } = useTheme();
+  const { mode, setMode } = useTheme();
   const { toast } = useToast();
   const [siteName, setSiteName] = useState("Ouwibo");
   const [siteDesc, setSiteDesc] = useState("Crypto airdrop tracker & news");
@@ -33,7 +33,7 @@ export default function SettingsPage() {
                 data-testid="input-site-desc" /></div></div></NeoSection>
 
         {/* Appearance */}
-        <NeoSection title="Appearance" bg={PASTEL[1]} icon={Palette}><div className="flex items-center justify-between p-3.5 rounded-xl border-2 border-foreground/15 bg-white/40"><div><p style={{ fontSize: "0.72rem", fontWeight: 700 }}>Dark Mode</p><p className="text-foreground/60 mt-0.5" style={{ fontSize: "0.6rem" }}>Currently: {theme === "dark" ? "Dark" : "Light"}</p></div><Switch checked={theme === "dark"} onCheckedChange={toggleTheme} data-testid="switch-dark-mode" /></div></NeoSection>
+        <NeoSection title="Appearance" bg={PASTEL[1]} icon={Palette}><div className="flex items-center justify-between p-3.5 rounded-xl border-2 border-foreground/15 bg-white/40"><div><p style={{ fontSize: "0.72rem", fontWeight: 700 }}>Dark Mode</p><p className="text-foreground/60 mt-0.5" style={{ fontSize: "0.6rem" }}>Currently: {mode === "dark" ? "Dark" : "Light"}</p></div><Switch checked={mode === "dark"} onCheckedChange={v => setMode(v ? "dark" : "light")} data-testid="switch-dark-mode" /></div></NeoSection>
 
         {/* Notifications */}
         <NeoSection title="Notifications" bg={PASTEL[2]} icon={Bell}><div className="space-y-2">

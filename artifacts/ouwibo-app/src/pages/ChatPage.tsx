@@ -62,13 +62,15 @@ export default function ChatPage() {
     setIsLoading(true);
 
     try {
+      const history = [...messages.slice(-10), userMsg].map(m => ({
+        role: m.role,
+        content: m.content,
+      }));
+
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: content,
-          history: messages.slice(-10), // Send last 10 messages for context
-        }),
+        body: JSON.stringify({ messages: history }),
       });
 
       if (!response.ok) {
