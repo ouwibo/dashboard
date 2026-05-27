@@ -19,7 +19,7 @@ export interface Airdrop {
   statusDate: string;
   rewardType: "Airdrop" | "Whitelist/Waitlist" | "Points" | "Token Sale" | "NFT";
   raiseFunds?: string;
-  backers?: { color: string; initial: string }[];
+  backers?: Backer[];
   backersExtra?: number;
   tasks: AirdropTask[];
   moniScore?: number;
