@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, Zap, Newspaper, Wallet, Calendar, Bell,
   Settings, Menu, ChevronUp, Search, BookOpen, MessageSquare,
-  ChevronRight, Sun, Moon, PenLine,
+  ChevronRight, Sun, Moon,
 } from "lucide-react";
 
 const NAV_GROUPS = [
@@ -21,7 +21,6 @@ const NAV_GROUPS = [
   {
     label: "TOOLS",
     items: [
-      { href: "/admin",     label: "Write",     Icon: PenLine                         },
       { href: "/portfolio", label: "Portfolio", Icon: Wallet,   soon: true },
       { href: "/calendar",  label: "Calendar",  Icon: Calendar, soon: true },
       { href: "/alerts",    label: "Alerts",    Icon: Bell,     soon: true },

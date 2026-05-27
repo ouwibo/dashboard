@@ -11,20 +11,33 @@ import NewsPage from "@/pages/NewsPage";
 import ChatPage from "@/pages/ChatPage";
 import SettingsPage from "@/pages/SettingsPage";
 import ArticlePage from "@/pages/ArticlePage";
-import AdminPage from "@/pages/AdminPage";
-import AdminLoginPage from "@/pages/AdminLoginPage";
 import NotFound from "@/pages/not-found";
 
 const qc = new QueryClient();
 
 function App() {
   return (
-    <WouterRouter><QueryClientProvider client={qc}><TooltipProvider><ThemeProvider><Switch>
-              {/* Admin — no sidebar */}
-              <Route path="/admin/login" component={AdminLoginPage} />
-
-              {/* All other routes — inside sidebar Layout */}
-              <Route><Layout><Switch><Route path="/"                component={DashboardPage}    /><Route path="/airdrops"         component={AirdropsPage}     /><Route path="/airdrops/:slug"   component={AirdropDetailPage}/><Route path="/news"             component={NewsPage}         /><Route path="/article/:slug"    component={ArticlePage}      /><Route path="/chat"             component={ChatPage}         /><Route path="/admin"            component={AdminPage}        /><Route path="/settings"         component={SettingsPage}     /><Route component={NotFound} /></Switch></Layout></Route></Switch><Toaster /></ThemeProvider></TooltipProvider></QueryClientProvider></WouterRouter>
+    <WouterRouter>
+      <QueryClientProvider client={qc}>
+        <TooltipProvider>
+          <ThemeProvider>
+            <Layout>
+              <Switch>
+                <Route path="/" component={DashboardPage} />
+                <Route path="/airdrops" component={AirdropsPage} />
+                <Route path="/airdrops/:slug" component={AirdropDetailPage} />
+                <Route path="/news" component={NewsPage} />
+                <Route path="/article/:slug" component={ArticlePage} />
+                <Route path="/chat" component={ChatPage} />
+                <Route path="/settings" component={SettingsPage} />
+                <Route component={NotFound} />
+              </Switch>
+            </Layout>
+            <Toaster />
+          </ThemeProvider>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </WouterRouter>
   );
 }
 

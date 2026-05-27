@@ -70,12 +70,6 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Write / Admin */}
-        <Link href="/admin"
-          className="hidden md:flex items-center gap-1.5 h-7 px-3 rounded-md bg-primary text-primary-foreground text-[12px] font-medium hover:opacity-90 transition-opacity">
-          Write
-        </Link>
-
         {/* Mobile burger */}
         <button onClick={() => setMob(v => !v)}
           className="md:hidden w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:bg-muted">
@@ -106,10 +100,7 @@ export default function Navbar() {
                   outline: accent === a.id ? `2px solid ${a.hex}` : "none", outlineOffset: 2 }}
               />
             ))}
-          </div><Link href="/admin" onClick={() => setMob(false)}
-            className="mx-3 mt-1 flex items-center justify-center h-8 rounded-md bg-primary text-primary-foreground text-[13px] font-medium">
-            Write Article
-          </Link></div>
+          </div></div>
       )}
     </header>
   );
