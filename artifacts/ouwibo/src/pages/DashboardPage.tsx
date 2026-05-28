@@ -5,6 +5,7 @@ import { getAllArticles } from "@/lib/articleStore";
 import { ArticleCard } from "@/components/ArticleCard";
 import { TrendingUp, Zap, Clock, CheckCircle2, ChevronRight, Gift, Newspaper } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AirdropLogo } from "@/components/AirdropLogo";
 
 /* ── Moni score gradient bar (mini) ── */
 function MiniBar({ score }: { score: number }) {
@@ -26,10 +27,13 @@ function AirdropRow({ a, rank }: { a: Airdrop; rank: number }) {
     <Link href={`/airdrops/${a.slug}`}><div className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted/40 transition-colors cursor-pointer border-b border-border/30 last:border-0"><span className="text-[11px] text-muted-foreground w-5 text-center shrink-0">{rank}</span>
 
         {/* logo */}
-        <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-[10px] font-bold shrink-0"
-             style={{ background: a.logoColor }}>
-          {a.logoInitial}
-        </div>
+        <AirdropLogo
+          name={a.name}
+          logoUrl={a.logoUrl}
+          logoInitial={a.logoInitial}
+          logoColor={a.logoColor}
+          size={32}
+        />
 
         {/* name + task */}
         <div className="flex-1 min-w-0"><div className="flex items-center gap-1.5 mb-0.5"><span className="text-[13px] font-semibold truncate">{a.name}</span>
@@ -119,11 +123,15 @@ export default function DashboardPage() {
               <p className="text-[12px] text-muted-foreground text-center py-6">None available</p>
             ) : (
               <div>
-                {rewardA.map((a) => (
-                  <Link key={a.id} href={`/airdrops/${a.slug}`}><div className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-muted/40 transition-colors cursor-pointer border-b border-border/30 last:border-0"><div className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-[9px] font-bold shrink-0"
-                           style={{ background: a.logoColor }}>
-                        {a.logoInitial}
-                      </div><div className="flex-1 min-w-0"><p className="text-[12px] font-medium truncate">{a.name}</p><p className="text-[10px] text-blue-400">Reward Available</p></div><ChevronRight className="w-3 h-3 text-muted-foreground shrink-0" /></div></Link>
+                {rewardA.map((drop) => (
+                  <Link key={drop.id} href={`/airdrops/${drop.slug}`}><div className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-muted/40 transition-colors cursor-pointer border-b border-border/30 last:border-0"><AirdropLogo
+                    name={drop.name}
+                    logoUrl={drop.logoUrl}
+                    logoInitial={drop.logoInitial}
+                    logoColor={drop.logoColor}
+                    size={28}
+                  />
+                  <div className="flex-1 min-w-0"><p className="text-[12px] font-medium truncate">{drop.name}</p><p className="text-[10px] text-blue-400">Reward Available</p></div><ChevronRight className="w-3 h-3 text-muted-foreground shrink-0" /></div></Link>
                 ))}
               </div>
             )}
@@ -136,12 +144,16 @@ export default function DashboardPage() {
             ) : (
               <div>
                 {newest.map((a) => (
-                  <Link key={a.id} href={`/airdrops/${a.slug}`}><div className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-muted/40 transition-colors cursor-pointer border-b border-border/30 last:border-0"><div className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-[9px] font-bold shrink-0"
-                           style={{ background: a.logoColor }}>
-                        {a.logoInitial}
-                      </div><div className="flex-1 min-w-0"><p className="text-[12px] font-medium truncate">{a.name}</p><p className="text-[10px] text-muted-foreground">
-                          {a.tasks[0] ? (a.tasks[0].cost === 0 ? "Free" : `$${a.tasks[0].cost}`) : "—"} · {a.rewardType}
-                        </p></div><span className="text-[9px] bg-emerald-500 text-white px-1.5 py-0.5 rounded font-medium shrink-0">NEW</span></div></Link>
+                  <Link key={a.id} href={`/airdrops/${a.slug}`}><div className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-muted/40 transition-colors cursor-pointer border-b border-border/30 last:border-0"><AirdropLogo
+                    name={a.name}
+                    logoUrl={a.logoUrl}
+                    logoInitial={a.logoInitial}
+                    logoColor={a.logoColor}
+                    size={28}
+                  />
+                  <div className="flex-1 min-w-0"><p className="text-[12px] font-medium truncate">{a.name}</p><p className="text-[10px] text-muted-foreground">
+                      {a.tasks[0] ? (a.tasks[0].cost === 0 ? "Free" : `$${a.tasks[0].cost}`) : "—"} · {a.rewardType}
+                    </p></div><span className="text-[9px] bg-emerald-500 text-white px-1.5 py-0.5 rounded font-medium shrink-0">NEW</span></div></Link>
                 ))}
               </div>
             )}
