@@ -1,3 +1,4 @@
+import React from "react";
 import { useMemo, useState } from "react";
 import { Link } from "wouter";
 import { cn } from "@/lib/utils";
@@ -14,6 +15,7 @@ import {
   Search,
   Star,
 } from "lucide-react";
+import { useScrollAnim } from "@/hooks/useScrollAnim";
 
 const STATUS_ICON = {
   Confirmed: <CheckCircle2 className="h-3 w-3 shrink-0" />,
@@ -269,6 +271,15 @@ function AirdropCard({ a, bookmarked, onToggle }: { a: Airdrop; bookmarked: bool
   );
 }
 
+function AnimatedItem({ children, index }: { children: React.ReactNode; index: number }) {
+  const ref = useScrollAnim();
+  return (
+    <div ref={ref} className="anim anim-up" style={{ animationDelay: `${Math.min(index, 8) * 45}ms` }}>
+      {children}
+    </div>
+  );
+}
+
 export default function AirdropsPage() {
   const [tab, setTab] = useState("All");
   const [rewardTab, setRewardTab] = useState("All");
@@ -307,7 +318,7 @@ export default function AirdropsPage() {
 
   return (
     <div className="mx-auto w-full max-w-[1320px] space-y-5 pb-8">
-      <section className="rounded-3xl border border-border/60 bg-card/70 p-4 shadow-sm backdrop-blur sm:p-5">
+      <section className="rounded-3xl border border-border/60 bg-card/70 p-4 shadow-sm backdrop-blur sm:p-5 anim anim-up">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0">
             <p className="text-[11px] font-black uppercase tracking-[0.2em] text-primary">Airdrop Radar</p>
@@ -318,15 +329,15 @@ export default function AirdropsPage() {
           </div>
 
           <div className="grid grid-cols-3 gap-2 lg:min-w-[360px]">
-            <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-3">
+            <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-3 anim anim-scale anim-delay-1">
               <p className="text-2xl font-black text-emerald-400">{counts.confirmed}</p>
               <p className="text-[11px] font-bold text-emerald-300/80">Confirmed</p>
             </div>
-            <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 p-3">
+            <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 p-3 anim anim-scale anim-delay-2">
               <p className="text-2xl font-black text-amber-400">{counts.potential}</p>
               <p className="text-[11px] font-bold text-amber-300/80">Potential</p>
             </div>
-            <div className="rounded-2xl border border-sky-500/20 bg-sky-500/10 p-3">
+            <div className="rounded-2xl border border-sky-500/20 bg-sky-500/10 p-3 anim anim-scale anim-delay-3">
               <p className="text-2xl font-black text-sky-400">{counts.reward}</p>
               <p className="text-[11px] font-bold text-sky-300/80">Rewards</p>
             </div>
@@ -398,7 +409,7 @@ export default function AirdropsPage() {
       </section>
 
       {filtered.length === 0 ? (
-        <section className="grid min-h-64 place-items-center rounded-3xl border border-dashed border-border bg-card/50 p-10 text-center text-muted-foreground">
+        <section className="grid min-h-64 place-items-center rounded-3xl border border-dashed border-border bg-card/50 p-10 text-center text-muted-foreground anim anim-up">
           <div>
             <Search className="mx-auto h-9 w-9 opacity-40" />
             <p className="mt-3 text-sm font-bold">No airdrops match your filter</p>
@@ -406,14 +417,18 @@ export default function AirdropsPage() {
         </section>
       ) : view === "cards" ? (
         <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-          {filtered.map((airdrop) => (
-            <AirdropCard key={airdrop.id} a={airdrop} bookmarked={bookmarks.has(airdrop.id)} onToggle={() => toggle(airdrop.id)} />
+          {filtered.map((airdrop, index) => (
+            <AnimatedItem key={airdrop.id} index={index}>
+              <AirdropCard a={airdrop} bookmarked={bookmarks.has(airdrop.id)} onToggle={() => toggle(airdrop.id)} />
+            </AnimatedItem>
           ))}
         </section>
       ) : (
         <section className="space-y-3">
-          {filtered.map((airdrop) => (
-            <AirdropRow key={airdrop.id} a={airdrop} bookmarked={bookmarks.has(airdrop.id)} onToggle={() => toggle(airdrop.id)} />
+          {filtered.map((airdrop, index) => (
+            <AnimatedItem key={airdrop.id} index={index}>
+              <AirdropRow a={airdrop} bookmarked={bookmarks.has(airdrop.id)} onToggle={() => toggle(airdrop.id)} />
+            </AnimatedItem>
           ))}
         </section>
       )}

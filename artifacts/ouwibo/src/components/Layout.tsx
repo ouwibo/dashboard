@@ -19,6 +19,7 @@ import {
   Sun,
   Moon,
 } from "lucide-react";
+import AnimatedBackdrop from "@/components/AnimatedBackdrop";
 
 const NAV_GROUPS = [
   {
@@ -221,6 +222,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <AnimatedBackdrop />
       {/* ── Premium background glows ── */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden>
         <div className="absolute bottom-[-10%] left-[-5%] w-[55vw] h-[55vw] max-w-[700px] max-h-[700px] rounded-full bg-primary/[0.07] blur-[120px]" />

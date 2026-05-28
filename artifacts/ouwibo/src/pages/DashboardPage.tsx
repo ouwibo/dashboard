@@ -3,7 +3,7 @@ import { mockAirdrops } from "@/lib/mockData";
 import type { Airdrop } from "@/lib/mockData";
 import { getAllArticles } from "@/lib/articleStore";
 import { ArticleCard } from "@/components/ArticleCard";
-import { TrendingUp, Zap, Clock, CheckCircle2, ChevronRight, Gift, Newspaper } from "lucide-react";
+import { TrendingUp, Zap, Clock, CheckCircle2, ChevronRight, Gift, Newspaper, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AirdropLogo } from "@/components/AirdropLogo";
 
@@ -93,12 +93,12 @@ export default function DashboardPage() {
       {/* ── Stats strip ── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: "Total",     value: total,     icon: <Zap className="w-4 h-4" />,          cls: "text-primary" },
-          { label: "Confirmed", value: confirmed, icon: <CheckCircle2 className="w-4 h-4" />, cls: "text-emerald-500" },
-          { label: "Potential", value: potential, icon: <Clock className="w-4 h-4" />,        cls: "text-amber-500" },
-          { label: "Free Tasks",value: free,      icon: <Gift className="w-4 h-4" />,         cls: "text-blue-400" },
+          { label: "Total",     value: total,     icon: <Zap className="w-4 h-4" />,          cls: "text-primary border-primary/25 bg-primary/5" },
+          { label: "Confirmed", value: confirmed, icon: <CheckCircle2 className="w-4 h-4" />, cls: "text-emerald-500 border-emerald-500/25 bg-emerald-500/5" },
+          { label: "Potential", value: potential, icon: <Clock className="w-4 h-4" />,        cls: "text-amber-500 border-amber-500/25 bg-amber-500/5" },
+          { label: "Free Tasks",value: free,      icon: <Gift className="w-4 h-4" />,         cls: "text-blue-400 border-blue-500/25 bg-blue-500/5" },
         ].map(({ label, value, icon, cls }) => (
-          <div key={label} className="border border-border rounded-xl p-3.5 bg-card/60 backdrop-blur-sm"><div className={cn("mb-2", cls)}>{icon}</div><div className="text-[22px] font-bold leading-none">{value}</div><div className="text-[11px] text-muted-foreground mt-1">{label}</div></div>
+          <div key={label} className={cn("border rounded-xl p-3.5 backdrop-blur-sm", cls)}><div className="mb-2">{icon}</div><div className="text-[22px] font-bold leading-none">{value}</div><div className="text-[11px] text-muted-foreground mt-1">{label}</div></div>
         ))}
       </div>
 
@@ -106,7 +106,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
         {/* Top ranked (2/3 width) */}
-        <div className="lg:col-span-2 border border-border rounded-xl bg-card/60 backdrop-blur-sm overflow-hidden"><div className="flex items-center justify-between px-4 py-3 border-b border-border/50"><div className="flex items-center gap-2"><TrendingUp className="w-4 h-4 text-primary" /><span className="text-[13px] font-semibold">Top Ranked</span></div><Link href="/airdrops" className="text-[11px] text-primary hover:underline">See all →</Link></div><div>
+        <div className="lg:col-span-2 border border-border rounded-xl bg-card/60 backdrop-blur-sm overflow-hidden shadow-[0_0_0_1px_rgba(255,255,255,0.02)]"><div className="flex items-center justify-between px-4 py-3 border-b border-border/50 bg-gradient-to-r from-primary/8 to-transparent"><div className="flex items-center gap-2"><TrendingUp className="w-4 h-4 text-primary" /><span className="text-[13px] font-semibold">Top Ranked</span></div><Link href="/airdrops" className="text-[11px] text-primary hover:underline">See all →</Link></div><div>
             {top.length === 0 ? (
               <p className="text-[13px] text-muted-foreground text-center py-8">No airdrops yet</p>
             ) : (
@@ -118,7 +118,7 @@ export default function DashboardPage() {
         <div className="space-y-4">
 
           {/* Reward Available */}
-          <div className="border border-border rounded-xl bg-card/60 backdrop-blur-sm overflow-hidden"><div className="flex items-center gap-2 px-4 py-3 border-b border-border/50"><span className="text-base"></span><span className="text-[13px] font-semibold">Claim Now</span></div>
+          <div className="border border-border rounded-xl bg-card/60 backdrop-blur-sm overflow-hidden shadow-[0_0_0_1px_rgba(255,255,255,0.02)]"><div className="flex items-center gap-2 px-4 py-3 border-b border-border/50 bg-gradient-to-r from-sky-500/8 to-transparent"><span className="text-base"></span><span className="text-[13px] font-semibold">Claim Now</span></div>
             {rewardA.length === 0 ? (
               <p className="text-[12px] text-muted-foreground text-center py-6">None available</p>
             ) : (
