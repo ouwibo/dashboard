@@ -1,19 +1,43 @@
+import { Suspense, lazy } from "react";
 import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import Layout from "@/components/Layout";
-import DashboardPage from "@/pages/DashboardPage";
-import AirdropsPage from "@/pages/AirdropsPage";
-import AirdropDetailPage from "@/pages/AirdropDetailPage";
-import NewsPage from "@/pages/NewsPage";
-import ChatPage from "@/pages/ChatPage";
-import SettingsPage from "@/pages/SettingsPage";
-import ArticlePage from "@/pages/ArticlePage";
-import NotFound from "@/pages/not-found";
+import PageErrorBoundary from "@/components/PageErrorBoundary";
+
+const DashboardPage = lazy(() => import("@/pages/DashboardPage"));
+const AirdropsPage = lazy(() => import("@/pages/AirdropsPage"));
+const AirdropDetailPage = lazy(() => import("@/pages/AirdropDetailPage"));
+const NewsPage = lazy(() => import("@/pages/NewsPage"));
+const ChatPage = lazy(() => import("@/pages/ChatPage"));
+const SettingsPage = lazy(() => import("@/pages/SettingsPage"));
+const ArticlePage = lazy(() => import("@/pages/ArticlePage"));
+const NotFound = lazy(() => import("@/pages/not-found"));
 
 const qc = new QueryClient();
+
+function PremiumRouteFallback() {
+  return (
+    <div className="premium-page space-y-4" aria-busy="true" aria-live="polite">
+      <div className="premium-panel rounded-3xl border p-5 sm:p-6">
+        <div className="lazy-premium h-4 w-32 rounded-full" />
+        <div className="lazy-premium mt-5 h-8 w-full max-w-xl rounded-2xl" />
+        <div className="lazy-premium mt-3 h-4 w-full max-w-3xl rounded-full" />
+      </div>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div key={index} className="premium-card rounded-2xl border p-4">
+            <div className="lazy-premium h-28 rounded-xl" />
+            <div className="lazy-premium mt-4 h-4 rounded-full" />
+            <div className="lazy-premium mt-2 h-3 w-2/3 rounded-full" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function App() {
   return (
@@ -22,16 +46,23 @@ function App() {
         <TooltipProvider>
           <ThemeProvider>
             <Layout>
-              <Switch>
-                <Route path="/" component={DashboardPage} />
-                <Route path="/airdrops" component={AirdropsPage} />
-                <Route path="/airdrops/:slug" component={AirdropDetailPage} />
-                <Route path="/news" component={NewsPage} />
-                <Route path="/article/:slug" component={ArticlePage} />
-                <Route path="/chat" component={ChatPage} />
-                <Route path="/settings" component={SettingsPage} />
-                <Route component={NotFound} />
-              </Switch>
+              <PageErrorBoundary>
+                <Suspense fallback={<PremiumRouteFallback />}>
+                  <Switch>
+                    <Route path="/" component={DashboardPage} />
+                    <Route path="/airdrops" component={AirdropsPage} />
+                    <Route
+                      path="/airdrops/:slug"
+                      component={AirdropDetailPage}
+                    />
+                    <Route path="/news" component={NewsPage} />
+                    <Route path="/article/:slug" component={ArticlePage} />
+                    <Route path="/chat" component={ChatPage} />
+                    <Route path="/settings" component={SettingsPage} />
+                    <Route component={NotFound} />
+                  </Switch>
+                </Suspense>
+              </PageErrorBoundary>
             </Layout>
             <Toaster />
           </ThemeProvider>
