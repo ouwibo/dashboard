@@ -13,6 +13,7 @@ import ChatPage from "@/pages/ChatPage";
 import SettingsPage from "@/pages/SettingsPage";
 import ArticlePage from "@/pages/ArticlePage";
 import NotFound from "@/pages/not-found";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 const qc = new QueryClient();
 
@@ -21,23 +22,11 @@ function App() {
     <WouterRouter>
       <QueryClientProvider client={qc}>
         <TooltipProvider>
-          <ThemeProvider>
-            <Layout>
-              <PageErrorBoundary>
-                <Switch>
-                  <Route path="/" component={DashboardPage} />
-                  <Route path="/airdrops" component={AirdropsPage} />
-                  <Route path="/airdrops/:slug" component={AirdropDetailPage} />
-                  <Route path="/news" component={NewsPage} />
-                  <Route path="/article/:slug" component={ArticlePage} />
-                  <Route path="/chat" component={ChatPage} />
-                  <Route path="/settings" component={SettingsPage} />
-                  <Route component={NotFound} />
-                </Switch>
-              </PageErrorBoundary>
-            </Layout>
-            <Toaster />
-          </ThemeProvider>
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+            <Router />
+          </WouterRouter>
+          <Toaster />
+          <SpeedInsights />
         </TooltipProvider>
       </QueryClientProvider>
     </WouterRouter>
