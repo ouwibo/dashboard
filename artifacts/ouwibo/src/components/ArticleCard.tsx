@@ -51,6 +51,8 @@ export function ArticleCard({
             src={article.coverImage}
             alt={article.title}
             className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
+            loading="lazy"
+            decoding="async"
           />
         ) : (
           <div
@@ -115,6 +117,9 @@ export function HeroArticleCard({ article }: { article: Article }) {
             src={article.coverImage}
             alt={article.title}
             className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
           />
         ) : (
           <div

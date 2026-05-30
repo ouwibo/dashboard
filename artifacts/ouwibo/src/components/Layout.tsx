@@ -50,6 +50,44 @@ const NAV_GROUPS = [
 const ALL_NAV = NAV_GROUPS.flatMap((g) => g.items);
 type NavItem = (typeof ALL_NAV)[number];
 
+function BrandMark() {
+  return (
+    <span className="premium-icon h-9 w-9 rounded-2xl text-primary-foreground">
+      <svg
+        viewBox="0 0 32 32"
+        className="relative z-10 h-5 w-5 drop-shadow-[0_2px_10px_hsl(var(--primary)/0.45)]"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          d="M17.7 2.8 7.3 17.2h7.1l-1.1 12 11.4-15.8h-7.6l.6-10.6Z"
+          fill="url(#brand-bolt)"
+        />
+        <path
+          d="M17.7 2.8 7.3 17.2h7.1l-1.1 12 11.4-15.8h-7.6l.6-10.6Z"
+          stroke="rgba(255,255,255,.55)"
+          strokeWidth="1.2"
+          strokeLinejoin="round"
+        />
+        <defs>
+          <linearGradient
+            id="brand-bolt"
+            x1="8"
+            y1="4"
+            x2="24"
+            y2="28"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop stopColor="white" />
+            <stop offset=".42" stopColor="hsl(var(--primary-foreground))" />
+            <stop offset="1" stopColor="hsl(var(--primary))" />
+          </linearGradient>
+        </defs>
+      </svg>
+    </span>
+  );
+}
+
 /* ── Scroll-to-top ── */
 function ScrollTop() {
   const [show, setShow] = useState(false);
@@ -130,8 +168,15 @@ function NavLink({
           : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
       )}
     >
-      <div className="shrink-0 w-4 flex items-center justify-center">
-        <item.Icon size={15} />
+      <div
+        className={cn(
+          "premium-icon shrink-0 rounded-lg",
+          expanded ? "h-7 w-7" : "h-8 w-8",
+          active &&
+            "border-primary-foreground/30 bg-primary-foreground/12 text-primary-foreground",
+        )}
+      >
+        <item.Icon size={15} className="relative z-10" strokeWidth={2.4} />
       </div>
       {expanded && (
         <>
@@ -248,9 +293,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </button>
         <Link href="/">
           <div className="flex select-none items-center gap-2 cursor-pointer">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-              <Zap size={14} fill="currentColor" />
-            </div>
+            <BrandMark />
             <div className="hidden flex-col leading-none sm:flex">
               <span className="text-[11px] font-black">Ouwibo</span>
               <span className="text-[8px] text-muted-foreground">Cloud</span>

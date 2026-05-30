@@ -30,7 +30,7 @@ export function AirdropLogo({
       aria-label={name}
       className={cn(
         "relative flex items-center justify-center overflow-hidden shrink-0 rounded-xl border border-white/10 text-white font-black shadow-sm",
-        className
+        className,
       )}
       style={{
         width: px,
@@ -44,6 +44,7 @@ export function AirdropLogo({
           src={logoUrl}
           alt={name}
           loading="lazy"
+          decoding="async"
           referrerPolicy="no-referrer"
           className="h-full w-full object-cover"
           onError={() => setFailed(true)}

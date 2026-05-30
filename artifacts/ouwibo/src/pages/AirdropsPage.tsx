@@ -1,5 +1,5 @@
 import React from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
 import { cn } from "@/lib/utils";
 import { mockAirdrops } from "@/lib/mockData";
@@ -70,6 +70,9 @@ function ProjectLogo({
           src={airdrop.logoUrl}
           alt={airdrop.name}
           className="h-full w-full object-cover"
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
           onError={() => setFailed(true)}
         />
       ) : (
@@ -99,6 +102,9 @@ function BackerAvatar({ backer, index }: { backer: Backer; index: number }) {
           src={backer.logoUrl}
           alt={backer.name}
           className="h-full w-full object-cover"
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
           onError={() => setFailed(true)}
         />
       ) : (
@@ -439,7 +445,16 @@ export default function AirdropsPage() {
   const [rewardTab, setRewardTab] = useState("All");
   const [search, setSearch] = useState("");
   const [view, setView] = useState<"list" | "cards">("list");
+  const [isCompact, setIsCompact] = useState(false);
   const [bookmarks, setBookmarks] = useState<Set<number>>(new Set());
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 639px)");
+    const update = () => setIsCompact(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
 
   const counts = useMemo(
     () => ({
@@ -470,6 +485,8 @@ export default function AirdropsPage() {
     [rewardTab, search, tab],
   );
 
+  const effectiveView = isCompact ? "cards" : view;
+
   const toggle = (id: number) => {
     setBookmarks((previous) => {
       const next = new Set(previous);
@@ -496,7 +513,7 @@ export default function AirdropsPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 lg:min-w-[360px]">
+          <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-3 lg:min-w-[360px]">
             <div className="premium-stat rounded-2xl border border-emerald-500/25 p-3 text-emerald-400 anim anim-scale anim-delay-1">
               <p className="text-2xl font-black text-emerald-400">
                 {counts.confirmed}
@@ -525,13 +542,13 @@ export default function AirdropsPage() {
 
       <section className="premium-panel rounded-3xl border p-3 sm:p-4">
         <div className="grid gap-3 lg:grid-cols-[1fr_auto] lg:items-center">
-          <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <div className="grid min-w-0 grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
             {FILTER_TABS.map((item) => (
               <button
                 key={item}
                 onClick={() => setTab(item)}
                 className={cn(
-                  "inline-flex h-9 items-center rounded-full border px-3 text-[12px] font-bold transition-colors",
+                  "inline-flex h-9 items-center justify-center rounded-full border px-3 text-center text-[11px] font-bold transition-colors sm:text-[12px]",
                   tab === item
                     ? "border-primary bg-primary text-primary-foreground shadow-sm"
                     : "border-border/60 bg-background/45 text-muted-foreground hover:text-foreground",
@@ -542,8 +559,8 @@ export default function AirdropsPage() {
             ))}
           </div>
 
-          <div className="flex items-center gap-2">
-            <label className="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-full border border-border/60 bg-background/55 px-3 lg:w-72 lg:flex-none">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <label className="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-full border border-border/60 bg-background/55 px-3 sm:min-w-64 lg:w-72 lg:flex-none">
               <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
               <input
                 value={search}
@@ -553,14 +570,16 @@ export default function AirdropsPage() {
               />
             </label>
 
-            <div className="hidden items-center gap-1 rounded-full border border-border/60 bg-background/55 p-1 lg:flex">
+            <div className="hidden items-center gap-1 rounded-full border border-border/60 bg-background/55 p-1 sm:flex">
               <button
                 onClick={() => setView("list")}
+                disabled={isCompact}
                 className={cn(
                   "grid h-8 w-8 place-items-center rounded-full transition-colors",
                   view === "list"
                     ? "bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:text-foreground",
+                  isCompact && "cursor-not-allowed opacity-40",
                 )}
                 aria-label="List view"
               >
@@ -573,6 +592,7 @@ export default function AirdropsPage() {
                   view === "cards"
                     ? "bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:text-foreground",
+                  isCompact && "cursor-not-allowed opacity-40",
                 )}
                 aria-label="Card view"
               >
@@ -582,7 +602,7 @@ export default function AirdropsPage() {
           </div>
         </div>
 
-        <div className="mt-3 flex min-w-0 gap-2 overflow-x-auto pb-1">
+        <div className="mt-3 flex min-w-0 gap-2 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch]">
           {REWARD_TABS.map((item) => (
             <button
               key={item}
@@ -609,7 +629,7 @@ export default function AirdropsPage() {
             </p>
           </div>
         </section>
-      ) : view === "cards" ? (
+      ) : effectiveView === "cards" ? (
         <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {filtered.map((airdrop, index) => (
             <AnimatedItem key={airdrop.id} index={index}>

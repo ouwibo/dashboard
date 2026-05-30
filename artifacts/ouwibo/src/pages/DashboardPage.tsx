@@ -114,20 +114,36 @@ export default function DashboardPage() {
 
   return (
     <div className="premium-page space-y-6">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-[20px] font-bold">{greet} </h1>
-          <p className="mt-0.5 text-[13px] text-muted-foreground">
-            {total} airdrops tracked · {confirmed} confirmed · {rewards} reward
-            {rewards !== 1 ? "s" : ""} available
-          </p>
+      <section className="premium-panel overflow-hidden rounded-3xl border p-5 sm:p-6">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-3xl">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-primary">
+              <span className="premium-icon h-6 w-6 rounded-full">
+                <Star className="relative z-10 h-3 w-3" fill="currentColor" />
+              </span>
+              Research-grade airdrop intelligence
+            </div>
+            <h1 className="premium-heading text-3xl font-black text-foreground sm:text-4xl lg:text-5xl">
+              {greet}, welcome to Ouwibo.
+            </h1>
+            <p className="mt-4 text-sm leading-7 text-muted-foreground sm:text-[15px]">
+              Ouwibo is a professional airdrop intelligence workspace for
+              discovering credible campaigns, comparing time-to-reward signals,
+              and tracking claim-ready opportunities without noisy speculation.
+            </p>
+            <p className="mt-2 text-[13px] font-semibold text-foreground/80">
+              {total} airdrops tracked · {confirmed} confirmed · {rewards}{" "}
+              reward
+              {rewards !== 1 ? "s" : ""} available
+            </p>
+          </div>
+          <Link href="/airdrops" className="w-full sm:w-auto">
+            <button className="w-full shrink-0 rounded-2xl bg-primary px-5 py-3 text-[13px] font-black text-primary-foreground shadow-[0_16px_34px_hsl(var(--primary)/0.22)] transition-all hover:-translate-y-0.5 hover:shadow-[0_22px_44px_hsl(var(--primary)/0.28)] sm:w-auto">
+              Explore Airdrops →
+            </button>
+          </Link>
         </div>
-        <Link href="/airdrops">
-          <button className="shrink-0 rounded-lg bg-primary px-3 py-1.5 text-[12px] font-medium text-primary-foreground transition-opacity hover:opacity-90">
-            View All →
-          </button>
-        </Link>
-      </div>
+      </section>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
@@ -160,7 +176,7 @@ export default function DashboardPage() {
             key={label}
             className={cn("premium-stat rounded-2xl border p-3.5", cls)}
           >
-            <div className="mb-2">{icon}</div>
+            <div className="premium-icon mb-2 h-8 w-8 rounded-xl">{icon}</div>
             <div className="text-[22px] font-bold leading-none">{value}</div>
             <div className="mt-1 text-[11px] text-muted-foreground">
               {label}
