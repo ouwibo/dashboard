@@ -1,39 +1,39 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "light" | "dark";
+export type BaseMode = "dark" | "light";
 
 interface ThemeContextValue {
-  theme: Theme;
-  toggleTheme: () => void;
+  mode: BaseMode;
+  isDark: boolean;
+  setMode: (m: BaseMode) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  theme: "dark",
-  toggleTheme: () => {},
+  mode: "dark",
+  isDark: true,
+  setMode: () => {},
 });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    const stored = localStorage.getItem("ouwibo-theme");
-    return (stored as Theme) ?? "dark";
+  const [mode, setModeState] = useState<BaseMode>(() => {
+    const saved = localStorage.getItem("ouwibo-mode") as BaseMode | null;
+    return saved === "light" || saved === "dark" ? saved : "dark";
   });
+
+  const setMode = (nextMode: BaseMode) => {
+    setModeState(nextMode);
+    localStorage.setItem("ouwibo-mode", nextMode);
+  };
 
   useEffect(() => {
     const root = document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-    localStorage.setItem("ouwibo-theme", theme);
-  }, [theme]);
-
-  function toggleTheme() {
-    setTheme(prev => prev === "dark" ? "light" : "dark");
-  }
+    root.classList.toggle("dark", mode === "dark");
+    root.setAttribute("data-theme", mode);
+    root.removeAttribute("data-accent");
+  }, [mode]);
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ mode, isDark: mode === "dark", setMode }}>
       {children}
     </ThemeContext.Provider>
   );

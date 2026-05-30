@@ -1,406 +1,639 @@
-import { useState } from "react";
+import React from "react";
+import { useMemo, useState } from "react";
 import { Link } from "wouter";
-import { Plus, Zap, CheckCircle, Trash2, Pencil, Search, Globe, Twitter, Send, Star, ExternalLink, Users, ListChecks, TrendingUp, ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { mockAirdrops } from "@/lib/mockData";
+import type { Airdrop, Backer } from "@/lib/mockData";
+import {
+  Banknote,
+  CheckCircle2,
+  ChevronRight,
+  Clock,
+  HelpCircle,
+  LayoutGrid,
+  LayoutList,
+  Search,
+  Star,
+} from "lucide-react";
+import { useScrollAnim } from "@/hooks/useScrollAnim";
 
-const MONO    = "'Space Mono', monospace";
-const DISPLAY = "'Unbounded', sans-serif";
+const STATUS_ICON = {
+  Confirmed: <CheckCircle2 className="h-3 w-3 shrink-0" />,
+  Potential: <HelpCircle className="h-3 w-3 shrink-0" />,
+  "Reward Available": <Banknote className="h-3 w-3 shrink-0" />,
+} as const;
 
-const PASTEL = { sky: "#b8d8f0", mint: "#b8e8c8", peach: "#f0c4a8", lavender: "#d4c0f0", yellow: "#f0e0a0", sage: "#c8dcc0" };
-const STATUS_STYLE: Record<string, { bg: string; color: string; label: string }> = {
-  active:    { bg: "#10b981", color: "#fff", label: "Active"    },
-  upcoming:  { bg: "#f59e0b", color: "#fff", label: "Upcoming"  },
-  ended:     { bg: "#6b7280", color: "#fff", label: "Ended"     },
-  potential: { bg: "#8b5cf6", color: "#fff", label: "Potential" },
+const STATUS_BADGE = {
+  Confirmed: "border-emerald-500/25 bg-emerald-500/10 text-emerald-400",
+  Potential: "border-amber-500/25 bg-amber-500/10 text-amber-400",
+  "Reward Available": "border-sky-500/25 bg-sky-500/10 text-sky-400",
+} as const;
+
+const TYPE_CLS: Record<string, string> = {
+  "Fill The Form": "border-sky-500/20 bg-sky-500/10 text-sky-400",
+  Trading: "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
+  Testnet: "border-violet-500/20 bg-violet-500/10 text-violet-400",
+  Social: "border-pink-500/20 bg-pink-500/10 text-pink-400",
+  Liquidity: "border-amber-500/20 bg-amber-500/10 text-amber-400",
+  Staking: "border-indigo-500/20 bg-indigo-500/10 text-indigo-400",
+  Mainnet: "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
+  Hold: "border-orange-500/20 bg-orange-500/10 text-orange-400",
+  Referral: "border-cyan-500/20 bg-cyan-500/10 text-cyan-400",
+  Community: "border-rose-500/20 bg-rose-500/10 text-rose-400",
 };
-const DIFF_STYLE: Record<string, { bg: string; color: string }> = { 
-  easy: { bg: "#10b981", color: "#fff" }, 
-  medium: { bg: "#f59e0b", color: "#fff" }, 
-  hard: { bg: "#ef4444", color: "#fff" } 
-};
-const LOGO_COLORS = ["#d95c38","#3b82f6","#10b981","#8b5cf6","#f59e0b","#ec4899","#06b6d4","#f97316","#14b8a6","#a855f7"];
-const CATEGORIES = ["defi","nft","layer1","layer2","gaming","dao","infrastructure","wallet","exchange"];
-const CHAINS = ["ETH","SOL","BNB","ARB","OP","BASE","APT","SUI","AVAX","MATIC","HYP","MON","BERA","HYP"];
-const STATUSES = ["active","upcoming","ended","potential"];
-const DIFFICULTIES = ["easy","medium","hard"];
 
-interface Airdrop {
-  id: number;
-  name: string;
-  slug: string;
-  description: string | null;
-  logoColor: string;
-  logoInitial: string;
-  websiteUrl: string | null;
-  twitterUrl: string | null;
-  telegramUrl: string | null;
-  discordUrl: string | null;
-  category: string;
-  chain: string;
-  status: string;
-  rewardEstimate: string | null;
-  totalValue: string | null;
-  difficulty: string;
-  isFeatured: boolean;
-  isVerified: boolean;
-  participantsCount: number;
-  taskCount: number;
-  startDate: string | null;
-  endDate: string | null;
-  createdAt: string;
+const FILTER_TABS = ["All", "Confirmed", "Potential", "Reward Available"];
+const REWARD_TABS = [
+  "All",
+  "Airdrop",
+  "Whitelist/Waitlist",
+  "Points",
+  "Token Sale",
+];
+
+function ProjectLogo({
+  airdrop,
+  size = 44,
+}: {
+  airdrop: Airdrop;
+  size?: number;
+}) {
+  const [failed, setFailed] = useState(false);
+
+  return (
+    <div
+      className="grid shrink-0 place-items-center overflow-hidden rounded-2xl text-white shadow-sm ring-1 ring-white/10"
+      style={{ width: size, height: size, background: airdrop.logoColor }}
+    >
+      {airdrop.logoUrl && !failed ? (
+        <img
+          src={airdrop.logoUrl}
+          alt={airdrop.name}
+          className="h-full w-full object-cover"
+          onError={() => setFailed(true)}
+        />
+      ) : (
+        <span className="text-[13px] font-black tracking-tight">
+          {airdrop.logoInitial}
+        </span>
+      )}
+    </div>
+  );
 }
 
-type FilterStatus = "all" | "active" | "upcoming" | "ended" | "potential";
-type SortField = "rank" | "name" | "participants" | "tasks" | "reward";
-type SortOrder = "asc" | "desc";
+function BackerAvatar({ backer, index }: { backer: Backer; index: number }) {
+  const [failed, setFailed] = useState(false);
+
+  return (
+    <div
+      title={backer.name}
+      className="grid h-6 w-6 shrink-0 place-items-center overflow-hidden rounded-full border-2 border-card text-[7px] font-black text-white shadow-sm"
+      style={{
+        background: backer.color,
+        marginLeft: index > 0 ? "-7px" : 0,
+        zIndex: 10 - index,
+      }}
+    >
+      {backer.logoUrl && !failed ? (
+        <img
+          src={backer.logoUrl}
+          alt={backer.name}
+          className="h-full w-full object-cover"
+          onError={() => setFailed(true)}
+        />
+      ) : (
+        backer.initial
+      )}
+    </div>
+  );
+}
+
+function BackerRow({ backers, extra }: { backers?: Backer[]; extra?: number }) {
+  if (!backers?.length && !extra)
+    return <span className="text-[11px] text-muted-foreground">—</span>;
+
+  return (
+    <div className="flex items-center justify-end">
+      {backers?.slice(0, 4).map((b, i) => (
+        <BackerAvatar key={`${b.name}-${i}`} backer={b} index={i} />
+      ))}
+      {(extra ?? 0) > 0 && (
+        <span className="ml-2 text-[11px] font-semibold text-muted-foreground">
+          +{extra}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function StatusBadge({ status }: { status: Airdrop["status"] }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex h-7 items-center gap-1.5 rounded-full border px-2.5 text-[11px] font-bold",
+        STATUS_BADGE[status],
+      )}
+    >
+      {STATUS_ICON[status]}
+      {status}
+    </span>
+  );
+}
+
+function TypePills({ types, max = 2 }: { types: string[]; max?: number }) {
+  return (
+    <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+      {types.slice(0, max).map((type) => (
+        <span
+          key={type}
+          className={cn(
+            "rounded-md border px-2 py-1 text-[10px] font-bold leading-none",
+            TYPE_CLS[type] ?? "border-border bg-muted text-muted-foreground",
+          )}
+        >
+          {type}
+        </span>
+      ))}
+      {types.length > max && (
+        <span className="text-[10px] font-black text-primary">
+          +{types.length - max}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function AirdropRow({
+  a,
+  bookmarked,
+  onToggle,
+}: {
+  a: Airdrop;
+  bookmarked: boolean;
+  onToggle: () => void;
+}) {
+  const topTask = a.tasks[0];
+  const totalCost = a.tasks.reduce((sum, task) => sum + task.cost, 0);
+  const totalTime = a.tasks.reduce((sum, task) => sum + task.timeMin, 0);
+
+  return (
+    <Link href={`/airdrops/${a.slug}`} className="group block">
+      <article className="premium-card premium-card-hover grid min-h-[92px] grid-cols-1 gap-4 rounded-2xl border p-4 sm:grid-cols-[minmax(220px,1.15fr)_120px_minmax(220px,1fr)_130px_44px] sm:items-center lg:grid-cols-[minmax(260px,1.25fr)_130px_minmax(280px,1fr)_150px_44px]">
+        <div className="flex min-w-0 items-center gap-3">
+          <ProjectLogo airdrop={a} />
+          <div className="min-w-0 space-y-2">
+            <div className="flex min-w-0 items-center gap-2">
+              <h3 className="truncate text-[14px] font-black leading-tight tracking-tight text-foreground group-hover:text-primary">
+                {a.name}
+              </h3>
+              {a.isNew && (
+                <span className="rounded-full bg-emerald-500 px-2 py-0.5 text-[9px] font-black uppercase leading-none text-white">
+                  New
+                </span>
+              )}
+            </div>
+            <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+              <StatusBadge status={a.status} />
+              <span className="inline-flex h-7 items-center rounded-full border border-border/70 bg-background/60 px-2.5 text-[11px] font-bold text-muted-foreground">
+                {a.rewardType}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-1 sm:gap-1 sm:border-l sm:border-border/40 sm:pl-4">
+          <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground sm:hidden">
+            Cost / time
+          </div>
+          <div className="flex items-center gap-3 sm:block">
+            <p
+              className={cn(
+                "text-[15px] font-black leading-none",
+                totalCost === 0 ? "text-emerald-400" : "text-amber-400",
+              )}
+            >
+              {totalCost === 0 ? "Free" : `$${totalCost}`}
+            </p>
+            <p className="mt-1 inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
+              <Clock className="h-3 w-3" /> {totalTime} min
+            </p>
+          </div>
+        </div>
+
+        <div className="min-w-0 space-y-2">
+          <p className="truncate text-[13px] font-bold leading-tight text-foreground">
+            {topTask?.name ?? "No active tasks"}
+          </p>
+          {topTask ? (
+            <TypePills types={topTask.types} />
+          ) : (
+            <span className="text-[11px] text-muted-foreground">
+              No requirement listed
+            </span>
+          )}
+          {a.tasks.length > 1 && (
+            <p className="text-[11px] font-semibold text-muted-foreground">
+              +{a.tasks.length - 1} more task{a.tasks.length > 2 ? "s" : ""}
+            </p>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between gap-3 sm:block sm:text-right">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              Funding
+            </p>
+            <p className="mt-1 text-[12px] font-black text-foreground">
+              {a.raiseFunds ?? "—"}
+            </p>
+          </div>
+          <div className="mt-0 sm:mt-3">
+            <BackerRow backers={a.backers} extra={a.backersExtra} />
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between border-t border-border/40 pt-3 sm:block sm:border-t-0 sm:pt-0 sm:text-right">
+          <button
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              onToggle();
+            }}
+            className={cn(
+              "inline-grid h-10 w-10 place-items-center rounded-xl border transition-all duration-200 hover:scale-105",
+              bookmarked
+                ? "border-amber-400/20 bg-amber-400/10 text-amber-400"
+                : "border-border/60 bg-background/50 text-muted-foreground hover:text-amber-300",
+            )}
+            aria-label={bookmarked ? "Remove bookmark" : "Bookmark airdrop"}
+          >
+            <Star
+              className="h-4 w-4"
+              fill={bookmarked ? "currentColor" : "none"}
+            />
+          </button>
+          <span className="inline-flex items-center gap-1 text-[12px] font-black text-primary sm:mt-3">
+            View <ChevronRight className="h-3.5 w-3.5" />
+          </span>
+        </div>
+      </article>
+    </Link>
+  );
+}
+
+function AirdropCard({
+  a,
+  bookmarked,
+  onToggle,
+}: {
+  a: Airdrop;
+  bookmarked: boolean;
+  onToggle: () => void;
+}) {
+  const topTask = a.tasks[0];
+  const totalCost = a.tasks.reduce((sum, task) => sum + task.cost, 0);
+  const totalTime = a.tasks.reduce((sum, task) => sum + task.timeMin, 0);
+
+  return (
+    <Link href={`/airdrops/${a.slug}`} className="group block h-full">
+      <article className="premium-card premium-card-hover flex h-full min-h-[320px] flex-col rounded-2xl border p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <ProjectLogo airdrop={a} />
+            <div className="min-w-0">
+              <div className="flex min-w-0 items-center gap-2">
+                <h3 className="truncate text-[15px] font-black leading-tight group-hover:text-primary">
+                  {a.name}
+                </h3>
+                {a.isNew && (
+                  <span className="rounded-full bg-emerald-500 px-2 py-0.5 text-[9px] font-black uppercase leading-none text-white">
+                    New
+                  </span>
+                )}
+              </div>
+              {a.ticker && (
+                <p className="mt-1 text-[11px] font-semibold text-muted-foreground">
+                  {a.ticker}
+                </p>
+              )}
+            </div>
+          </div>
+          <button
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              onToggle();
+            }}
+            className={cn(
+              "grid h-9 w-9 shrink-0 place-items-center rounded-xl border transition-all",
+              bookmarked
+                ? "border-amber-400/20 bg-amber-400/10 text-amber-400"
+                : "border-border/60 bg-background/50 text-muted-foreground",
+            )}
+            aria-label={bookmarked ? "Remove bookmark" : "Bookmark airdrop"}
+          >
+            <Star
+              className="h-4 w-4"
+              fill={bookmarked ? "currentColor" : "none"}
+            />
+          </button>
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <StatusBadge status={a.status} />
+          <span className="inline-flex h-7 items-center rounded-full border border-border/70 bg-background/60 px-2.5 text-[11px] font-bold text-muted-foreground">
+            {a.rewardType}
+          </span>
+        </div>
+
+        <div className="mt-4 grid grid-cols-3 gap-2 rounded-2xl border border-border/50 bg-background/45 p-3">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Cost
+            </p>
+            <p
+              className={cn(
+                "mt-1 text-[13px] font-black",
+                totalCost === 0 ? "text-emerald-400" : "text-amber-400",
+              )}
+            >
+              {totalCost === 0 ? "Free" : `$${totalCost}`}
+            </p>
+          </div>
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Time
+            </p>
+            <p className="mt-1 text-[13px] font-black text-foreground">
+              {totalTime}m
+            </p>
+          </div>
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Tasks
+            </p>
+            <p className="mt-1 text-[13px] font-black text-foreground">
+              {a.tasks.length}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-4 min-w-0 flex-1 space-y-2">
+          <p className="truncate text-[13px] font-bold">
+            {topTask?.name ?? "No active tasks"}
+          </p>
+          {topTask ? (
+            <TypePills types={topTask.types} max={2} />
+          ) : (
+            <span className="text-[11px] text-muted-foreground">
+              No requirement listed
+            </span>
+          )}
+        </div>
+
+        <div className="mt-5 border-t border-border/50 pt-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Funding
+              </p>
+              <p className="mt-1 text-[12px] font-black text-foreground">
+                {a.raiseFunds ?? "—"}
+              </p>
+            </div>
+            <BackerRow backers={a.backers} extra={a.backersExtra} />
+          </div>
+          <div className="mt-4 flex items-center justify-between text-[12px] font-black text-primary">
+            <span>{a.statusDate}</span>
+            <span className="inline-flex items-center gap-1">
+              View Details <ChevronRight className="h-3.5 w-3.5" />
+            </span>
+          </div>
+        </div>
+      </article>
+    </Link>
+  );
+}
+
+function AnimatedItem({
+  children,
+  index,
+}: {
+  children: React.ReactNode;
+  index: number;
+}) {
+  const ref = useScrollAnim();
+  return (
+    <div
+      ref={ref}
+      className="anim anim-up"
+      style={{ animationDelay: `${Math.min(index, 8) * 45}ms` }}
+    >
+      {children}
+    </div>
+  );
+}
 
 export default function AirdropsPage() {
-  const [airdrops, setAirdrops] = useState<Airdrop[]>(mockAirdrops);
-  const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");
-  const [sortField, setSortField] = useState<SortField>("rank");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
+  const [tab, setTab] = useState("All");
+  const [rewardTab, setRewardTab] = useState("All");
   const [search, setSearch] = useState("");
-  const [showCreate, setShowCreate] = useState(false);
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [createForm, setCreateForm] = useState({
-    name: "", slug: "", description: "", logoColor: "#d95c38", logoInitial: "",
-    websiteUrl: "", twitterUrl: "", telegramUrl: "", discordUrl: "",
-    category: "defi", chain: "ETH", status: "active", rewardEstimate: "", totalValue: "",
-    difficulty: "medium", isFeatured: false, isVerified: false, startDate: "", endDate: ""
-  });
-  const [editForm, setEditForm] = useState(createForm);
-  
-  const { toast } = useToast();
+  const [view, setView] = useState<"list" | "cards">("list");
+  const [bookmarks, setBookmarks] = useState<Set<number>>(new Set());
 
-  function handleSort(field: SortField) {
-    if (sortField === field) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortOrder("asc");
-    }
-  }
+  const counts = useMemo(
+    () => ({
+      confirmed: mockAirdrops.filter((a) => a.status === "Confirmed").length,
+      potential: mockAirdrops.filter((a) => a.status === "Potential").length,
+      reward: mockAirdrops.filter((a) => a.status === "Reward Available")
+        .length,
+    }),
+    [],
+  );
 
-  const filteredAirdrops = airdrops.filter(a => {
-    if (filterStatus !== "all" && a.status !== filterStatus) return false;
-    if (search && !a.name.toLowerCase().includes(search.toLowerCase())) return false;
-    return true;
-  });
+  const filtered = useMemo(
+    () =>
+      mockAirdrops.filter((airdrop) => {
+        const query = search.trim().toLowerCase();
+        if (tab !== "All" && airdrop.status !== tab) return false;
+        if (rewardTab !== "All" && airdrop.rewardType !== rewardTab)
+          return false;
+        if (
+          query &&
+          !`${airdrop.name} ${airdrop.ticker ?? ""}`
+            .toLowerCase()
+            .includes(query)
+        )
+          return false;
+        return true;
+      }),
+    [rewardTab, search, tab],
+  );
 
-  const sortedAirdrops = [...filteredAirdrops].sort((a, b) => {
-    let comparison = 0;
-    switch (sortField) {
-      case "name": comparison = a.name.localeCompare(b.name); break;
-      case "participants": comparison = a.participantsCount - b.participantsCount; break;
-      case "tasks": comparison = a.taskCount - b.taskCount; break;
-      case "reward": comparison = (a.rewardEstimate || "").localeCompare(b.rewardEstimate || ""); break;
-      default: comparison = a.id - b.id;
-    }
-    return sortOrder === "asc" ? comparison : -comparison;
-  });
-
-  function handleCreate() {
-    if (!createForm.name.trim()) {
-      toast({ title: "Name is required", variant: "destructive" });
-      return;
-    }
-    const newAirdrop: Airdrop = {
-      id: Math.max(...airdrops.map(a => a.id)) + 1,
-      slug: createForm.slug || createForm.name.toLowerCase().replace(/\s+/g, "-"),
-      logoColor: createForm.logoColor,
-      logoInitial: createForm.logoInitial || createForm.name.charAt(0).toUpperCase(),
-      participantsCount: 0,
-      taskCount: 0,
-      createdAt: new Date().toISOString(),
-      ...createForm,
-    } as Airdrop;
-    setAirdrops([...airdrops, newAirdrop]);
-    setShowCreate(false);
-    setCreateForm({ name: "", slug: "", description: "", logoColor: "#d95c38", logoInitial: "", websiteUrl: "", twitterUrl: "", telegramUrl: "", discordUrl: "", category: "defi", chain: "ETH", status: "active", rewardEstimate: "", totalValue: "", difficulty: "medium", isFeatured: false, isVerified: false, startDate: "", endDate: "" });
-    toast({ title: "Airdrop added!" });
-  }
-
-  function handleEdit() {
-    if (!editingId) return;
-    setAirdrops(airdrops.map(a => a.id === editingId ? { ...a, ...editForm } : a));
-    setEditingId(null);
-    toast({ title: "Updated!" });
-  }
-
-  function handleDelete(id: number, name: string) {
-    setAirdrops(airdrops.filter(a => a.id !== id));
-    toast({ title: `"${name}" removed` });
-  }
-
-  const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortField !== field) return null;
-    return sortOrder === "asc" ? <ChevronUp size={12} className="ml-1" /> : <ChevronDown size={12} className="ml-1" />;
+  const toggle = (id: number) => {
+    setBookmarks((previous) => {
+      const next = new Set(previous);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-end justify-between">
-        <div>
-          <h1 style={{ fontFamily: DISPLAY, fontSize: "1.8rem", fontWeight: 800, letterSpacing: "-0.02em" }}>
-            Airdrops
-          </h1>
-          <p className="text-muted-foreground mt-1" style={{ fontFamily: MONO, fontSize: "0.72rem" }}>
-            Track and manage crypto airdrops
-          </p>
-        </div>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="neo-button px-4 py-2 rounded-xl bg-primary text-white flex items-center gap-2"
-          style={{ border: "2px solid hsl(var(--border))", boxShadow: "3px 3px 0 hsl(var(--border))", fontFamily: MONO, fontSize: "0.7rem", fontWeight: 700 }}
-        >
-          <Plus size={14} /> Add Airdrop
-        </button>
-      </div>
+    <div className="premium-page space-y-5 pb-8">
+      <section className="premium-panel rounded-3xl border p-4 sm:p-5 anim anim-up">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="min-w-0">
+            <p className="text-[11px] font-black uppercase tracking-[0.2em] text-primary">
+              Airdrop Radar
+            </p>
+            <h1 className="mt-1 text-2xl font-black tracking-tight text-foreground sm:text-3xl">
+              Find campaigns worth farming
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+              Clean list of active, potential, and reward-ready campaigns with
+              cost, time, requirements, and funding signals aligned for fast
+              scanning.
+            </p>
+          </div>
 
-      {/* Search + Filter */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search airdrops..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border-2 border-border bg-background"
-            style={{ fontFamily: MONO, fontSize: "0.72rem", boxShadow: "3px 3px 0 hsl(var(--border))" }}
-          />
+          <div className="grid grid-cols-3 gap-2 lg:min-w-[360px]">
+            <div className="premium-stat rounded-2xl border border-emerald-500/25 p-3 text-emerald-400 anim anim-scale anim-delay-1">
+              <p className="text-2xl font-black text-emerald-400">
+                {counts.confirmed}
+              </p>
+              <p className="text-[11px] font-bold text-emerald-300/80">
+                Confirmed
+              </p>
+            </div>
+            <div className="premium-stat rounded-2xl border border-amber-500/25 p-3 text-amber-400 anim anim-scale anim-delay-2">
+              <p className="text-2xl font-black text-amber-400">
+                {counts.potential}
+              </p>
+              <p className="text-[11px] font-bold text-amber-300/80">
+                Potential
+              </p>
+            </div>
+            <div className="premium-stat rounded-2xl border border-sky-500/25 p-3 text-sky-400 anim anim-scale anim-delay-3">
+              <p className="text-2xl font-black text-sky-400">
+                {counts.reward}
+              </p>
+              <p className="text-[11px] font-bold text-sky-300/80">Rewards</p>
+            </div>
+          </div>
         </div>
-        <div className="flex gap-2">
-          {["all", "active", "upcoming", "ended", "potential"].map(status => (
+      </section>
+
+      <section className="premium-panel rounded-3xl border p-3 sm:p-4">
+        <div className="grid gap-3 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            {FILTER_TABS.map((item) => (
+              <button
+                key={item}
+                onClick={() => setTab(item)}
+                className={cn(
+                  "inline-flex h-9 items-center rounded-full border px-3 text-[12px] font-bold transition-colors",
+                  tab === item
+                    ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                    : "border-border/60 bg-background/45 text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <label className="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-full border border-border/60 bg-background/55 px-3 lg:w-72 lg:flex-none">
+              <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+              <input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search projects..."
+                className="min-w-0 flex-1 bg-transparent text-[13px] font-medium outline-none placeholder:text-muted-foreground/50"
+              />
+            </label>
+
+            <div className="hidden items-center gap-1 rounded-full border border-border/60 bg-background/55 p-1 lg:flex">
+              <button
+                onClick={() => setView("list")}
+                className={cn(
+                  "grid h-8 w-8 place-items-center rounded-full transition-colors",
+                  view === "list"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+                aria-label="List view"
+              >
+                <LayoutList className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => setView("cards")}
+                className={cn(
+                  "grid h-8 w-8 place-items-center rounded-full transition-colors",
+                  view === "cards"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+                aria-label="Card view"
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-3 flex min-w-0 gap-2 overflow-x-auto pb-1">
+          {REWARD_TABS.map((item) => (
             <button
-              key={status}
-              onClick={() => setFilterStatus(status as FilterStatus)}
+              key={item}
+              onClick={() => setRewardTab(item)}
               className={cn(
-                "px-3 py-2 rounded-xl border-2 border-border transition-all capitalize",
-                filterStatus === status ? "bg-foreground text-background" : "bg-background hover:bg-muted"
+                "h-8 shrink-0 rounded-full px-3 text-[11px] font-bold transition-colors",
+                rewardTab === item
+                  ? "bg-foreground text-background"
+                  : "bg-background/45 text-muted-foreground hover:text-foreground",
               )}
-              style={{ fontFamily: MONO, fontSize: "0.68rem", fontWeight: 700, boxShadow: "2px 2px 0 hsl(var(--border))" }}
             >
-              {status}
+              {item}
             </button>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Table */}
-      <div className="rounded-2xl border-2 border-border overflow-hidden" style={{ boxShadow: "4px 4px 0 hsl(var(--border))" }}>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-muted/50 border-b-2 border-border">
-                <th className="text-left p-4 cursor-pointer hover:bg-muted transition-colors" onClick={() => handleSort("rank")} style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase" }}>
-                  # <SortIcon field="rank" />
-                </th>
-                <th className="text-left p-4 cursor-pointer hover:bg-muted transition-colors" onClick={() => handleSort("name")} style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase" }}>
-                  Name <SortIcon field="name" />
-                </th>
-                <th className="text-left p-4" style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase" }}>Status</th>
-                <th className="text-left p-4" style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase" }}>Chain</th>
-                <th className="text-left p-4" style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase" }}>Reward</th>
-                <th className="text-right p-4 cursor-pointer hover:bg-muted transition-colors" onClick={() => handleSort("participants")} style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase" }}>
-                  Users <SortIcon field="participants" />
-                </th>
-                <th className="text-right p-4 cursor-pointer hover:bg-muted transition-colors" onClick={() => handleSort("tasks")} style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase" }}>
-                  Tasks <SortIcon field="tasks" />
-                </th>
-                <th className="text-center p-4" style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase" }}>Difficulty</th>
-                <th className="text-center p-4" style={{ fontFamily: MONO, fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase" }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedAirdrops.map((airdrop, idx) => (
-                <tr key={airdrop.id} className="border-b border-border hover:bg-muted/30 transition-colors">
-                  <td className="p-4" style={{ fontFamily: MONO, fontSize: "0.75rem", fontWeight: 700 }}>{idx + 1}</td>
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold"
-                        style={{ backgroundColor: airdrop.logoColor, fontFamily: DISPLAY, fontSize: "0.9rem", border: "2px solid hsl(var(--border))", boxShadow: "2px 2px 0 hsl(var(--border))" }}
-                      >
-                        {airdrop.logoInitial}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span style={{ fontFamily: DISPLAY, fontSize: "0.85rem", fontWeight: 700 }}>{airdrop.name}</span>
-                          {airdrop.isVerified && <CheckCircle size={14} className="text-primary" />}
-                        </div>
-                        <div className="text-muted-foreground" style={{ fontFamily: MONO, fontSize: "0.6rem" }}>{airdrop.category}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <span className="px-2.5 py-1 rounded-full text-xs font-bold" style={{ backgroundColor: STATUS_STYLE[airdrop.status]?.bg || "#6b7280", color: STATUS_STYLE[airdrop.status]?.color || "#fff", fontFamily: MONO }}>
-                      {STATUS_STYLE[airdrop.status]?.label || airdrop.status}
-                    </span>
-                  </td>
-                  <td className="p-4" style={{ fontFamily: MONO, fontSize: "0.72rem" }}>{airdrop.chain}</td>
-                  <td className="p-4" style={{ fontFamily: MONO, fontSize: "0.72rem", color: "hsl(var(--primary))" }}>{airdrop.rewardEstimate || "-"}</td>
-                  <td className="p-4 text-right" style={{ fontFamily: MONO, fontSize: "0.72rem" }}>{(airdrop.participantsCount / 1000).toFixed(0)}K</td>
-                  <td className="p-4 text-right" style={{ fontFamily: MONO, fontSize: "0.72rem" }}>{airdrop.taskCount}</td>
-                  <td className="p-4 text-center">
-                    <span className="px-2 py-1 rounded-full text-xs font-bold" style={{ backgroundColor: DIFF_STYLE[airdrop.difficulty]?.bg || "#6b7280", color: DIFF_STYLE[airdrop.difficulty]?.color || "#fff", fontFamily: MONO }}>
-                      {airdrop.difficulty}
-                    </span>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex items-center justify-center gap-1">
-                      <a
-                        href={airdrop.referralUrl || airdrop.websiteUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 transition-colors"
-                        style={{ fontFamily: MONO }}
-                      >
-                        Join
-                      </a>
-                      <Link href={`/airdrops/${airdrop.id}`}>
-                        <button className="p-2 rounded-lg hover:bg-muted transition-colors" title="View details">
-                          <ExternalLink size={14} />
-                        </button>
-                      </Link>
-                      <button
-                        onClick={() => { setEditForm({ ...airdrop }); setEditingId(airdrop.id); }}
-                        className="p-2 rounded-lg hover:bg-muted transition-colors"
-                        title="Edit"
-                      >
-                        <Pencil size={14} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(airdrop.id, airdrop.name)}
-                        className="p-2 rounded-lg hover:bg-destructive/10 text-destructive transition-colors"
-                        title="Delete"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {sortedAirdrops.length === 0 && (
-          <div className="p-8 text-center text-muted-foreground" style={{ fontFamily: MONO, fontSize: "0.75rem" }}>
-            No airdrops found. Add one to get started!
+      {filtered.length === 0 ? (
+        <section className="grid min-h-64 place-items-center rounded-3xl border border-dashed border-border bg-card/50 p-10 text-center text-muted-foreground anim anim-up">
+          <div>
+            <Search className="mx-auto h-9 w-9 opacity-40" />
+            <p className="mt-3 text-sm font-bold">
+              No airdrops match your filter
+            </p>
           </div>
-        )}
-      </div>
-
-      {/* Create Dialog */}
-      <Dialog open={showCreate} onOpenChange={setShowCreate}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle style={{ fontFamily: DISPLAY }}>Add Airdrop</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3 py-4">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label style={{ fontFamily: MONO, fontSize: "0.65rem" }}>Name *</Label>
-                <Input value={createForm.name} onChange={e => setCreateForm({ ...createForm, name: e.target.value })} className="mt-1" />
-              </div>
-              <div>
-                <Label style={{ fontFamily: MONO, fontSize: "0.65rem" }}>Status</Label>
-                <Select value={createForm.status} onValueChange={v => setCreateForm({ ...createForm, status: v })}>
-                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-                  <SelectContent>{STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div>
-              <Label style={{ fontFamily: MONO, fontSize: "0.65rem" }}>Description</Label>
-              <Input value={createForm.description} onChange={e => setCreateForm({ ...createForm, description: e.target.value })} className="mt-1" />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label style={{ fontFamily: MONO, fontSize: "0.65rem" }}>Chain</Label>
-                <Select value={createForm.chain} onValueChange={v => setCreateForm({ ...createForm, chain: v })}>
-                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-                  <SelectContent>{CHAINS.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label style={{ fontFamily: MONO, fontSize: "0.65rem" }}>Difficulty</Label>
-                <Select value={createForm.difficulty} onValueChange={v => setCreateForm({ ...createForm, difficulty: v })}>
-                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-                  <SelectContent>{DIFFICULTIES.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div>
-              <Label style={{ fontFamily: MONO, fontSize: "0.65rem" }}>Reward Estimate</Label>
-              <Input value={createForm.rewardEstimate} onChange={e => setCreateForm({ ...createForm, rewardEstimate: e.target.value })} placeholder="$100 - $1,000" className="mt-1" />
-            </div>
-          </div>
-          <DialogFooter>
-            <button onClick={() => setShowCreate(false)} className="px-4 py-2 rounded-xl border-2 border-border" style={{ fontFamily: MONO }}>Cancel</button>
-            <button onClick={handleCreate} className="px-4 py-2 rounded-xl bg-primary text-white" style={{ fontFamily: MONO }}>Add</button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Dialog */}
-      <Dialog open={editingId !== null} onOpenChange={() => setEditingId(null)}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle style={{ fontFamily: DISPLAY }}>Edit Airdrop</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3 py-4">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label style={{ fontFamily: MONO, fontSize: "0.65rem" }}>Name</Label>
-                <Input value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} className="mt-1" />
-              </div>
-              <div>
-                <Label style={{ fontFamily: MONO, fontSize: "0.65rem" }}>Status</Label>
-                <Select value={editForm.status} onValueChange={v => setEditForm({ ...editForm, status: v })}>
-                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-                  <SelectContent>{STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div>
-              <Label style={{ fontFamily: MONO, fontSize: "0.65rem" }}>Description</Label>
-              <Input value={editForm.description} onChange={e => setEditForm({ ...editForm, description: e.target.value })} className="mt-1" />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label style={{ fontFamily: MONO, fontSize: "0.65rem" }}>Chain</Label>
-                <Select value={editForm.chain} onValueChange={v => setEditForm({ ...editForm, chain: v })}>
-                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-                  <SelectContent>{CHAINS.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label style={{ fontFamily: MONO, fontSize: "0.65rem" }}>Difficulty</Label>
-                <Select value={editForm.difficulty} onValueChange={v => setEditForm({ ...editForm, difficulty: v })}>
-                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-                  <SelectContent>{DIFFICULTIES.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div>
-              <Label style={{ fontFamily: MONO, fontSize: "0.65rem" }}>Reward Estimate</Label>
-              <Input value={editForm.rewardEstimate} onChange={e => setEditForm({ ...editForm, rewardEstimate: e.target.value })} className="mt-1" />
-            </div>
-          </div>
-          <DialogFooter>
-            <button onClick={() => setEditingId(null)} className="px-4 py-2 rounded-xl border-2 border-border" style={{ fontFamily: MONO }}>Cancel</button>
-            <button onClick={handleEdit} className="px-4 py-2 rounded-xl bg-primary text-white" style={{ fontFamily: MONO }}>Save</button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        </section>
+      ) : view === "cards" ? (
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+          {filtered.map((airdrop, index) => (
+            <AnimatedItem key={airdrop.id} index={index}>
+              <AirdropCard
+                a={airdrop}
+                bookmarked={bookmarks.has(airdrop.id)}
+                onToggle={() => toggle(airdrop.id)}
+              />
+            </AnimatedItem>
+          ))}
+        </section>
+      ) : (
+        <section className="space-y-3">
+          {filtered.map((airdrop, index) => (
+            <AnimatedItem key={airdrop.id} index={index}>
+              <AirdropRow
+                a={airdrop}
+                bookmarked={bookmarks.has(airdrop.id)}
+                onToggle={() => toggle(airdrop.id)}
+              />
+            </AnimatedItem>
+          ))}
+        </section>
+      )}
     </div>
   );
 }

@@ -3,44 +3,54 @@ import { useState, useEffect } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import { cn } from "@/lib/utils";
 import {
-  LayoutDashboard, Zap, Newspaper, Wallet, Calendar, Bell,
-  Settings, Sun, Moon, Menu, X, ChevronUp, Search,
-  TrendingUp, Gift, BookOpen, ExternalLink, ChevronRight,
+  LayoutDashboard,
+  Zap,
+  Newspaper,
+  Wallet,
+  Calendar,
+  Bell,
+  Settings,
+  Menu,
+  ChevronUp,
+  Search,
+  BookOpen,
+  MessageSquare,
+  ChevronRight,
+  Sun,
+  Moon,
 } from "lucide-react";
+import AnimatedBackdrop from "@/components/AnimatedBackdrop";
 
-const MONO    = "'Space Mono', monospace";
-const DISPLAY = "'Unbounded', sans-serif";
-
-/* ── Nav definition ── */
 const NAV_GROUPS = [
   {
     label: "MAIN",
     items: [
-      { href: "/",          label: "Dashboard",  Icon: LayoutDashboard, color: "#f97316" },
-      { href: "/airdrops",  label: "Airdrops",   Icon: Zap,             color: "#8b5cf6" },
-      { href: "/news",      label: "News",       Icon: Newspaper,       color: "#06b6d4" },
+      { href: "/", label: "Dashboard", Icon: LayoutDashboard },
+      { href: "/airdrops", label: "Airdrops", Icon: Zap },
+      { href: "/news", label: "News", Icon: Newspaper },
     ],
   },
   {
     label: "TOOLS",
     items: [
-      { href: "/portfolio", label: "Portfolio",  Icon: Wallet,          color: "#10b981" },
-      { href: "/calendar",  label: "Calendar",   Icon: Calendar,        color: "#f43f5e" },
-      { href: "/alerts",    label: "Alerts",     Icon: Bell,            color: "#eab308" },
+      { href: "/portfolio", label: "Portfolio", Icon: Wallet, soon: true },
+      { href: "/calendar", label: "Calendar", Icon: Calendar, soon: true },
+      { href: "/alerts", label: "Alerts", Icon: Bell, soon: true },
     ],
   },
   {
-    label: "RESOURCES",
+    label: "LEARN",
     items: [
-      { href: "/guide",     label: "How to Farm",Icon: BookOpen,        color: "#a855f7" },
-      { href: "/chat",      label: "AI Chat",    Icon: TrendingUp,      color: "#14b8a6" },
+      { href: "/guide", label: "How to Farm", Icon: BookOpen, soon: true },
+      { href: "/chat", label: "AI Chat", Icon: MessageSquare },
     ],
   },
 ];
 
-const ALL_NAV = NAV_GROUPS.flatMap(g => g.items);
+const ALL_NAV = NAV_GROUPS.flatMap((g) => g.items);
+type NavItem = (typeof ALL_NAV)[number];
 
-/* ── Scroll-to-top button ── */
+/* ── Scroll-to-top ── */
 function ScrollTop() {
   const [show, setShow] = useState(false);
   useEffect(() => {
@@ -52,332 +62,300 @@ function ScrollTop() {
   return (
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      className="fixed bottom-24 right-5 z-50 w-10 h-10 rounded-full bg-card border-2 border-border flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
-      style={{ boxShadow: "3px 3px 0 hsl(var(--border))" }}
+      className="fixed bottom-20 right-4 z-50 w-9 h-9 rounded-xl bg-card border border-border flex items-center justify-center hover:scale-110 transition-transform shadow-md"
     >
-      <ChevronUp size={16} />
+      <ChevronUp size={14} />
     </button>
   );
 }
 
-/* ── Coming soon stub for placeholder pages ── */
-function isStub(href: string) {
-  return ["/portfolio", "/calendar", "/alerts", "/guide"].includes(href);
+/* ── Appearance panel (dark/light only) ── */
+function AppearancePanel({ expanded }: { expanded: boolean }) {
+  const { mode, setMode } = useTheme();
+  const isDark = mode === "dark";
+
+  return (
+    <div className="px-2 py-2 border-t border-border/40">
+      <button
+        onClick={() => setMode(isDark ? "light" : "dark")}
+        className={cn(
+          "group flex w-full items-center gap-2 rounded-xl border border-border/50 bg-background/35 px-3 py-2 text-muted-foreground",
+          "transition-[background-color,color,border-color,transform] duration-200 ease-out hover:-translate-y-0.5 hover:bg-muted hover:text-foreground",
+          expanded ? "justify-start" : "justify-center",
+        )}
+        aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      >
+        <span className="relative flex h-4 w-4 items-center justify-center">
+          {isDark ? (
+            <Moon
+              size={14}
+              className="transition-transform duration-300 group-hover:-rotate-12"
+            />
+          ) : (
+            <Sun
+              size={14}
+              className="transition-transform duration-300 group-hover:rotate-45"
+            />
+          )}
+        </span>
+        {expanded && (
+          <span className="text-[10px] font-bold">
+            {isDark ? "Night mode" : "Light mode"}
+          </span>
+        )}
+      </button>
+    </div>
+  );
 }
 
-/* ── Sidebar nav item ── */
-function NavItem({
+/* ── Single nav link ── */
+function NavLink({
   item,
   active,
   expanded,
   onClick,
 }: {
-  item: (typeof ALL_NAV)[0];
+  item: NavItem;
   active: boolean;
   expanded: boolean;
   onClick?: () => void;
 }) {
-  const stub = isStub(item.href);
+  const isStub = item.soon === true;
   const inner = (
     <div
       className={cn(
-        "flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all w-full",
-        active ? "text-white" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+        "flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer transition-all w-full",
+        active
+          ? "bg-primary text-primary-foreground"
+          : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
       )}
-      style={active ? { backgroundColor: item.color, boxShadow: `0 4px 14px ${item.color}55` } : {}}
     >
-      <div className="shrink-0 w-5 flex items-center justify-center">
-        <item.Icon size={17} color={active ? "#fff" : undefined} />
+      <div className="shrink-0 w-4 flex items-center justify-center">
+        <item.Icon size={15} />
       </div>
       {expanded && (
-        <span className="text-[11px] font-bold flex-1 whitespace-nowrap" style={{ fontFamily: MONO }}>
-          {item.label}
-        </span>
-      )}
-      {expanded && stub && !active && (
-        <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-muted-foreground/15 text-muted-foreground" style={{ fontFamily: MONO }}>
-          SOON
-        </span>
-      )}
-      {expanded && active && (
-        <ChevronRight size={12} className="ml-auto opacity-60" />
+        <>
+          <span className="text-[11px] font-bold flex-1 whitespace-nowrap">
+            {item.label}
+          </span>
+          {isStub && !active && (
+            <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
+              SOON
+            </span>
+          )}
+          {active && <ChevronRight size={10} className="opacity-50" />}
+        </>
       )}
     </div>
   );
 
-  if (stub) {
-    return <div onClick={onClick} className="w-full px-2">{inner}</div>;
-  }
   return (
     <div className="w-full px-2">
-      <Link href={item.href} onClick={onClick}>
-        {inner}
-      </Link>
+      {isStub ? (
+        <div onClick={onClick}>{inner}</div>
+      ) : (
+        <Link href={item.href} onClick={onClick}>
+          {inner}
+        </Link>
+      )}
     </div>
+  );
+}
+
+/* ── Sidebar contents ── */
+function SidebarContents({
+  expanded,
+  onNav,
+}: {
+  expanded: boolean;
+  onNav?: () => void;
+}) {
+  const [location] = useLocation();
+  const isActive = (href: string) =>
+    href === "/" ? location === "/" : location.startsWith(href);
+
+  return (
+    <>
+      <div className="flex-1 overflow-y-auto overflow-x-hidden py-2 space-y-1">
+        {NAV_GROUPS.map((group, gi) => (
+          <div key={group.label}>
+            {gi > 0 && <div className="mx-3 my-2 border-t border-border/30" />}
+            {expanded && (
+              <p className="px-5 pt-2 pb-1 text-[9px] font-bold text-muted-foreground/50 tracking-widest select-none">
+                {group.label}
+              </p>
+            )}
+            {group.items.map((item) => (
+              <NavLink
+                key={item.href}
+                item={item}
+                active={isActive(item.href)}
+                expanded={expanded}
+                onClick={onNav}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+      <div className="border-t border-border/30 py-2">
+        <NavLink
+          item={{ href: "/settings", label: "About", Icon: Settings }}
+          active={location === "/settings"}
+          expanded={expanded}
+          onClick={onNav}
+        />
+      </div>
+      <AppearancePanel expanded={expanded} />
+    </>
   );
 }
 
 /* ── Main Layout ── */
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { theme, toggleTheme } = useTheme();
   const [location] = useLocation();
-
-  const SIDEBAR_W = expanded ? 220 : 64;
-
-  function isActive(href: string) {
-    if (href === "/") return location === "/";
-    return location.startsWith(href);
-  }
+  const SIDEBAR_W = expanded ? 256 : 72;
+  const mobileNavItems = ALL_NAV.filter((i) => !("soon" in i) || !i.soon).slice(
+    0,
+    5,
+  );
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-
-      {/* ── Top Navbar ── */}
-      <header className="fixed top-0 left-0 right-0 z-50 h-14 bg-background/90 backdrop-blur-md border-b border-border flex items-center gap-3 px-4">
-        {/* Hamburger — desktop toggles sidebar, mobile opens drawer */}
+    <div className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
+      <AnimatedBackdrop />
+      {/* ── Premium background glows ── */}
+      <div
+        className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
+        aria-hidden
+      >
+        <div className="absolute bottom-[-10%] left-[-5%] h-[55vw] w-[55vw] max-h-[700px] max-w-[700px] rounded-full bg-primary/[0.07] blur-[120px]" />
+        <div className="absolute top-[-10%] right-[-5%] h-[40vw] w-[40vw] max-h-[500px] max-w-[500px] rounded-full bg-blue-500/[0.05] blur-[100px]" />
+        <div className="absolute top-[40%] left-[30%] h-[30vw] w-[30vw] max-h-[400px] max-w-[400px] rounded-full bg-primary/[0.03] blur-[130px]" />
+      </div>
+      {/* ── Navbar ── */}
+      <header className="fixed left-0 right-0 top-0 z-50 flex h-14 items-center gap-2.5 border-b border-border/60 bg-background/82 px-3 backdrop-blur-xl">
         <button
-          onClick={() => {
-            if (window.innerWidth >= 1024) {
-              setExpanded(o => !o);
-            } else {
-              setMobileOpen(o => !o);
-            }
-          }}
-          className="w-9 h-9 rounded-xl flex items-center justify-center hover:bg-muted transition-colors shrink-0"
+          onClick={() =>
+            window.innerWidth >= 1024
+              ? setExpanded((o) => !o)
+              : setMobileOpen((o) => !o)
+          }
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl hover:bg-muted transition-colors"
+          aria-label={expanded ? "Collapse sidebar" : "Open menu"}
         >
-          <Menu size={18} />
+          <Menu size={16} />
         </button>
-
-        {/* Logo */}
         <Link href="/">
-          <div className="flex items-center gap-2 cursor-pointer select-none shrink-0">
-            <div
-              className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-[10px] font-black"
-              style={{ background: "linear-gradient(135deg,#f97316,#8b5cf6)", fontFamily: DISPLAY }}
-            >
-              O
+          <div className="flex select-none items-center gap-2 cursor-pointer">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+              <Zap size={14} fill="currentColor" />
             </div>
-            <div className="hidden sm:flex flex-col">
-              <span className="font-black text-sm leading-none" style={{ fontFamily: DISPLAY }}>Ouwibo</span>
-              <span className="text-[9px] text-muted-foreground" style={{ fontFamily: MONO }}>Cloud</span>
+            <div className="hidden flex-col leading-none sm:flex">
+              <span className="text-[11px] font-black">Ouwibo</span>
+              <span className="text-[8px] text-muted-foreground">Cloud</span>
             </div>
           </div>
         </Link>
-
-        {/* Search bar */}
-        <div className="flex-1 max-w-md mx-auto">
-          <div className="flex items-center gap-2 bg-muted rounded-xl px-4 py-2 text-muted-foreground border border-border/50">
-            <Search size={13} />
-            <span className="text-[11px]" style={{ fontFamily: MONO }}>Search airdrops, news…</span>
-            <span className="ml-auto text-[10px] bg-background border border-border rounded px-1.5 py-0.5 hidden md:block" style={{ fontFamily: MONO }}>
+        <div className="mx-auto flex-1 max-w-xl px-2">
+          <div className="flex items-center gap-2 rounded-xl border border-border/50 bg-muted/35 px-3 py-2 text-muted-foreground shadow-sm">
+            <Search size={11} />
+            <span className="text-[10px]">Search airdrops, news…</span>
+            <span className="ml-auto hidden rounded-md border border-border/40 bg-background px-1.5 py-0.5 text-[9px] md:block">
               ⌘K
             </span>
           </div>
         </div>
-
-        {/* Right */}
-        <div className="ml-auto flex items-center gap-1 shrink-0">
+        <div className="ml-auto flex items-center gap-1">
           <button
-            onClick={toggleTheme}
-            className="w-9 h-9 rounded-xl flex items-center justify-center hover:bg-muted transition-colors"
-            title={theme === "dark" ? "Light Mode" : "Dark Mode"}
+            className="relative flex h-9 w-9 items-center justify-center rounded-xl hover:bg-muted transition-colors"
+            aria-label="Alerts"
           >
-            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-          </button>
-          <button className="w-9 h-9 rounded-xl flex items-center justify-center hover:bg-muted transition-colors relative">
-            <Bell size={16} />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500" />
+            <Bell size={14} />
+            <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-primary" />
           </button>
           <div
-            className="w-8 h-8 rounded-full flex items-center justify-center text-white text-[11px] font-bold ml-1 border-2 border-border"
-            style={{ background: "linear-gradient(135deg,#f97316,#8b5cf6)", fontFamily: DISPLAY }}
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-[10px] font-black text-primary-foreground"
+            style={{
+              background:
+                "linear-gradient(135deg,hsl(var(--primary)),hsl(var(--primary)/0.6))",
+            }}
           >
             O
           </div>
         </div>
       </header>
 
-      {/* ── Desktop Left Sidebar ── */}
+      {/* ── Desktop Sidebar ── */}
       <aside
-        className="fixed top-14 left-0 bottom-0 z-40 border-r border-border bg-background hidden lg:flex flex-col py-4 gap-0 transition-all duration-300 overflow-hidden"
+        className="fixed bottom-0 left-0 top-14 z-40 hidden flex-col overflow-hidden border-r border-border/60 bg-sidebar/92 backdrop-blur-xl shadow-[1px_0_0_rgba(255,255,255,0.03)] lg:flex"
         style={{ width: SIDEBAR_W }}
       >
-        {/* Nav groups */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden py-1 space-y-1">
-          {NAV_GROUPS.map((group, gi) => (
-            <div key={group.label}>
-              {gi > 0 && <div className="mx-4 my-2 border-t border-border/50" />}
-              {expanded && (
-                <p
-                  className="px-5 mb-1.5 text-[9px] font-bold text-muted-foreground/50 tracking-widest select-none"
-                  style={{ fontFamily: MONO }}
-                >
-                  {group.label}
-                </p>
-              )}
-              {group.items.map(item => (
-                <NavItem
-                  key={item.href}
-                  item={item}
-                  active={isActive(item.href)}
-                  expanded={expanded}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
-
-        {/* Bottom: theme + settings */}
-        <div className="shrink-0 border-t border-border/50 pt-3 space-y-1">
-          <NavItem
-            item={{ href: "/settings", label: "Settings", Icon: Settings, color: "#6b7280" }}
-            active={isActive("/settings")}
-            expanded={expanded}
-          />
-          <button
-            onClick={toggleTheme}
-            className="flex items-center gap-3 w-full px-3 py-2.5 mx-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
-            style={{ width: "calc(100% - 16px)" }}
-          >
-            <div className="shrink-0 w-5 flex items-center justify-center">
-              {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
-            </div>
-            {expanded && (
-              <span className="text-[11px] font-bold whitespace-nowrap" style={{ fontFamily: MONO }}>
-                {theme === "dark" ? "Light Mode" : "Dark Mode"}
-              </span>
-            )}
-          </button>
-        </div>
+        <SidebarContents expanded={expanded} />
       </aside>
 
-      {/* ── Mobile Sidebar Drawer ── */}
+      {/* ── Mobile Drawer ── */}
       {mobileOpen && (
         <div
           className="fixed inset-0 z-50 lg:hidden"
           onClick={() => setMobileOpen(false)}
         >
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-background/55 backdrop-blur-sm" />
           <aside
-            className="absolute top-0 left-0 bottom-0 w-64 bg-background border-r border-border flex flex-col py-4 gap-0"
-            onClick={e => e.stopPropagation()}
+            className="absolute bottom-0 left-0 top-0 flex w-64 flex-col border-r border-border/50 bg-sidebar/95 backdrop-blur-xl"
+            onClick={(e) => e.stopPropagation()}
           >
-            {/* Drawer header */}
-            <div className="flex items-center justify-between px-4 mb-4">
-              <div className="flex items-center gap-2">
-                <div
-                  className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-[10px] font-black"
-                  style={{ background: "linear-gradient(135deg,#f97316,#8b5cf6)", fontFamily: DISPLAY }}
-                >
-                  O
-                </div>
-                <div>
-                  <span className="font-black text-sm" style={{ fontFamily: DISPLAY }}>Ouwibo</span>
-                  <span className="text-[9px] text-muted-foreground ml-1" style={{ fontFamily: MONO }}>Cloud</span>
-                </div>
-              </div>
-              <button onClick={() => setMobileOpen(false)} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted">
-                <X size={16} />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto space-y-1 px-0">
-              {NAV_GROUPS.map((group, gi) => (
-                <div key={group.label}>
-                  {gi > 0 && <div className="mx-4 my-2 border-t border-border/50" />}
-                  <p
-                    className="px-5 mb-1.5 text-[9px] font-bold text-muted-foreground/50 tracking-widest select-none"
-                    style={{ fontFamily: MONO }}
-                  >
-                    {group.label}
-                  </p>
-                  {group.items.map(item => (
-                    <NavItem
-                      key={item.href}
-                      item={item}
-                      active={isActive(item.href)}
-                      expanded={true}
-                      onClick={() => setMobileOpen(false)}
-                    />
-                  ))}
-                </div>
-              ))}
-            </div>
-
-            <div className="shrink-0 border-t border-border/50 pt-3 space-y-1 px-0">
-              <NavItem
-                item={{ href: "/settings", label: "Settings", Icon: Settings, color: "#6b7280" }}
-                active={isActive("/settings")}
-                expanded={true}
-                onClick={() => setMobileOpen(false)}
-              />
+            <div className="flex h-14 items-center justify-between border-b border-border/40 px-4">
+              <span className="text-sm font-black">Ouwibo Cloud</span>
               <button
-                onClick={toggleTheme}
-                className="flex items-center gap-3 w-full px-5 py-2.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
+                onClick={() => setMobileOpen(false)}
+                className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-muted"
+                aria-label="Close menu"
               >
-                <div className="shrink-0 w-5 flex items-center justify-center">
-                  {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
-                </div>
-                <span className="text-[11px] font-bold whitespace-nowrap" style={{ fontFamily: MONO }}>
-                  {theme === "dark" ? "Light Mode" : "Dark Mode"}
-                </span>
+                <Menu size={14} />
               </button>
             </div>
+            <SidebarContents expanded onNav={() => setMobileOpen(false)} />
           </aside>
         </div>
       )}
 
-      {/* ── Main Content ── */}
-      <main
-        className="pt-14 transition-all duration-300 hidden lg:block"
-        style={{ marginLeft: SIDEBAR_W }}
-      >
-        <div className="max-w-6xl mx-auto px-5 sm:px-8 py-7 pb-10">
-          {children}
-        </div>
-      </main>
-
-      {/* Mobile main (no margin) */}
-      <main className="pt-14 lg:hidden pb-20">
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          {children}
-        </div>
-      </main>
-
-      {/* ── Bottom Mobile Nav ── */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 h-16 bg-background/95 backdrop-blur border-t border-border flex lg:hidden">
-        {ALL_NAV.slice(0, 5).map(item => {
-          const active = isActive(item.href);
+      {/* ── Bottom mobile nav ── */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 flex h-16 items-center justify-around border-t border-border/50 bg-sidebar/90 px-2 backdrop-blur-xl lg:hidden">
+        {mobileNavItems.map((item) => {
+          const active =
+            item.href === "/"
+              ? location === "/"
+              : location.startsWith(item.href);
           return (
-            <Link
-              key={item.href}
-              href={isStub(item.href) ? location : item.href}
-              className="flex-1"
-            >
-              <div className="flex flex-col items-center justify-center h-full gap-1 cursor-pointer">
-                <div
-                  className={cn(
-                    "w-9 h-9 rounded-xl flex items-center justify-center transition-all",
-                    active ? "text-white scale-110" : "text-muted-foreground"
-                  )}
-                  style={active ? { backgroundColor: item.color, boxShadow: `0 3px 10px ${item.color}66` } : {}}
-                >
-                  <item.Icon size={17} color={active ? "#fff" : undefined} />
-                </div>
-                <span
-                  className="text-[8px] font-bold truncate"
-                  style={{ fontFamily: MONO, color: active ? item.color : undefined }}
-                >
-                  {item.label}
-                </span>
+            <Link key={item.href} href={item.href}>
+              <div
+                className={cn(
+                  "flex flex-col items-center gap-1 rounded-xl px-3 py-1.5 transition-colors",
+                  active ? "text-primary" : "text-muted-foreground",
+                )}
+              >
+                <item.Icon size={18} />
+                <span className="text-[8px] font-bold">{item.label}</span>
               </div>
             </Link>
           );
         })}
       </nav>
 
+      {/* ── Main content ── */}
+      <main
+        className={cn(
+          "relative z-10 flex min-h-screen w-full flex-col transition-[padding] duration-300",
+          expanded ? "lg:pl-[256px]" : "lg:pl-[72px]",
+        )}
+      >
+        <div className="hidden lg:block" style={{ height: 56 }} />
+        <div className="h-14 lg:hidden" />
+        <div className="flex-1 w-full px-3 py-4 pb-22 sm:px-4 lg:px-5 xl:px-6 2xl:px-8 lg:py-5 lg:pb-8">
+          {children}
+        </div>
+      </main>
       <ScrollTop />
     </div>
   );

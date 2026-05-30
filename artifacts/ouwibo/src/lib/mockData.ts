@@ -1,405 +1,863 @@
-export const mockAirdrops: any[] = [
+export interface AirdropTask {
+  name: string;
+  types: string[];
+  cost: number; // 0 = free
+  timeMin: number;
+  url: string;
+}
+
+export interface Airdrop {
+  id: number;
+  slug: string;
+  name: string;
+  ticker?: string;
+  logoUrl: string; // unavatar.io/twitter/{handle}
+  logoColor: string; // fallback bg color
+  logoInitial: string; // fallback text
+  isNew: boolean;
+  status: "Confirmed" | "Potential" | "Reward Available";
+  statusDate: string;
+  rewardType:
+    | "Airdrop"
+    | "Whitelist/Waitlist"
+    | "Points"
+    | "Token Sale"
+    | "NFT";
+  raiseFunds?: string;
+  backers?: Backer[];
+  backersExtra?: number;
+  tasks: AirdropTask[];
+  description?: string;
+  website?: string;
+  twitter?: string;
+  telegram?: string;
+  discord?: string;
+  chain?: string;
+  network?: "Testnet" | "Mainnet" | "Both";
+}
+
+export interface Backer {
+  name: string;
+  logoUrl: string;
+  initial: string;
+  color: string;
+}
+
+const VC: Record<string, Backer> = {
+  framework: {
+    name: "Framework Ventures",
+    logoUrl: "https://unavatar.io/twitter/framework",
+    initial: "FW",
+    color: "#7c3aed",
+  },
+  paradigm: {
+    name: "Paradigm",
+    logoUrl: "https://unavatar.io/twitter/paradigm",
+    initial: "PA",
+    color: "#2563eb",
+  },
+  coinbase: {
+    name: "Coinbase Ventures",
+    logoUrl: "https://unavatar.io/twitter/CoinbaseVentures",
+    initial: "CB",
+    color: "#1d4ed8",
+  },
+  dragonfly: {
+    name: "Dragonfly",
+    logoUrl: "https://unavatar.io/twitter/dragonfly_xyz",
+    initial: "DF",
+    color: "#0369a1",
+  },
+  a16z: {
+    name: "a16z",
+    logoUrl: "https://unavatar.io/twitter/a16z",
+    initial: "A",
+    color: "#1e40af",
+  },
+  pantera: {
+    name: "Pantera Capital",
+    logoUrl: "https://unavatar.io/twitter/PanteraCapital",
+    initial: "PC",
+    color: "#15803d",
+  },
+  binance: {
+    name: "Binance Labs",
+    logoUrl: "https://unavatar.io/twitter/BinanceLabs",
+    initial: "BL",
+    color: "#b45309",
+  },
+  mirana: {
+    name: "Mirana Ventures",
+    logoUrl: "https://unavatar.io/twitter/MiranaVentures",
+    initial: "MV",
+    color: "#6d28d9",
+  },
+  wintermute: {
+    name: "Wintermute",
+    logoUrl: "https://unavatar.io/twitter/wintermute_t",
+    initial: "WM",
+    color: "#047857",
+  },
+  multicoin: {
+    name: "Multicoin Capital",
+    logoUrl: "https://unavatar.io/twitter/multicoincap",
+    initial: "MC",
+    color: "#0891b2",
+  },
+  g500: {
+    name: "500 Global",
+    logoUrl: "https://unavatar.io/twitter/500global",
+    initial: "5G",
+    color: "#dc2626",
+  },
+  qcp: {
+    name: "QCP Capital",
+    logoUrl: "https://unavatar.io/twitter/QCPCapital",
+    initial: "QC",
+    color: "#7c2d12",
+  },
+  slow: {
+    name: "Slow Ventures",
+    logoUrl: "https://unavatar.io/twitter/slowventures",
+    initial: "SV",
+    color: "#374151",
+  },
+  jump: {
+    name: "Jump Crypto",
+    logoUrl: "https://unavatar.io/twitter/JumpCryptoHQ",
+    initial: "JC",
+    color: "#1f2937",
+  },
+  gnosis: {
+    name: "Gnosis",
+    logoUrl: "https://unavatar.io/twitter/gnosisdao",
+    initial: "GN",
+    color: "#065f46",
+  },
+  kraken: {
+    name: "Kraken",
+    logoUrl: "https://unavatar.io/twitter/krakenfx",
+    initial: "KR",
+    color: "#1d4ed8",
+  },
+  robot: {
+    name: "Robot Ventures",
+    logoUrl: "https://unavatar.io/twitter/robotventures",
+    initial: "RV",
+    color: "#78350f",
+  },
+  selini: {
+    name: "Selini Capital",
+    logoUrl: "https://unavatar.io/twitter/selini_capital",
+    initial: "SC",
+    color: "#4f46e5",
+  },
+  sony: {
+    name: "Sony Innovation Fund",
+    logoUrl: "https://unavatar.io/twitter/sony_ventures",
+    initial: "SF",
+    color: "#111827",
+  },
+  nimbus: {
+    name: "Nimbus Capital",
+    logoUrl: "https://unavatar.io/twitter/nimbuscap",
+    initial: "NC",
+    color: "#1e3a5f",
+  },
+};
+
+export const mockAirdrops: Airdrop[] = [
   {
     id: 1,
-    name: "Hyperliquid",
-    slug: "hyperliquid",
-    description: "Decentralized perpetual DEX on its own L1 with on-chain order book and ultra-low latency trading.",
-    logoColor: "#00c2ff",
-    logoInitial: "HL",
-    category: "DeFi",
-    chain: "HYP",
-    status: "active",
-    rewardEstimate: "$500–2,000",
-    totalValue: "$1.2B",
-    difficulty: "easy",
-    isFeatured: true,
-    isVerified: true,
-    participantsCount: 420000,
-    taskCount: 4,
-    endDate: null,
-    websiteUrl: "https://hyperliquid.xyz",
-    twitterUrl: "https://twitter.com/HyperliquidX",
-    telegramUrl: null,
-    discordUrl: "https://discord.gg/hyperliquid",
-    referralUrl: "https://app.hyperliquid.xyz/",
+    slug: "strato",
+    name: "STRATO",
+    ticker: undefined,
+    logoUrl: "https://unavatar.io/twitter/strato_net",
+    logoColor: "#1a56db",
+    logoInitial: "ST",
+    isNew: true,
+    status: "Confirmed",
+    statusDate: "May 25, 2026",
+    rewardType: "Airdrop",
+    raiseFunds: "$18.50M",
+    backers: [VC.framework, VC.slow, VC.paradigm],
+    backersExtra: 4,
+    description:
+      "DeFi protocol with liquidity pools, CDP stablecoin minting, staking, and lending — all on Ethereum mainnet.",
+    website: "https://strato.nexus",
+    twitter: "strato_net",
+    telegram: "https://t.me/strato_official",
+    discord: "https://discord.gg/strato",
+    chain: "Ethereum",
+    network: "Mainnet",
+    tasks: [
+      {
+        name: "Provide Liquidity to Swap Pools",
+        types: ["Liquidity"],
+        cost: 50,
+        timeMin: 15,
+        url: "https://strato.nexus/app",
+      },
+      {
+        name: "Mint USDST via CDP",
+        types: ["Mainnet"],
+        cost: 100,
+        timeMin: 10,
+        url: "https://strato.nexus/app",
+      },
+      {
+        name: "Stake in Safety Module",
+        types: ["Staking"],
+        cost: 50,
+        timeMin: 5,
+        url: "https://strato.nexus/app",
+      },
+      {
+        name: "Deposit in Lending Pool",
+        types: ["Staking"],
+        cost: 20,
+        timeMin: 5,
+        url: "https://strato.nexus/app",
+      },
+    ],
   },
   {
     id: 2,
-    name: "Monad",
-    slug: "monad",
-    description: "EVM-compatible L1 with 10,000 TPS throughput and 1-second block times, parallel execution engine.",
-    logoColor: "#8b5cf6",
-    logoInitial: "MON",
-    category: "Layer 1",
-    chain: "MON",
-    status: "upcoming",
-    rewardEstimate: "$200–800",
-    totalValue: "$500M",
-    difficulty: "medium",
-    isFeatured: false,
-    isVerified: true,
-    participantsCount: 310000,
-    taskCount: 6,
-    endDate: null,
-    websiteUrl: "https://monad.xyz",
-    twitterUrl: "https://twitter.com/monad_xyz",
-    telegramUrl: null,
-    discordUrl: "https://discord.gg/monad",
-    referralUrl: "https://monad.xyz",
+    slug: "netrun",
+    name: "Netrun",
+    ticker: "NET",
+    logoUrl: "https://unavatar.io/twitter/netrun_xyz",
+    logoColor: "#1a1a2e",
+    logoInitial: "NR",
+    isNew: false,
+    status: "Potential",
+    statusDate: "May 25, 2026",
+    rewardType: "Airdrop",
+    raiseFunds: undefined,
+    backers: [VC.dragonfly, VC.multicoin],
+    backersExtra: 2,
+    description:
+      "Permissionless token launchpad with built-in DEX, NFT engine, and custom domains — currently live on testnet.",
+    website: "https://netrun.xyz",
+    twitter: "netrun_xyz",
+    telegram: "https://t.me/netrun_xyz",
+    discord: "https://discord.gg/netrun",
+    chain: "Ethereum",
+    network: "Testnet",
+    tasks: [
+      {
+        name: "Apply & Join Testnet",
+        types: ["Testnet"],
+        cost: 0,
+        timeMin: 5,
+        url: "https://join.netrun.xyz",
+      },
+      {
+        name: "Create Token on Testnet",
+        types: ["Testnet"],
+        cost: 0,
+        timeMin: 10,
+        url: "https://app.netrun.xyz",
+      },
+      {
+        name: "Launch NFT Collection",
+        types: ["Testnet"],
+        cost: 0,
+        timeMin: 10,
+        url: "https://app.netrun.xyz",
+      },
+      {
+        name: "Set Up Custom Domain",
+        types: ["Testnet"],
+        cost: 0,
+        timeMin: 10,
+        url: "https://app.netrun.xyz",
+      },
+    ],
   },
   {
     id: 3,
-    name: "Berachain",
-    slug: "berachain",
-    description: "EVM-identical L1 using Proof-of-Liquidity consensus. Earn BGT by providing liquidity in native vaults.",
-    logoColor: "#e8a845",
-    logoInitial: "BERA",
-    category: "Layer 1",
-    chain: "BERA",
-    status: "active",
-    rewardEstimate: "$300–1,500",
-    totalValue: "$750M",
-    difficulty: "medium",
-    isFeatured: false,
-    isVerified: true,
-    participantsCount: 275000,
-    taskCount: 8,
-    endDate: null,
-    websiteUrl: "https://berachain.com",
-    twitterUrl: "https://twitter.com/berachain",
-    telegramUrl: null,
-    discordUrl: "https://discord.gg/berachainofficial",
-    referralUrl: "https://berachain.com",
+    slug: "boost-rabbithole",
+    name: "Boost (RabbitHole)",
+    ticker: undefined,
+    logoUrl: "https://unavatar.io/twitter/rabbithole_gg",
+    logoColor: "#ea580c",
+    logoInitial: "BR",
+    isNew: false,
+    status: "Confirmed",
+    statusDate: "May 25, 2026",
+    rewardType: "Whitelist/Waitlist",
+    raiseFunds: "$21.60M",
+    backers: [VC.framework, VC.slow, VC.paradigm, VC.coinbase],
+    backersExtra: 10,
+    description:
+      "On-chain quest platform that rewards users for completing DeFi and Web3 tasks across multiple chains.",
+    website: "https://rabbithole.gg",
+    twitter: "rabbithole_gg",
+    telegram: "https://t.me/rabbithole_gg",
+    discord: "https://discord.gg/rabbithole",
+    chain: "Multi-chain",
+    network: "Mainnet",
+    tasks: [
+      {
+        name: "Fill Waitlist Form",
+        types: ["Fill The Form"],
+        cost: 0,
+        timeMin: 3,
+        url: "https://www.rabbithole.gg",
+      },
+    ],
   },
   {
     id: 4,
-    name: "ZKsync",
-    slug: "zksync",
-    description: "Ethereum ZK rollup scaling solution with native account abstraction and EVM compatibility.",
-    logoColor: "#1755f4",
-    logoInitial: "ZK",
-    category: "Layer 2",
-    chain: "ETH",
-    status: "ended",
-    rewardEstimate: "Distributed",
-    totalValue: "$400M",
-    difficulty: "easy",
-    isFeatured: false,
-    isVerified: true,
-    participantsCount: 695000,
-    taskCount: 3,
-    endDate: "2024-06-17",
-    websiteUrl: "https://zksync.io",
-    twitterUrl: "https://twitter.com/zksync",
-    telegramUrl: null,
-    discordUrl: "https://discord.gg/zksync",
-    referralUrl: "https://zksync.io",
+    slug: "hotstuff",
+    name: "Hotstuff (Prev. Syndr Protocol)",
+    ticker: undefined,
+    logoUrl: "",
+    logoColor: "#1f2937",
+    logoInitial: "HS",
+    isNew: false,
+    status: "Potential",
+    statusDate: "May 25, 2026",
+    rewardType: "Airdrop",
+    raiseFunds: undefined,
+    backers: [VC.mirana, VC.wintermute],
+    backersExtra: 3,
+    description:
+      "Perpetual futures DEX on Arbitrum with a points program, trading competitions, and liquidity vaults.",
+    website: "https://hotstuff.xyz",
+    twitter: "HotstuffXYZ",
+    telegram: "https://t.me/hotstuff_xyz",
+    discord: "https://discord.gg/hotstuff",
+    chain: "Arbitrum",
+    network: "Mainnet",
+    tasks: [
+      {
+        name: "Trade Perpetuals (Points Program)",
+        types: ["Trading"],
+        cost: 80,
+        timeMin: 60,
+        url: "https://app.hotstuff.xyz",
+      },
+      {
+        name: "Provide Liquidity to Vault",
+        types: ["Liquidity"],
+        cost: 100,
+        timeMin: 15,
+        url: "https://app.hotstuff.xyz",
+      },
+      {
+        name: "Complete Trading Expeditions",
+        types: ["Mainnet"],
+        cost: 0,
+        timeMin: 20,
+        url: "https://app.hotstuff.xyz",
+      },
+      {
+        name: "Weekly Trading Competition",
+        types: ["Trading"],
+        cost: 80,
+        timeMin: 30,
+        url: "https://app.hotstuff.xyz",
+      },
+      {
+        name: "Refer Friends",
+        types: ["Referral"],
+        cost: 0,
+        timeMin: 5,
+        url: "https://app.hotstuff.xyz",
+      },
+      {
+        name: "Complete Social Missions",
+        types: ["Social"],
+        cost: 0,
+        timeMin: 10,
+        url: "https://app.hotstuff.xyz",
+      },
+    ],
   },
   {
     id: 5,
-    name: "Starknet",
-    slug: "starknet",
-    description: "Permissionless decentralized ZK-Rollup on Ethereum with STARK proofs and Cairo programming language.",
-    logoColor: "#ec407a",
-    logoInitial: "STRK",
-    category: "Layer 2",
-    chain: "ETH",
-    status: "ended",
-    rewardEstimate: "Distributed",
-    totalValue: "$600M",
-    difficulty: "medium",
-    isFeatured: false,
-    isVerified: true,
-    participantsCount: 580000,
-    taskCount: 5,
-    endDate: "2024-02-20",
-    websiteUrl: "https://starknet.io",
-    twitterUrl: "https://twitter.com/Starknet",
-    telegramUrl: "https://t.me/starknet",
-    discordUrl: "https://discord.gg/starknet",
-    referralUrl: "https://starknet.io",
+    slug: "popdex",
+    name: "PopDEX",
+    ticker: undefined,
+    logoUrl: "https://unavatar.io/twitter/popdex_io",
+    logoColor: "#7c3aed",
+    logoInitial: "PD",
+    isNew: false,
+    status: "Potential",
+    statusDate: "May 25, 2026",
+    rewardType: "Airdrop",
+    raiseFunds: "$30.00M",
+    backers: [VC.paradigm, VC.coinbase, VC.pantera],
+    backersExtra: 5,
+    description:
+      "Community-driven DEX on Arbitrum with liquidity incentives, social missions, and referral rewards.",
+    website: "https://popdex.io",
+    twitter: "popdex_io",
+    telegram: "https://t.me/popdex_io",
+    discord: "https://discord.gg/popdex",
+    chain: "Arbitrum",
+    network: "Mainnet",
+    tasks: [
+      {
+        name: "Complete Social Missions",
+        types: ["Social"],
+        cost: 0,
+        timeMin: 10,
+        url: "https://popdex.io",
+      },
+      {
+        name: "Provide Liquidity",
+        types: ["Liquidity"],
+        cost: 50,
+        timeMin: 15,
+        url: "https://popdex.io/app",
+      },
+      {
+        name: "Refer & Earn Bonus Points",
+        types: ["Referral"],
+        cost: 0,
+        timeMin: 5,
+        url: "https://popdex.io",
+      },
+    ],
   },
   {
     id: 6,
-    name: "Scroll",
-    slug: "scroll",
-    description: "Native zkEVM Layer 2 for Ethereum, bytecode-compatible with full EVM equivalence and low fees.",
-    logoColor: "#f59e0b",
-    logoInitial: "SCR",
-    category: "Layer 2",
-    chain: "ETH",
-    status: "active",
-    rewardEstimate: "$100–400",
-    totalValue: "$200M",
-    difficulty: "easy",
-    isFeatured: false,
-    isVerified: true,
-    participantsCount: 198000,
-    taskCount: 4,
-    endDate: null,
-    websiteUrl: "https://scroll.io",
-    twitterUrl: "https://twitter.com/Scroll_ZKP",
-    telegramUrl: null,
-    discordUrl: "https://discord.gg/scroll",
-    referralUrl: "https://scroll.io",
+    slug: "beep",
+    name: "Beep",
+    ticker: undefined,
+    logoUrl: "https://unavatar.io/twitter/beep_fi",
+    logoColor: "#0d9488",
+    logoInitial: "BP",
+    isNew: false,
+    status: "Confirmed",
+    statusDate: "May 25, 2026",
+    rewardType: "Airdrop",
+    raiseFunds: undefined,
+    backers: [VC.robot, VC.mirana, VC.wintermute],
+    backersExtra: 5,
+    description:
+      "On-chain trading protocol built on Ethereum with a wallet-native UX for swapping ETH and stablecoins.",
+    website: "https://beep.fi",
+    twitter: "beep_fi",
+    telegram: "https://t.me/beep_fi",
+    discord: "https://discord.gg/beep",
+    chain: "Ethereum",
+    network: "Mainnet",
+    tasks: [
+      {
+        name: "Connect Wallet & Trade ETH/USDC",
+        types: ["Trading", "On-Chain Activity"],
+        cost: 0,
+        timeMin: 10,
+        url: "https://beep.fi",
+      },
+    ],
   },
   {
     id: 7,
-    name: "Eigenlayer",
-    slug: "eigenlayer",
-    description: "Ethereum restaking protocol enabling validators to secure multiple networks with the same staked ETH.",
-    logoColor: "#3b82f6",
-    logoInitial: "EIGEN",
-    category: "Infrastructure",
-    chain: "ETH",
-    status: "active",
-    rewardEstimate: "$200–1,000",
-    totalValue: "$1.5B",
-    difficulty: "hard",
-    isFeatured: false,
-    isVerified: true,
-    participantsCount: 350000,
-    taskCount: 7,
-    endDate: null,
-    websiteUrl: "https://eigenlayer.xyz",
-    twitterUrl: "https://twitter.com/eigenlayer",
-    telegramUrl: null,
-    discordUrl: "https://discord.gg/eigenlayer",
-    referralUrl: "https://app.eigenlayer.xyz/",
+    slug: "nado",
+    name: "Nado",
+    ticker: undefined,
+    logoUrl: "https://unavatar.io/twitter/nadodex",
+    logoColor: "#1d4ed8",
+    logoInitial: "ND",
+    isNew: false,
+    status: "Confirmed",
+    statusDate: "May 22, 2026",
+    rewardType: "Airdrop",
+    raiseFunds: undefined,
+    backers: [VC.dragonfly, VC.coinbase, VC.jump],
+    backersExtra: 3,
+    description:
+      "Arbitrum-native perpetuals DEX with liquidity vaults, lending markets, and a points-farming program.",
+    website: "https://nado.xyz",
+    twitter: "nadodex",
+    telegram: "https://t.me/nadodex",
+    discord: "https://discord.gg/nado",
+    chain: "Arbitrum",
+    network: "Mainnet",
+    tasks: [
+      {
+        name: "Trade Perpetuals (Farm Points)",
+        types: ["Trading"],
+        cost: 50,
+        timeMin: 30,
+        url: "https://nado.xyz/trade",
+      },
+      {
+        name: "Provide Liquidity to NLP Vault",
+        types: ["Liquidity"],
+        cost: 50,
+        timeMin: 15,
+        url: "https://nado.xyz/earn",
+      },
+      {
+        name: "Lend & Borrow Assets",
+        types: ["Staking"],
+        cost: 20,
+        timeMin: 10,
+        url: "https://nado.xyz/lend",
+      },
+    ],
   },
   {
     id: 8,
-    name: "Linea",
-    slug: "linea",
-    description: "ConsenSys-built zkEVM L2 on Ethereum. Powers the Ethereum ecosystem with MetaMask-native integration.",
-    logoColor: "#121212",
-    logoInitial: "LXP",
-    category: "Layer 2",
-    chain: "ETH",
-    status: "active",
-    rewardEstimate: "$50–300",
-    totalValue: "$175M",
-    difficulty: "easy",
-    isFeatured: false,
-    isVerified: true,
-    participantsCount: 230000,
-    taskCount: 5,
-    endDate: null,
-    websiteUrl: "https://linea.build",
-    twitterUrl: "https://twitter.com/LineaBuild",
-    telegramUrl: null,
-    discordUrl: "https://discord.gg/linea",
-    referralUrl: "https://linea.build",
+    slug: "k25-ai",
+    name: "K25.ai",
+    ticker: undefined,
+    logoUrl: "https://unavatar.io/twitter/k25ai",
+    logoColor: "#111827",
+    logoInitial: "K2",
+    isNew: true,
+    status: "Confirmed",
+    statusDate: "May 22, 2026",
+    rewardType: "Whitelist/Waitlist",
+    raiseFunds: "$2.00M",
+    backers: [VC.g500, VC.selini],
+    backersExtra: 0,
+    description:
+      "AI-powered analytics layer for crypto traders on Solana, with an early access waitlist and token rewards.",
+    website: "https://k25.ai",
+    twitter: "k25ai",
+    telegram: "https://t.me/k25ai",
+    discord: "https://discord.gg/k25ai",
+    chain: "Solana",
+    network: "Mainnet",
+    tasks: [
+      {
+        name: "Register Waitlist",
+        types: ["Fill The Form"],
+        cost: 0,
+        timeMin: 2,
+        url: "https://k25.ai",
+      },
+    ],
   },
   {
     id: 9,
-    name: "Sui Ecosystem",
-    slug: "sui-defi",
-    description: "DeFi protocols building on Sui's high-throughput Move-based blockchain. Multiple active incentive programs.",
-    logoColor: "#4ca2ff",
-    logoInitial: "SUI",
-    category: "DeFi",
-    chain: "SUI",
-    status: "active",
-    rewardEstimate: "$100–500",
-    totalValue: "$300M",
-    difficulty: "medium",
-    isFeatured: false,
-    isVerified: false,
-    participantsCount: 155000,
-    taskCount: 6,
-    endDate: null,
-    websiteUrl: "https://sui.io",
-    twitterUrl: "https://twitter.com/SuiNetwork",
-    telegramUrl: null,
-    discordUrl: "https://discord.gg/sui",
-    referralUrl: "https://sui.io",
+    slug: "grove",
+    name: "Grove",
+    ticker: undefined,
+    logoUrl: "https://unavatar.io/twitter/groveprotocol",
+    logoColor: "#92400e",
+    logoInitial: "GV",
+    isNew: true,
+    status: "Confirmed",
+    statusDate: "May 21, 2026",
+    rewardType: "Points",
+    raiseFunds: undefined,
+    backers: [VC.slow, VC.coinbase],
+    backersExtra: 1,
+    description:
+      "Earn points by holding assets in Grove's smart vaults on Ethereum — points convert to tokens at TGE.",
+    website: "https://grove.fi",
+    twitter: "groveprotocol",
+    telegram: "https://t.me/grove_fi",
+    discord: "https://discord.gg/grove",
+    chain: "Ethereum",
+    network: "Mainnet",
+    tasks: [
+      {
+        name: "Hold Assets to Earn Points",
+        types: ["Hold"],
+        cost: 100,
+        timeMin: 5,
+        url: "https://grove.fi",
+      },
+    ],
   },
   {
     id: 10,
-    name: "Taiko",
-    slug: "taiko",
-    description: "Based ZK-EVM rollup with based sequencing and multi-proof system for Ethereum scalability.",
-    logoColor: "#e84040",
-    logoInitial: "TAIKO",
-    category: "Layer 2",
-    chain: "ETH",
-    status: "potential",
-    rewardEstimate: "TBD",
-    totalValue: "TBD",
-    difficulty: "medium",
-    isFeatured: false,
-    isVerified: true,
-    participantsCount: 88000,
-    taskCount: 4,
-    endDate: null,
-    websiteUrl: "https://taiko.xyz",
-    twitterUrl: "https://twitter.com/taikoxyz",
-    telegramUrl: null,
-    discordUrl: "https://discord.gg/taikoxyz",
-    referralUrl: "https://taiko.xyz",
-  },
-  {
-    id: 11,
-    name: "Sophon",
-    slug: "sophon",
-    description: "Consumer blockchain built on ZK Stack focused on entertainment, gaming, and lifestyle applications.",
-    logoColor: "#7c3aed",
-    logoInitial: "SOPH",
-    category: "Gaming",
-    chain: "ETH",
-    status: "upcoming",
-    rewardEstimate: "$50–200",
-    totalValue: "$100M",
-    difficulty: "easy",
-    isFeatured: false,
-    isVerified: false,
-    participantsCount: 62000,
-    taskCount: 3,
-    endDate: null,
-    websiteUrl: "https://sophon.xyz",
-    twitterUrl: "https://twitter.com/sophon",
-    telegramUrl: "https://t.me/sophon",
-    discordUrl: "https://discord.gg/sophon",
-    referralUrl: "https://sophon.xyz",
-  },
-  {
-    id: 12,
-    name: "Grass",
-    slug: "grass",
-    description: "Decentralized data network that lets you monetize your unused bandwidth for AI training datasets.",
-    logoColor: "#16a34a",
-    logoInitial: "GRASS",
-    category: "Infrastructure",
-    chain: "SOL",
-    status: "active",
-    rewardEstimate: "$20–150",
-    totalValue: "$80M",
-    difficulty: "easy",
-    isFeatured: false,
-    isVerified: true,
-    participantsCount: 540000,
-    taskCount: 2,
-    endDate: null,
-    websiteUrl: "https://getgrass.io",
-    twitterUrl: "https://twitter.com/getgrass_io",
-    telegramUrl: "https://t.me/getgrass_io",
-    discordUrl: "https://discord.gg/getgrass",
-    referralUrl: "https://app.getgrass.io/register?referralCode=YOUR_CODE",
+    slug: "konnex",
+    name: "Konnex",
+    ticker: "KNX",
+    logoUrl: "https://unavatar.io/twitter/konnex_world",
+    logoColor: "#374151",
+    logoInitial: "KX",
+    isNew: false,
+    status: "Confirmed",
+    statusDate: "May 21, 2026",
+    rewardType: "Airdrop",
+    raiseFunds: "$15.00M",
+    backers: [VC.dragonfly, VC.pantera, VC.a16z, VC.coinbase],
+    backersExtra: 2,
+    description:
+      "Web3 social protocol connecting users across chains with daily tasks, leaderboards, and referral rewards.",
+    website: "https://konnex.world",
+    twitter: "konnex_world",
+    telegram: "https://t.me/konnex_world",
+    discord: "https://discord.gg/konnex",
+    chain: "Multi-chain",
+    network: "Both",
+    tasks: [
+      {
+        name: "Complete Social Missions",
+        types: ["Social"],
+        cost: 0,
+        timeMin: 15,
+        url: "https://konnex.world",
+      },
+      {
+        name: "Complete Daily Tasks",
+        types: ["Social"],
+        cost: 0,
+        timeMin: 10,
+        url: "https://konnex.world/tasks",
+      },
+      {
+        name: "Join Leaderboard Challenge",
+        types: ["Community"],
+        cost: 0,
+        timeMin: 5,
+        url: "https://konnex.world/leaderboard",
+      },
+      {
+        name: "Refer Friends",
+        types: ["Referral"],
+        cost: 0,
+        timeMin: 5,
+        url: "https://konnex.world/ref",
+      },
+    ],
   },
 ];
 
-export const mockNews: any[] = [
+export const mockNews: any[] = [];
+export const mockTasks: any[] = [];
+export const mockActivity: any[] = [];
+
+export const mockArticles: any[] = [
   {
-    id: 1,
-    title: "Hyperliquid Surpasses $10B in Daily DEX Volume",
-    summary: "The perpetual DEX built on its own L1 has become the top derivatives platform by volume, outpacing Binance perps in user growth.",
-    category: "DeFi",
-    source: "The Block",
-    url: "https://theblock.co",
-    imageColor: "#00c2ff",
-    publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    readTime: "3 min",
-    tags: ["hyperliquid", "perps", "dex"],
+    id: "art-2026-05-28-bitcoin-liquidity-shock",
+    slug: "bitcoin-liquidity-shock-funding-stablecoins-etf-flows",
+    title: "Bitcoin’s Liquidity Shock: Why Funding, Stablecoins, and ETF Flows Matter More Than the Headline Price",
+    excerpt:
+      "Bitcoin traded like a macro asset again as oil, rates, and ETF flows all pulled in different directions. The real story is the market plumbing underneath the move.",
+    content: `
+Bitcoin's latest move looks simple on a chart and messy everywhere else. The price action was driven by a mix of risk-off macro flows, renewed energy-market stress, and a steady structural bid from ETF buyers. That combination matters because it changes the shape of the market: Bitcoin is increasingly being priced as a liquid macro asset, not just a speculative token.
+
+The biggest clue is in derivatives. When funding turns negative or flat while spot demand stays sticky, it usually means traders are de-risking faster than long-term buyers are exiting. That can create sharp but temporary dips that later recover once spot absorbs the supply. In plain English: weak leverage can make the market look worse than the underlying demand really is.
+
+Stablecoin flows also matter. If USDT and USDC issuance stays firm, it usually means fresh dry powder is entering crypto rails. If issuance slows while exchange reserves fall, liquidity can feel tighter even if price looks stable.
+
+The takeaway is that investors should stop reading Bitcoin as one number. The real signal is the interaction between ETF inflows, derivatives positioning, and stablecoin liquidity.
+    `,
+    category: "News",
+    tags: ["Bitcoin", "ETF", "Liquidity", "Stablecoins", "Macro"],
+    author: "Ouwibo Markets Desk",
+    coverImage: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=1200&q=80&auto=format&fit=crop",
+    publishedAt: "May 28, 2026",
+    readTime: 6,
+    featured: true,
   },
   {
-    id: 2,
-    title: "Monad Testnet Goes Live with 10,000 TPS Benchmark",
-    summary: "Monad's public testnet officially launched showcasing parallel EVM execution. Community airdrop expected in Q3 2025.",
-    category: "Layer 1",
-    source: "CoinDesk",
-    url: "https://coindesk.com",
-    imageColor: "#8b5cf6",
-    publishedAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-    readTime: "4 min",
-    tags: ["monad", "testnet", "airdrop"],
-  },
-  {
-    id: 3,
-    title: "EigenLayer TVL Hits New All-Time High of $20B",
-    summary: "Ethereum restaking protocol EigenLayer continues its explosive growth as new AVS services launch on mainnet.",
-    category: "Infrastructure",
-    source: "DeFi Llama",
-    url: "https://defillama.com",
-    imageColor: "#3b82f6",
-    publishedAt: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
-    readTime: "2 min",
-    tags: ["eigenlayer", "restaking", "tvl"],
-  },
-  {
-    id: 4,
-    title: "Berachain Proof-of-Liquidity Explained: How to Maximize BGT Rewards",
-    summary: "A deep-dive into Berachain's novel PoL consensus mechanism and strategies to earn maximum validator emissions.",
-    category: "Guide",
-    source: "Bankless",
-    url: "https://bankless.com",
-    imageColor: "#e8a845",
-    publishedAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-    readTime: "8 min",
-    tags: ["berachain", "pol", "guide"],
-  },
-  {
-    id: 5,
-    title: "Grass Network Reaches 1M Active Nodes Milestone",
-    summary: "The decentralized bandwidth-sharing network hits 1 million active nodes, with Season 2 rewards campaign still live.",
-    category: "Infrastructure",
-    source: "CryptoSlate",
-    url: "https://cryptoslate.com",
-    imageColor: "#16a34a",
-    publishedAt: new Date(Date.now() - 18 * 60 * 60 * 1000).toISOString(),
-    readTime: "3 min",
-    tags: ["grass", "despin", "nodes"],
-  },
-  {
-    id: 6,
-    title: "ZK Rollup Wars: Scroll vs Linea vs Taiko in 2025",
-    summary: "Comparative analysis of the top ZK-EVM L2 solutions and which one is best positioned for a large airdrop.",
+    id: "art-2026-05-28-ethereum-activity",
+    slug: "ethereum-activity-fees-layer2-demand",
+    title: "Ethereum’s Quiet Strength: Activity Is Shifting, Not Disappearing",
+    excerpt:
+      "Ethereum fees and usage keep being re-routed through Layer 2s, but the core network still acts as the settlement anchor.",
+    content: `
+Ethereum doesn't need loud headlines to matter. The chain still sits at the center of stablecoins, DeFi settlement, and Layer 2 security. What has changed is where the activity lives: more of the user experience happens on rollups, while Ethereum itself remains the final settlement layer.
+
+That split is healthy, but it can confuse observers. Lower mainnet fees do not automatically mean lower relevance. They can also mean better scaling and more room for apps to grow. The right question is whether economic activity is moving away from Ethereum or simply becoming cheaper to process.
+
+The deeper signal is capital formation. Projects still choose Ethereum when they want the broadest liquidity, the deepest tooling, and the cleanest path to institutional familiarity. That is not a meme. It is a network effect.
+
+Bottom line: the ETH thesis is less about raw transaction counts and more about whether Ethereum remains the base layer that everything else settles into.
+    `,
     category: "Analysis",
-    source: "Messari",
-    url: "https://messari.io",
-    imageColor: "#f59e0b",
-    publishedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-    readTime: "6 min",
-    tags: ["scroll", "linea", "taiko", "zk"],
+    tags: ["Ethereum", "Layer 2", "DeFi", "Fees", "Settlement"],
+    author: "Ouwibo Research",
+    coverImage: "https://images.unsplash.com/photo-1640340434855-6084b1f4901c?w=1200&q=80&auto=format&fit=crop",
+    publishedAt: "May 28, 2026",
+    readTime: 5,
+    featured: false,
   },
   {
-    id: 7,
-    title: "Top 10 Airdrop Opportunities in June 2025",
-    summary: "Monthly roundup of the highest-potential crypto airdrops with step-by-step task guides for each project.",
-    category: "Guide",
-    source: "Ouwibo Cloud",
-    url: "#",
-    imageColor: "#f97316",
-    publishedAt: new Date(Date.now() - 30 * 60 * 60 * 1000).toISOString(),
-    readTime: "10 min",
-    tags: ["airdrop", "monthly", "guide"],
-  },
-  {
-    id: 8,
-    title: "Sui Ecosystem DeFi TVL Crosses $500M as New Protocols Launch",
-    summary: "Multiple new DeFi protocols are going live on Sui with incentive campaigns and early-user reward programs.",
+    id: "art-2026-05-28-stablecoin-rails",
+    slug: "stablecoin-rails-payments-cash-app-mastercard",
+    title: "Stablecoins Are Moving From Trading Tool to Payments Rail",
+    excerpt:
+      "Cash App, Mastercard, and other large brands are turning stablecoins into actual consumer and merchant infrastructure.",
+    content: `
+Stablecoins are no longer just a crypto-trader convenience. The bigger story is that consumer apps and payments companies are wiring them into the real economy.
+
+That matters for three reasons. First, it reduces the gap between crypto balances and usable money. Second, it creates a less volatile way for users to move value across chains and apps. Third, it pushes the discussion from "should crypto exist?" to "which rails will win?"
+
+The likely outcome is not one stablecoin to rule them all. It is a layered market: USDC for compliance-heavy flows, USDT for broad liquidity, and branded or region-specific products for specialized use cases.
+
+For users, the most important effect is boring in the best way: faster settlement, lower friction, and fewer steps between earning money and spending it.
+    `,
     category: "DeFi",
-    source: "DeFi Pulse",
-    url: "#",
-    imageColor: "#4ca2ff",
-    publishedAt: new Date(Date.now() - 36 * 60 * 60 * 1000).toISOString(),
-    readTime: "4 min",
-    tags: ["sui", "defi", "tvl"],
+    tags: ["Stablecoins", "Payments", "USDC", "Mastercard", "Cash App"],
+    author: "Ouwibo Payments Desk",
+    coverImage: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80&auto=format&fit=crop",
+    publishedAt: "May 28, 2026",
+    readTime: 5,
+    featured: false,
   },
-];
+  {
+    id: "art-2026-05-28-solana-liquidity",
+    slug: "solana-liquidity-trading-activity-meme-season",
+    title: "Solana’s Liquidity Is Deepening Again — But This Time the Signal Looks Cleaner",
+    excerpt:
+      "The SOL market is being supported by better liquidity conditions rather than just retail meme churn.",
+    content: `
+Solana has always been fast. The real question is whether it can remain durable once the meme-cycle excitement fades. Right now, the answer looks better than it did in prior runs.
 
-export const mockTasks: any[] = [
-  { id: 1, name: "Bridge ETH to Hyperliquid", airdropId: 1, taskType: "bridge", completed: true },
-  { id: 2, name: "Make 10 trades on HL", airdropId: 1, taskType: "trade", completed: true },
-  { id: 3, name: "Follow Monad on Twitter", airdropId: 2, taskType: "social", completed: false },
-  { id: 4, name: "Join Monad Discord", airdropId: 2, taskType: "social", completed: false },
-  { id: 5, name: "Stake on Berachain testnet", airdropId: 3, taskType: "stake", completed: false },
-];
+Liquidity is deeper, execution is cleaner, and trading activity is no longer purely a retail-led event. That makes the market less fragile. When liquidity improves, large orders have less impact and price discovery becomes less chaotic.
 
-export const mockActivity: any[] = [
-  { id: 1, type: "airdrop_added", message: "Hyperliquid added to tracker — 4 tasks", createdAt: new Date(Date.now() - 3600000).toISOString() },
-  { id: 2, type: "task_completed", message: "Completed: Bridge ETH to Hyperliquid", createdAt: new Date(Date.now() - 7200000).toISOString() },
-  { id: 3, type: "airdrop_added", message: "Monad testnet is now live — start farming", createdAt: new Date(Date.now() - 86400000).toISOString() },
-  { id: 4, type: "status_change", message: "Scroll airdrop status updated to Active", createdAt: new Date(Date.now() - 172800000).toISOString() },
-  { id: 5, type: "airdrop_added", message: "Grass Season 2 rewards campaign active", createdAt: new Date(Date.now() - 259200000).toISOString() },
+The next test is whether builders keep shipping. A chain can survive on speculation for a while, but the stronger version of the Solana thesis is about consumer apps, payments, and onchain trading infrastructure that users actually keep returning to.
+
+If that continues, Solana can hold a position as the high-throughput venue for active onchain users rather than just the home of the loudest cycle.
+    `,
+    category: "Layer 1",
+    tags: ["Solana", "Liquidity", "Trading", "DeFi", "Apps"],
+    author: "Ouwibo Research",
+    coverImage: "https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?w=1200&q=80&auto=format&fit=crop",
+    publishedAt: "May 28, 2026",
+    readTime: 5,
+    featured: false,
+  },
+  {
+    id: "art-2026-05-28-crypto-policy-gemini",
+    slug: "crypto-policy-gemini-cftc-reversal-regulatory-shift",
+    title: "A Gemini Penalty Reversal Could Signal a Bigger U.S. Crypto Policy Shift",
+    excerpt:
+      "A regulator moving to withdraw a penalty against Gemini may be small on paper, but it suggests a larger change in enforcement tone.",
+    content: `
+When regulators reverse or soften past actions, the headline size usually understates the impact. A withdrawn penalty tells markets that the enforcement environment may be entering a different phase.
+
+For the industry, that matters because policy clarity changes capital allocation. Exchanges, custodians, and payments firms make hiring, product, and compliance decisions based on the expected regulatory temperature. If the temperature drops, investment usually follows.
+
+This does not mean the U.S. becomes crypto-friendly overnight. It means the argument is shifting from punishment-first to framework-first. That is a meaningful distinction for institutional players who want rules they can model.
+
+The market should watch whether this is isolated or part of a wider pattern across CFTC, SEC, and Treasury attitudes.
+    `,
+    category: "News",
+    tags: ["Policy", "Regulation", "Gemini", "CFTC", "United States"],
+    author: "Ouwibo Policy Desk",
+    coverImage: "https://images.unsplash.com/photo-1559526324-593bc073d938?w=1200&q=80&auto=format&fit=crop",
+    publishedAt: "May 28, 2026",
+    readTime: 6,
+    featured: false,
+  },
+  {
+    id: "art-2026-05-28-political-market-map",
+    slug: "politics-trump-texas-paxton-cornyn-crypto-policy",
+    title: "Politics Is Now a Crypto Market Variable — Here’s Why the Texas Senate Fight Matters",
+    excerpt:
+      "The Texas Republican runoff is not just politics; it affects the regulatory mood for crypto and risk assets.",
+    content: `
+Crypto traders still pretend politics is separate from markets, then act surprised when it moves prices. The Texas Senate fight is a useful example: leadership changes, regulatory priorities shift, and those shifts affect everything from enforcement to stablecoin legislation.
+
+The broader point is that crypto has become politically legible. Candidates talk about it in fundraising, policy committees treat it as a real issue, and industry groups now behave like traditional lobby blocs. That means political outcomes increasingly feed into market expectations.
+
+If a crypto-friendly bloc gains power, the effect is not just symbolic. It can change how much uncertainty companies face when launching products, listing tokens, or applying for licenses.
+
+This is why a good crypto site should include politics coverage alongside market news. The two are too connected to separate anymore.
+    `,
+    category: "Analysis",
+    tags: ["Politics", "Texas", "Crypto Policy", "Senate", "Markets"],
+    author: "Ouwibo Editorial",
+    coverImage: "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=1200&q=80&auto=format&fit=crop",
+    publishedAt: "May 28, 2026",
+    readTime: 5,
+    featured: false,
+  },
+  {
+    id: "art-2026-05-28-fed-liquidity",
+    slug: "fed-liquidity-risk-assets-crypto-correlation",
+    title: "The Fed, Liquidity, and Why Crypto Still Trades Like a Risk Asset",
+    excerpt:
+      "Inflation prints, rate expectations, and risk appetite still matter more than most crypto headlines admit.",
+    content: `
+Crypto often claims to be uncorrelated until the macro tape reminds everyone otherwise. Liquidity is still the main driver. When traders expect easier financial conditions, risk assets tend to re-rate together.
+
+That correlation matters because Bitcoin and major alts now attract a mix of speculative, institutional, and treasury-driven capital. Each group reacts differently to inflation data, bond yields, and central bank commentary.
+
+The practical lesson: if you want to understand crypto, you also need to understand rates. The cost of capital affects leverage, market-making, and the appetite for long-duration bets.
+
+In short, the Fed is still one of crypto’s biggest invisible exchanges.
+    `,
+    category: "News",
+    tags: ["Fed", "Liquidity", "Bitcoin", "Macro", "Rates"],
+    author: "Ouwibo Macro Desk",
+    coverImage: "https://images.unsplash.com/photo-1622630998477-20aa696ecb05?w=1200&q=80&auto=format&fit=crop",
+    publishedAt: "May 28, 2026",
+    readTime: 5,
+    featured: false,
+  },
+  {
+    id: "art-2026-05-28-defi-reality-check",
+    slug: "defi-reality-check-yield-dex-onchain-usage",
+    title: "DeFi’s Real Story in 2026: Less Hype, More Usable Infrastructure",
+    excerpt:
+      "The best DeFi projects now look like financial infrastructure, not just yield experiments.",
+    content: `
+The strongest DeFi projects in 2026 are not trying to win by yelling the loudest. They win by making the chain easier to use, cheaper to bridge, and safer to hold value in.
+
+That shift matters because the old DeFi playbook was built around incentives. The newer playbook is built around usefulness: borrowing, swapping, payments, and yield products that feel less like a campaign and more like a product.
+
+Users care less about narratives and more about execution. If a protocol can handle liquidity without constant emissions and can survive without heroic token incentives, it has a better chance of lasting.
+
+This is the version of DeFi that institutions can actually evaluate.
+    `,
+    category: "DeFi",
+    tags: ["DeFi", "Yield", "DEX", "Infrastructure", "Onchain"],
+    author: "Ouwibo DeFi Desk",
+    coverImage: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=1200&q=80&auto=format&fit=crop",
+    publishedAt: "May 28, 2026",
+    readTime: 4,
+    featured: false,
+  },
+  {
+    id: "art-2026-05-28-ethereum-policy",
+    slug: "ethereum-policy-stablecoins-security-settlement",
+    title: "Why Ethereum Still Wins the Policy Game Even When Price Is Quiet",
+    excerpt:
+      "The network’s compliance, settlement, and stablecoin position keeps it important even without constant hype.",
+    content: `
+Ethereum's policy advantage is underappreciated. It is the chain most financial teams already know how to describe to lawyers, auditors, and risk committees.
+
+That does not guarantee the highest price performance in every cycle, but it helps Ethereum stay embedded in the parts of crypto that are hardest to dislodge: stablecoins, settlement, and tokenized financial workflows.
+
+Whenever regulations tighten, the networks that can explain themselves clearly tend to keep the most useful institutional relationships.
+
+For Ethereum, that is often enough to preserve relevance even when sentiment cools.
+    `,
+    category: "Analysis",
+    tags: ["Ethereum", "Policy", "Stablecoins", "Settlement", "Compliance"],
+    author: "Ouwibo Editorial",
+    coverImage: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1200&q=80&auto=format&fit=crop",
+    publishedAt: "May 28, 2026",
+    readTime: 4,
+    featured: false,
+  },
+  {
+    id: "art-2026-05-28-crypto-politics-x",
+    slug: "crypto-politics-x-sources-trusted-accounts",
+    title: "What Trusted X Accounts Are Watching Today: Crypto Policy, Senate Moves, and Market Tone",
+    excerpt:
+      "A fast summary of the political and crypto-policy posts most relevant to traders and builders today.",
+    content: `
+Trusted X accounts are flagging the same themes: crypto policy is getting more political, stablecoins are becoming real payment rails, and market structure is being shaped as much by Washington as by Wall Street.
+
+That matters because X often surfaces the first public signal before a longer article lands. For a daily news desk, those posts are useful context, but they should never stand alone. The right way to use them is as a lead-in to confirmed reporting from Reuters, AP, Politico, CoinDesk, or The Block.
+
+Today's mix of posts and reporting points to one conclusion: the market is no longer just reacting to token headlines. It is reacting to regulation, elections, and the growing institutionalization of crypto infrastructure.
+
+That makes political coverage a core part of any serious crypto news page.
+    `,
+    category: "News",
+    tags: ["X", "Politics", "Crypto Policy", "Reuters", "CoinDesk"],
+    author: "Ouwibo Editorial",
+    coverImage: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&q=80&auto=format&fit=crop",
+    publishedAt: "May 28, 2026",
+    readTime: 4,
+    featured: false,
+  },
 ];
