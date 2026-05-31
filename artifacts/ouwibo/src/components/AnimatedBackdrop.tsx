@@ -13,7 +13,9 @@ function shouldAnimate() {
   if (typeof window === "undefined") return false;
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const mobile = window.matchMedia("(max-width: 767px)").matches;
-  const connection = navigator as Navigator & { connection?: { saveData?: boolean } };
+  const connection = navigator as Navigator & {
+    connection?: { saveData?: boolean };
+  };
   const saveData = connection.connection?.saveData ?? false;
   const cores = navigator.hardwareConcurrency ?? 8;
   return !(reduce || mobile || saveData || cores <= 4);
@@ -44,8 +46,10 @@ export default function AnimatedBackdrop() {
 
     const readColors = () => {
       const styles = getComputedStyle(document.documentElement);
-      const primary = styles.getPropertyValue("--primary").trim() || "24 62% 44%";
-      const foreground = styles.getPropertyValue("--foreground").trim() || "0 0% 9%";
+      const primary =
+        styles.getPropertyValue("--primary").trim() || "24 62% 44%";
+      const foreground =
+        styles.getPropertyValue("--foreground").trim() || "0 0% 9%";
       const dark = document.documentElement.classList.contains("dark");
       return {
         primary,
@@ -68,7 +72,10 @@ export default function AnimatedBackdrop() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       if (particles.length === 0) {
-        const count = Math.min(30, Math.max(18, Math.round((width * height) / 48000)));
+        const count = Math.min(
+          30,
+          Math.max(18, Math.round((width * height) / 48000)),
+        );
         for (let i = 0; i < count; i += 1) {
           particles.push({
             x: Math.random() * width,
@@ -98,7 +105,14 @@ export default function AnimatedBackdrop() {
       palette = readColors();
       ctx.clearRect(0, 0, width, height);
 
-      const gradient = ctx.createRadialGradient(width * 0.5, 0, 0, width * 0.5, height * 0.35, Math.max(width, height));
+      const gradient = ctx.createRadialGradient(
+        width * 0.5,
+        0,
+        0,
+        width * 0.5,
+        height * 0.35,
+        Math.max(width, height),
+      );
       gradient.addColorStop(0, palette.glow);
       gradient.addColorStop(1, "transparent");
       ctx.fillStyle = gradient;
@@ -167,7 +181,10 @@ export default function AnimatedBackdrop() {
     const observer = new MutationObserver(() => {
       palette = readColors();
     });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
 
     return () => {
       window.cancelAnimationFrame(raf);
@@ -180,12 +197,23 @@ export default function AnimatedBackdrop() {
   }, [enabled]);
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
+    <div
+      className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
+      aria-hidden="true"
+    >
+      <div className="animated-grid" />
+      <div className="animated-orb animated-orb-a" />
+      <div className="animated-orb animated-orb-b" />
       <div className="animated-mesh animated-mesh-a" />
       <div className="animated-mesh animated-mesh-b" />
       <div className="animated-mesh animated-mesh-c" />
       <div className="animated-vignette" />
-      {enabled && <canvas ref={canvasRef} className="animated-network absolute inset-0 h-full w-full" />}
+      {enabled && (
+        <canvas
+          ref={canvasRef}
+          className="animated-network absolute inset-0 h-full w-full"
+        />
+      )}
     </div>
   );
 }
