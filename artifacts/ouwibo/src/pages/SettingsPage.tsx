@@ -164,9 +164,13 @@ export default function SettingsPage() {
 
           <div className="rounded-3xl border border-border/60 bg-card/70 p-4 shadow-xl shadow-background/20 backdrop-blur">
             <div className="flex items-center gap-3 border-b border-border/50 pb-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-primary text-xl font-black text-primary-foreground">
-                O
-              </div>
+              <img
+                src="/site-logo.svg"
+                alt="Ouwibo mascot logo"
+                className="h-14 w-14 rounded-3xl border border-border object-cover"
+                width={56}
+                height={56}
+              />
               <div>
                 <p className="text-[15px] font-black">{PROFILE.name}</p>
                 <p className="text-[12px] text-muted-foreground">
