@@ -1,4 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
@@ -903,6 +902,8 @@
   (pointer: coarse) {
   .animated-network,
   .animated-mesh,
+  .animated-grid,
+  .animated-orb,
   .animated-vignette {
     display: none !important;
     animation: none !important;
@@ -919,7 +920,8 @@
   .animate-slide-in-left,
   .animate-slide-down,
   .animate-pulse-soft,
-  .ticker-track {
+  .ticker-track,
+  .lazy-premium {
     animation: none !important;
   }
 }
