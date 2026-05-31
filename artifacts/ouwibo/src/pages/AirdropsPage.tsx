@@ -1,6 +1,6 @@
 import React from "react";
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { mockAirdrops } from "@/lib/mockData";
 import type { Airdrop, Backer } from "@/lib/mockData";
@@ -441,12 +441,23 @@ function AnimatedItem({
 }
 
 export default function AirdropsPage() {
+  const [location] = useLocation();
   const [tab, setTab] = useState("All");
   const [rewardTab, setRewardTab] = useState("All");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return new URLSearchParams(window.location.search).get("search") ?? "";
+  });
   const [view, setView] = useState<"list" | "cards">("list");
   const [isCompact, setIsCompact] = useState(false);
   const [bookmarks, setBookmarks] = useState<Set<number>>(new Set());
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const nextSearch =
+      new URLSearchParams(window.location.search).get("search") ?? "";
+    setSearch(nextSearch);
+  }, [location]);
 
   useEffect(() => {
     const media = window.matchMedia("(max-width: 639px)");
