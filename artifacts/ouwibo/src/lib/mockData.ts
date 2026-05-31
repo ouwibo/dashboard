@@ -166,7 +166,34 @@ const VC: Record<string, Backer> = {
   },
 };
 
-export const mockAirdrops: Airdrop[] = [];
+export const mockAirdrops: Airdrop[] = [
+  {
+    id: 1,
+    slug: "the-beacon-season-one",
+    name: "The Beacon",
+    ticker: "Beacon",
+    logoUrl: "https://unavatar.io/twitter/TheBeaconGame",
+    logoColor: "#f97316",
+    logoInitial: "TB",
+    isNew: true,
+    status: "Potential",
+    statusDate: "2026-05-31",
+    rewardType: "Airdrop",
+    description:
+      "The Beacon is a community-driven ecosystem focused on digital discovery and exploration. Season One is the initial phase where participants can earn rewards through active engagement.",
+    website: "https://www.thebeacon.gg",
+    twitter: "TheBeaconGame",
+    discord: "https://discord.gg/thebeacon",
+    chain: "Multiple",
+    network: "Both",
+    tasks: [
+      { name: "Sign up via referral link", types: ["Social"], cost: 0, timeMin: 2, url: "https://app.thebeacon.gg/season-one?referralCode=EQKYL2YBVF" },
+      { name: "Follow X/Twitter", types: ["Social"], cost: 0, timeMin: 1, url: "https://twitter.com/TheBeaconGame" },
+      { name: "Join Discord", types: ["Social"], cost: 0, timeMin: 2, url: "https://discord.gg/thebeacon" },
+      { name: "Complete profile setup", types: ["Onboarding"], cost: 0, timeMin: 5, url: "https://app.thebeacon.gg/season-one?referralCode=EQKYL2YBVF" },
+    ],
+  },
+];
 
 export const mockNews: any[] = [];
 export const mockTasks: any[] = [];
