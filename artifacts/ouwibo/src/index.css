@@ -74,44 +74,44 @@
   --card-foreground: 0 0% 9%;
   --card-border: 0 0% 88%;
 
-  --sidebar: 30 28% 96%;
-  --sidebar-foreground: 0 0% 12%;
-  --sidebar-border: 30 20% 86%;
-  --sidebar-primary: 24 62% 44%;
+  --sidebar: 210 36% 97%;
+  --sidebar-foreground: 220 18% 14%;
+  --sidebar-border: 208 28% 86%;
+  --sidebar-primary: 188 72% 38%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 30 30% 90%;
-  --sidebar-accent-foreground: 0 0% 12%;
-  --sidebar-ring: 24 62% 44%;
+  --sidebar-accent: 214 40% 92%;
+  --sidebar-accent-foreground: 220 18% 14%;
+  --sidebar-ring: 188 72% 38%;
 
   --popover: 0 0% 100%;
   --popover-foreground: 0 0% 12%;
   --popover-border: 0 0% 80%;
 
-  --primary: 24 62% 44%;
+  --primary: 188 72% 38%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 34 28% 88%;
+  --secondary: 214 34% 90%;
   --secondary-foreground: 0 0% 12%;
   --muted: 0 0% 94%;
   --muted-foreground: 0 0% 48%;
-  --accent: 34 28% 86%;
+  --accent: 250 40% 92%;
   --accent-foreground: 0 0% 12%;
   --destructive: 0 72% 52%;
   --destructive-foreground: 0 0% 100%;
   --input: 0 0% 80%;
-  --ring: 24 62% 44%;
+  --ring: 188 72% 38%;
 
-  --chart-1: 24 62% 44%;
-  --chart-2: 150 45% 42%;
-  --chart-3: 210 55% 52%;
-  --chart-4: 265 48% 56%;
-  --chart-5: 38 68% 52%;
+  --chart-1: 188 72% 38%;
+  --chart-2: 156 50% 42%;
+  --chart-3: 222 72% 58%;
+  --chart-4: 268 62% 62%;
+  --chart-5: 328 58% 58%;
 
   --app-font-sans:
-    "Manrope", -apple-system, BlinkMacSystemFont, "Inter", "Helvetica Neue",
-    sans-serif;
+    "Poppins", "Manrope", -apple-system, BlinkMacSystemFont, "Inter",
+    "Helvetica Neue", sans-serif;
   --app-font-display:
-    "Manrope", -apple-system, BlinkMacSystemFont, "Inter", "Helvetica Neue",
-    sans-serif;
+    "Poppins", "Manrope", -apple-system, BlinkMacSystemFont, "Inter",
+    "Helvetica Neue", sans-serif;
   --app-font-serif: Georgia, serif;
   --app-font-mono: "SF Mono", ui-monospace, "Cascadia Code", monospace;
   --radius: 0.625rem;
@@ -167,29 +167,29 @@
   --elevate-1: rgba(255, 255, 255, 0.03);
   --elevate-2: rgba(255, 255, 255, 0.07);
 
-  --background: 22 12% 6%;
-  --foreground: 0 0% 92%;
-  --border: 22 10% 17%;
+  --background: 224 24% 6%;
+  --foreground: 220 16% 92%;
+  --border: 222 18% 17%;
 
-  --card: 22 10% 9%;
-  --card-foreground: 0 0% 92%;
-  --card-border: 22 10% 17%;
+  --card: 224 20% 9%;
+  --card-foreground: 220 16% 92%;
+  --card-border: 222 18% 17%;
 
-  --sidebar: 24 38% 11%;
-  --sidebar-foreground: 28 18% 84%;
-  --sidebar-border: 24 28% 17%;
-  --sidebar-primary: 24 60% 50%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 24 28% 16%;
-  --sidebar-accent-foreground: 28 16% 84%;
-  --sidebar-ring: 24 60% 50%;
+  --sidebar: 224 28% 8%;
+  --sidebar-foreground: 218 18% 84%;
+  --sidebar-border: 222 20% 17%;
+  --sidebar-primary: 186 78% 58%;
+  --sidebar-primary-foreground: 224 24% 7%;
+  --sidebar-accent: 224 22% 14%;
+  --sidebar-accent-foreground: 218 18% 84%;
+  --sidebar-ring: 186 78% 58%;
 
   --popover: 220 14% 11%;
   --popover-foreground: 220 14% 86%;
   --popover-border: 220 14% 18%;
 
-  --primary: 24 60% 50%;
-  --primary-foreground: 0 0% 100%;
+  --primary: 186 78% 58%;
+  --primary-foreground: 224 24% 7%;
   --secondary: 220 12% 14%;
   --secondary-foreground: 220 10% 78%;
   --muted: 0 0% 13%;
@@ -199,18 +199,20 @@
   --destructive: 0 72% 58%;
   --destructive-foreground: 0 0% 100%;
   --input: 220 14% 20%;
-  --ring: 24 60% 50%;
+  --ring: 186 78% 58%;
 
-  --chart-1: hsl(var(--primary));
-  --chart-2: 152 42% 46%;
-  --chart-3: 38 62% 52%;
-  --chart-4: 265 48% 58%;
-  --chart-5: 340 48% 52%;
+  --chart-1: 186 78% 58%;
+  --chart-2: 154 52% 48%;
+  --chart-3: 220 78% 64%;
+  --chart-4: 268 66% 65%;
+  --chart-5: 326 62% 60%;
 
-  --app-font-sans: "Manrope", "Inter", sans-serif;
+  --app-font-sans:
+    "Poppins", "Manrope", -apple-system, BlinkMacSystemFont, "Inter",
+    "Helvetica Neue", sans-serif;
   --app-font-display:
-    "Manrope", -apple-system, BlinkMacSystemFont, "Inter", "Helvetica Neue",
-    sans-serif;
+    "Poppins", "Manrope", -apple-system, BlinkMacSystemFont, "Inter",
+    "Helvetica Neue", sans-serif;
   --app-font-serif: Georgia, serif;
   --app-font-mono: "SF Mono", ui-monospace, "Cascadia Code", monospace;
   --radius: 1rem;
@@ -469,8 +471,8 @@
   }
 
   .font-display {
-    font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
-    font-weight: 700;
+    font-family: var(--app-font-display);
+    font-weight: 800;
   }
   .font-mono-custom {
     font-family: "SF Mono", ui-monospace, monospace;
@@ -538,6 +540,57 @@
 }
 
 /* ═══════════════════════════════════════════
+   APP CHROME / MULTI-COLOR GLASS
+═══════════════════════════════════════════ */
+.app-topbar {
+  background:
+    linear-gradient(
+      90deg,
+      hsl(var(--background) / 0.9),
+      hsl(var(--card) / 0.78) 48%,
+      hsl(var(--background) / 0.86)
+    ),
+    radial-gradient(
+      circle at 18% 0%,
+      hsl(var(--primary) / 0.1),
+      transparent 38%
+    ),
+    radial-gradient(
+      circle at 82% 0%,
+      hsl(var(--chart-4) / 0.09),
+      transparent 34%
+    );
+  box-shadow: 0 12px 38px hsl(var(--background) / 0.18);
+}
+
+.app-sidebar-shell {
+  background:
+    linear-gradient(
+      180deg,
+      hsl(var(--sidebar) / 0.97),
+      hsl(var(--background) / 0.88)
+    ),
+    radial-gradient(
+      circle at 0% 0%,
+      hsl(var(--primary) / 0.13),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at 100% 16%,
+      hsl(var(--chart-4) / 0.12),
+      transparent 36%
+    ),
+    radial-gradient(
+      circle at 50% 100%,
+      hsl(var(--chart-3) / 0.08),
+      transparent 42%
+    );
+  box-shadow:
+    1px 0 0 hsl(var(--foreground) / 0.03),
+    20px 0 70px hsl(var(--background) / 0.16);
+}
+
+/* ═══════════════════════════════════════════
    PREMIUM SURFACE UTILITIES
 ═══════════════════════════════════════════ */
 .premium-page {
@@ -553,8 +606,18 @@
     linear-gradient(145deg, hsl(var(--card) / 0.94), hsl(var(--card) / 0.72)),
     radial-gradient(
       circle at 12% 0%,
-      hsl(var(--primary) / 0.13),
+      hsl(var(--primary) / 0.12),
       transparent 34%
+    ),
+    radial-gradient(
+      circle at 96% 4%,
+      hsl(var(--chart-4) / 0.1),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 50% 100%,
+      hsl(var(--chart-3) / 0.07),
+      transparent 44%
     );
   box-shadow:
     0 18px 48px hsl(var(--background) / 0.2),
@@ -582,13 +645,23 @@
   background:
     linear-gradient(
       135deg,
-      hsl(var(--card) / 0.88),
-      hsl(var(--background) / 0.52)
+      hsl(var(--card) / 0.9),
+      hsl(var(--background) / 0.54)
     ),
     radial-gradient(
       circle at 100% 0%,
       hsl(var(--primary) / 0.1),
       transparent 32%
+    ),
+    radial-gradient(
+      circle at 0% 0%,
+      hsl(var(--chart-4) / 0.08),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 48% 120%,
+      hsl(var(--chart-3) / 0.08),
+      transparent 44%
     );
   box-shadow: 0 18px 55px hsl(var(--background) / 0.24);
   backdrop-filter: blur(18px);
@@ -682,6 +755,150 @@
   100% {
     background-position: -120% 0;
   }
+}
+
+/* ═══════════════════════════════════════════
+   BLOG / ARTICLE MOTION UTILITIES
+═══════════════════════════════════════════ */
+@keyframes scrollRevealRise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 26px, 0) scale(0.985);
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes articleFloat {
+  0%,
+  100% {
+    transform: translate3d(-50%, -50%, 0) rotate(-3deg) scale(1);
+  }
+  50% {
+    transform: translate3d(-50%, -56%, 0) rotate(3deg) scale(1.06);
+  }
+}
+
+@keyframes heroArticleFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(-2deg) scale(1);
+  }
+  50% {
+    transform: translate3d(0, -8px, 0) rotate(2deg) scale(1.05);
+  }
+}
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0) scale(0.985);
+  filter: blur(10px);
+  will-change: transform, opacity, filter;
+}
+
+.scroll-reveal.is-visible {
+  animation: scrollRevealRise 680ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
+.article-card-motion::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at 12% 12%,
+      color-mix(
+        in oklab,
+        var(--article-accent, hsl(var(--primary))) 26%,
+        transparent
+      ),
+      transparent 32%
+    ),
+    linear-gradient(
+      120deg,
+      transparent 0%,
+      hsl(var(--foreground) / 0.05) 45%,
+      transparent 62%
+    );
+  opacity: 0.74;
+  transition: opacity 360ms ease;
+}
+
+.article-card-motion:hover::before {
+  opacity: 1;
+}
+
+.article-image-sheen {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      110deg,
+      transparent 0%,
+      hsl(var(--foreground) / 0.16) 44%,
+      transparent 56%
+    ),
+    linear-gradient(to top, hsl(var(--background) / 0.48), transparent 48%);
+  opacity: 0;
+  transform: translateX(-58%);
+  transition:
+    opacity 420ms ease,
+    transform 820ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.group:hover .article-image-sheen {
+  opacity: 1;
+  transform: translateX(58%);
+}
+
+.article-illustration::before,
+.article-illustration::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  background: var(--article-accent, hsl(var(--primary)));
+  opacity: 0.18;
+  filter: blur(1px);
+}
+
+.article-illustration::before {
+  left: 14%;
+  top: 18%;
+  height: 18px;
+  width: 18px;
+  animation: pulseSoft 3.4s ease-in-out infinite;
+}
+
+.article-illustration::after {
+  bottom: 16%;
+  right: 17%;
+  height: 28px;
+  width: 28px;
+  animation: pulseSoft 4.2s ease-in-out infinite reverse;
+}
+
+.article-floating-icon {
+  color: var(--article-accent, hsl(var(--primary)));
+  animation: articleFloat 6.5s ease-in-out infinite;
+  filter: drop-shadow(
+    0 16px 24px
+      color-mix(
+        in oklab,
+        var(--article-accent, hsl(var(--primary))) 24%,
+        transparent
+      )
+  );
+}
+
+.hero-article-card .article-floating-icon {
+  animation-name: heroArticleFloat;
 }
 
 /* ═══════════════════════════════════════════
@@ -921,7 +1138,28 @@
   .animate-slide-down,
   .animate-pulse-soft,
   .ticker-track,
-  .lazy-premium {
+  .lazy-premium,
+  .scroll-reveal,
+  .scroll-reveal.is-visible,
+  .article-floating-icon,
+  .article-illustration::before,
+  .article-illustration::after {
     animation: none !important;
+  }
+
+  .anim,
+  .scroll-reveal,
+  .scroll-reveal.is-visible {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  .article-floating-icon {
+    transform: translate3d(-50%, -50%, 0) !important;
+  }
+
+  .hero-article-card .article-floating-icon {
+    transform: none !important;
   }
 }
