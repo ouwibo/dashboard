@@ -994,6 +994,93 @@
   animation: premiumGridDrift 26s linear infinite;
 }
 
+.rainbow-bubble {
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+  border-radius: 9999px;
+  opacity: 0.42;
+  filter: blur(10px) saturate(1.18);
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+  background:
+    radial-gradient(
+      circle at 32% 28%,
+      hsl(0 0% 100% / 0.62),
+      transparent 0 16%,
+      transparent 34%
+    ),
+    conic-gradient(
+      from 130deg,
+      hsl(188 92% 62% / 0.64),
+      hsl(222 96% 66% / 0.54),
+      hsl(268 92% 68% / 0.56),
+      hsl(326 88% 66% / 0.48),
+      hsl(42 92% 64% / 0.38),
+      hsl(154 78% 55% / 0.5),
+      hsl(188 92% 62% / 0.64)
+    );
+  box-shadow:
+    inset 0 0 26px hsl(0 0% 100% / 0.12),
+    0 0 44px hsl(var(--primary) / 0.16);
+  animation: rainbowBubbleFloat var(--bubble-duration, 24s) ease-in-out infinite;
+  animation-delay: var(--bubble-delay, 0s);
+}
+
+.rainbow-bubble::after {
+  content: "";
+  position: absolute;
+  inset: 16%;
+  border-radius: inherit;
+  border: 1px solid hsl(0 0% 100% / 0.18);
+  opacity: 0.72;
+}
+
+.rainbow-bubble-a {
+  top: 10%;
+  left: 10%;
+  width: clamp(92px, 12vw, 178px);
+  height: clamp(92px, 12vw, 178px);
+  --bubble-duration: 26s;
+}
+
+.rainbow-bubble-b {
+  top: 18%;
+  right: 12%;
+  width: clamp(76px, 9vw, 138px);
+  height: clamp(76px, 9vw, 138px);
+  --bubble-duration: 30s;
+  --bubble-delay: -7s;
+}
+
+.rainbow-bubble-c {
+  bottom: 16%;
+  left: 18%;
+  width: clamp(112px, 14vw, 214px);
+  height: clamp(112px, 14vw, 214px);
+  --bubble-duration: 34s;
+  --bubble-delay: -14s;
+}
+
+.rainbow-bubble-d {
+  right: 24%;
+  bottom: 11%;
+  width: clamp(62px, 8vw, 124px);
+  height: clamp(62px, 8vw, 124px);
+  --bubble-duration: 28s;
+  --bubble-delay: -4s;
+}
+
+.rainbow-bubble-e {
+  top: 48%;
+  left: 54%;
+  width: clamp(54px, 6vw, 96px);
+  height: clamp(54px, 6vw, 96px);
+  opacity: 0.3;
+  --bubble-duration: 22s;
+  --bubble-delay: -11s;
+}
+
 .animated-orb {
   position: absolute;
   z-index: 0;
@@ -1045,6 +1132,26 @@
   }
 }
 
+@keyframes rainbowBubbleFloat {
+  0%,
+  100% {
+    opacity: 0.24;
+    transform: translate3d(0, 0, 0) scale(0.96) rotate(0deg);
+  }
+  25% {
+    opacity: 0.48;
+    transform: translate3d(10vw, -5vh, 0) scale(1.08) rotate(65deg);
+  }
+  50% {
+    opacity: 0.36;
+    transform: translate3d(2vw, 8vh, 0) scale(1.18) rotate(145deg);
+  }
+  75% {
+    opacity: 0.54;
+    transform: translate3d(-8vw, -3vh, 0) scale(1.02) rotate(240deg);
+  }
+}
+
 @keyframes premiumOrbSpin {
   from {
     transform: rotate(0deg) scale(1);
@@ -1084,6 +1191,13 @@
   }
   50% {
     transform: translate3d(4%, -6%, 0) scale(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce), (update: slow) {
+  .rainbow-bubble {
+    display: none !important;
+    animation: none !important;
   }
 }
 

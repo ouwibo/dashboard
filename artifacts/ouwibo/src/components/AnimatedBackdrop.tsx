@@ -7,6 +7,7 @@ type Particle = {
   vy: number;
   r: number;
   phase: number;
+  hue: number;
 };
 
 function shouldAnimate() {
@@ -58,6 +59,8 @@ export default function AnimatedBackdrop() {
         line: `hsl(${primary} / ${dark ? 0.18 : 0.1})`,
         lineStrong: `hsl(${primary} / ${dark ? 0.32 : 0.18})`,
         glow: `hsl(${foreground} / ${dark ? 0.12 : 0.06})`,
+        bubbleAlpha: dark ? 0.36 : 0.24,
+        lineAlpha: dark ? 0.2 : 0.12,
       };
     };
 
@@ -84,6 +87,7 @@ export default function AnimatedBackdrop() {
             vy: (Math.random() - 0.5) * 0.18,
             r: 1.1 + Math.random() * 1.7,
             phase: Math.random() * Math.PI * 2,
+            hue: Math.random() * 360,
           });
         }
       }
@@ -140,8 +144,9 @@ export default function AnimatedBackdrop() {
         p.vy *= 0.995;
 
         const pulse = 0.55 + Math.sin(time / 1000 + p.phase) * 0.2;
+        const hue = (p.hue + time / 95) % 360;
         ctx.beginPath();
-        ctx.fillStyle = palette.point;
+        ctx.fillStyle = `hsl(${hue} 92% 66% / ${palette.bubbleAlpha})`;
         ctx.globalAlpha = pulse;
         ctx.arc(p.x, p.y, p.r * (0.9 + pulse * 0.22), 0, Math.PI * 2);
         ctx.fill();
@@ -157,8 +162,9 @@ export default function AnimatedBackdrop() {
           const maxDist = 150;
           if (dist > maxDist) continue;
           const alpha = 1 - dist / maxDist;
+          const hue = (a.hue + b.hue + time / 120) / 2;
           ctx.beginPath();
-          ctx.strokeStyle = alpha > 0.7 ? palette.lineStrong : palette.line;
+          ctx.strokeStyle = `hsl(${hue % 360} 90% 66% / ${palette.lineAlpha})`;
           ctx.globalAlpha = alpha * 0.9;
           ctx.lineWidth = 1;
           ctx.moveTo(a.x, a.y);
@@ -202,6 +208,11 @@ export default function AnimatedBackdrop() {
       aria-hidden="true"
     >
       <div className="animated-grid" />
+      <div className="rainbow-bubble rainbow-bubble-a" />
+      <div className="rainbow-bubble rainbow-bubble-b" />
+      <div className="rainbow-bubble rainbow-bubble-c" />
+      <div className="rainbow-bubble rainbow-bubble-d" />
+      <div className="rainbow-bubble rainbow-bubble-e" />
       <div className="animated-orb animated-orb-a" />
       <div className="animated-orb animated-orb-b" />
       <div className="animated-mesh animated-mesh-a" />
