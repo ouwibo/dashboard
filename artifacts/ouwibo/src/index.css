@@ -1068,10 +1068,27 @@
   .animate-pulse-soft,
   .ticker-track,
   .lazy-premium,
+  .scroll-reveal,
   .scroll-reveal.is-visible,
   .article-floating-icon,
   .article-illustration::before,
   .article-illustration::after {
     animation: none !important;
+  }
+
+  .anim,
+  .scroll-reveal,
+  .scroll-reveal.is-visible {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  .article-floating-icon {
+    transform: translate3d(-50%, -50%, 0) !important;
+  }
+
+  .hero-article-card .article-floating-icon {
+    transform: none !important;
   }
 }
